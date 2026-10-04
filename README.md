@@ -1,4 +1,25 @@
-# LATIS v0.1 — Latent Task-Induced Synthesis
+# LATIS — Latent Task-Induced Synthesis
+
+当前新增 **v0.2A — Constraint-Driven Joint Synthesis**：在同一 constraint state 中传播 effect、typed schema、witness、参数表达式、自由变量与 Map/Scan 支持，达到 fixed point 后才分支。v0.1 的所有语义模块、参数语法、原 11 项任务与完整搜索入口均保留。
+
+```powershell
+./scripts/run-v02a.ps1
+```
+
+该脚本离线构建、运行两套测试、七组 core 消融、11 项回归、6 项压力任务及其七组消融，生成 [LATIS_V02A_REPORT.md](LATIS_V02A_REPORT.md)。结果包括 [完整 core trace](results/03560426/v02a_trace.md)、[消融表](results/03560426/v02a_ablation.md)、[压力任务消融](results/v02a/stress/ablation.md)、原始 JSON 与环境/source 哈希。`03560426` 保持原 scan，最终 expanded 314、首解 266；原 Full 为 1305、1251。全部训练/heldout 回归通过，具体统计口径、时间与负结果见报告。
+
+单独运行：
+
+```powershell
+cabal --config-file=scripts/cabal.config run latis --offline -- joint-solve --task data/03560426.json --out results/03560426
+cabal --config-file=scripts/cabal.config run latis --offline -- joint-benchmark --out results/03560426 --repeats 5
+cabal --config-file=scripts/cabal.config run latis --offline -- joint-suite --out results/v02a/synthetic
+cabal --config-file=scripts/cabal.config run latis --offline -- joint-stress --out results/v02a/stress
+```
+
+Joint modes：`JointConstraint`、`NoBidirectionalSkeleton`、`NoWitnessFirst`、`NoLazyContext`、`NoStructuralDominance`、`NoMemoization`。可选 `--budget`、`--branches`、`--solutions`；默认 joint 用 100,000 solution limit 以覆盖穷尽测试。scope 中使用的 source 仍只有旧 DSL 可观察的 current/prev/grid；首解后延后的 scope 不被删掉，trace 会记录先前 frontier 已遍历的证明。只有同 AST 且无 prev 的 scan→map 全局 rewrite 可以 hard prune。没有扩充 DSL、神经网络、SMT 或新增外部包。
+
+## 保留的 v0.1 使用说明
 
 面向 ARC-AGI-1 的纯符号 Haskell 实验：从 object-centric latent IO 推导程序结构，再合成类型化参数。没有神经网络、学习式分割、跨任务库学习或无界递归。附带官方 `03560426` 样例、可运行基线、五组消融与实测报告。
 

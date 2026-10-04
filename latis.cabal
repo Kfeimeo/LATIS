@@ -11,7 +11,10 @@ library
     Language.Types Language.ML Language.DSA Language.Effect Language.Schema Language.Witness
     Synthesis.Residual Synthesis.Dependency Synthesis.Skeleton Synthesis.Hole
     Synthesis.Search Synthesis.Verify Synthesis.MDL Synthesis.Abstraction
-    ARC.Dataset ARC.Evaluate
+    ARC.Dataset ARC.Evaluate ARC.JointEvaluate
+    Synthesis.Expression.FreeVars Synthesis.Expression.Domain
+    Synthesis.Constraint.State Synthesis.Constraint.Metrics Synthesis.Constraint.Propagate
+    Synthesis.Search.Memo Synthesis.Joint
   build-depends: base >=4.18 && <5, containers, time, directory, filepath, deepseq
   default-language: GHC2021
   ghc-options: -Wall -O2
@@ -28,5 +31,13 @@ test-suite latis-tests
   hs-source-dirs: test
   main-is: Main.hs
   build-depends: base, latis, containers, directory
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite joint-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: JointMain.hs
+  build-depends: base, latis, containers
   default-language: GHC2021
   ghc-options: -Wall -O1

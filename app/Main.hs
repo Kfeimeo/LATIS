@@ -1,6 +1,8 @@
 module Main where
 import ARC.Dataset
 import ARC.Evaluate
+import ARC.JointEvaluate
+import Synthesis.Joint
 import Synthesis.Search
 import Latent.Encode
 import System.Environment (getArgs)
@@ -12,7 +14,13 @@ import Data.List (sort)
 
 usage :: String
 usage = unlines
-  ["LATIS v0.1 (Haskell, symbolic, no neural heuristic)"
+  ["LATIS v0.2A (Haskell, symbolic; v0.1 baseline preserved)"
+  ,"latis joint-solve --task data/03560426.json --out results/03560426"
+  ,"latis joint-benchmark --out results/03560426 --repeats 5"
+  ,"latis joint-suite --out results/v02a/synthetic"
+  ,"latis joint-stress --out results/v02a/stress"
+  ,"latis joint-stress-benchmark --out results/v02a/stress --repeats 5"
+  ,"Joint --mode: JointConstraint|NoBidirectionalSkeleton|NoWitnessFirst|NoLazyContext|NoStructuralDominance|NoMemoization"
   ,"latis solve --task data/03560426.json --out results/03560426"
   ,"latis benchmark --task data/03560426.json --out results/03560426 --repeats 3"
   ,"latis suite --out results/synthetic"
@@ -30,6 +38,29 @@ main = do
   args <- getArgs
   case args of
     [] -> putStr usage
+    command:rest | command `elem` ["joint-solve","joint-benchmark","joint-suite","joint-stress","joint-stress-benchmark"] -> do
+      mode <- maybe (die "Invalid joint --mode") pure (readMaybe (option "--mode" "JointConstraint" rest))
+      budget <- number "--budget" 1000000 rest
+      solutions' <- number "--solutions" 100000 rest
+      branches' <- number "--branches" 256 rest
+      let config=defaultSearch {stateBudget=budget,solutionLimit=solutions',correspondenceBudget=branches'}
+          out=option "--out" "results/v02a" rest
+      case command of
+        "joint-suite" -> jointSuite mode config out syntheticTasks
+        "joint-stress" -> jointSuite mode config out stressTasks
+        "joint-stress-benchmark" -> do
+          repeats<-number "--repeats" 5 rest
+          mapM_ (\task->jointBenchmark config repeats (out </> taskId task) task) stressTasks
+        "joint-benchmark" -> do
+          repeats<-number "--repeats" 5 rest
+          task<-loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+          jointBenchmark config repeats out task
+        _ -> do
+          task<-loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+          r<-jointSearch mode config (training task)
+          saveJoint out mode config task r
+          print (jointMetrics r)
+          putStrLn (maybe "UNSOLVED" show (jointSolution r))
     command:rest | command `elem` ["solve","benchmark","suite","evaluate"] -> do
       mode <- maybe (die "Invalid --mode") pure (readMaybe (option "--mode" "Full" rest))
       budget <- number "--budget" 1000000 rest
