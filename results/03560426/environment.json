@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-04",
+  "timezone": "Asia/Shanghai",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "ghc": "9.14.1",
+  "cabal": "3.16.1.0",
+  "optimization": "-O2",
+  "repeats": 5,
+  "dataset_sha256": "098e548544498a4db5e874fd8c8f87922c1b68ad62e7f2616edc69898c8298e1",
+  "config": {
+    "state_budget": 1000000,
+    "constant_radius": 2,
+    "correspondence_budget": 256,
+    "solution_limit": 128,
+    "encoder": "EncoderConfig {connectivity = Four, encoderBackground = 0}"
+  },
+  "source_sha256": {
+    "app/Main.hs": "015b752ef56d15355e2c6e664d524eab9158a1df9be22d1fc64a5f19857294f9",
+    "src/ARC/Dataset.hs": "1f6d7b63ad39774aafab3485481ef68921881f1258818242e87ef49b178b9d44",
+    "src/ARC/Evaluate.hs": "becd9f9ec40e0846a4d59c070d8bb5b9d9fd51247ddd5719e8ac81bed70c9726",
+    "src/Language/DSA.hs": "5e809bcb41dfaf625dc76486f6beaf9ab8472a078dbf5a9d347f56c29b721a7f",
+    "src/Language/Effect.hs": "83b24d70aaf388bf2460be79979d854ceb847e9a88300ac993e707e4ae9ed07d",
+    "src/Language/ML.hs": "83e74d44a3cd01dad8e3f4f176ccae9681b070635906ecccd2bd84abba230057",
+    "src/Language/Schema.hs": "550d5932704485b8c75bed6dbddbb5959881ce250196546871f9e2b12db72fec",
+    "src/Language/Types.hs": "9d4f3edc896731ae11a1f7c0a6bc25c019a4ffb9669245ffde3236fd6271efd4",
+    "src/Language/Witness.hs": "319ab94043d4b85751e0c75f664a94cb0791195432059a1b96d23c892ad55b1e",
+    "src/Latent/Correspondence.hs": "a045148315c9d0e295a581e956d292dac02eaed92462e67b8bd7acbbbcba9f04",
+    "src/Latent/Encode.hs": "71d99ad2a65ac21730fa53f0b139dd5c3fc12ba09fe6abe97e9073227d76dd5a",
+    "src/Latent/Grid.hs": "d5d810bb091ec9a0823f408ce5906e2ff234a031155765bc220d2e6b504b0daf",
+    "src/Latent/Object.hs": "06d2d740f39e0ddcc2045f5c7334bf6870e993c862e4959a8329e064336f5cab",
+    "src/Latent/Render.hs": "76583a1419e0af1f31268c64b89dc873cdd65a8ea0afcad945ee8122cffddd4f",
+    "src/Synthesis/Abstraction.hs": "8d6fe35ff9ea2db9c2ba2d9261f4f8ffa363c240fc35c7b159a76d04e265f598",
+    "src/Synthesis/Dependency.hs": "330d5b601212e575787f88b6aa6543f98e31843173d8c11fcb5767d24971b355",
+    "src/Synthesis/Hole.hs": "d33e57d8aebe468bc0c961dc4562f0ba28ca3b90992729f76d77f829fba89833",
+    "src/Synthesis/MDL.hs": "3f971b5a67260981e41e595a7caf67371e5da62be04235f876d7b8ec90b8313b",
+    "src/Synthesis/Residual.hs": "085a29bae08830014acc83aac5b23f77664cf86196f33bbdd5d5c207c22ef949",
+    "src/Synthesis/Search.hs": "1e81eb9417d8e725b483fccc0ab051aea7cff87acc99ba355665c4c88e645bb9",
+    "src/Synthesis/Skeleton.hs": "48e21d68e3bb27b53d4ae66e2389b440040d7beda837e39c396754213a013a9e",
+    "src/Synthesis/Verify.hs": "63e7a666eafa815c9d9ee6a374c894f5d735da9f9065da4d77798a0e251f6fd4",
+    "test/Main.hs": "fe7e1aa9b155ae6a6e99543f3f37a8dac5c9774a2d7cbec581ab3fde73d60a96",
+    "test/negative/BadHole.hs": "87b25c613d5c96ad820ddcf969cc70568f448a9683d02806496896982822eb11"
+  }
+}

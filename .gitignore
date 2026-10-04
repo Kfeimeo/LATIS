@@ -1,0 +1,6 @@
+dist-newstyle/
+build/
+*.hi
+*.o
+*.exe
+__pycache__/
