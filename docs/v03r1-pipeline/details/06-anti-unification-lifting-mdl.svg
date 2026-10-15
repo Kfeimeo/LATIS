@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect width="1920" height="1080" fill="#F5F7FB"/>
+<title>06  自动 abstraction：找共同结构，再把洞变成参数</title>
+<text x="72" y="37.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#2563EB">LATIS  /  v0.3R.1</text>
+<text x="72" y="86.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="48" fill="#172B43">06  自动 abstraction：找共同结构，再把洞变成参数</text>
+<text x="74" y="151.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">affine 树来自参数化单元测试的表达式形式；该测试的候选 frontier 人工提供并通过 specification 检查。</text>
+<text x="1780" y="42.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">06 / 07</text>
+<text x="73" y="222.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#172B43">λx. 3x+7</text>
+<rect x="162" y="269" width="210" height="52" rx="12" fill="#EAF1FF"/>
+<text x="179" y="280.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">λx : Int</text>
+<rect x="185" y="354" width="164" height="50" rx="12" fill="#EAF1FF"/>
+<text x="202" y="365.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">add</text>
+<polyline points="267,321 267,354" fill="none" stroke="#2563EB" stroke-width="3"/>
+<rect x="83" y="450" width="228" height="52" rx="12" fill="#EAF1FF"/>
+<text x="100" y="461.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">multiply</text>
+<rect x="340" y="450" width="130" height="52" rx="12" fill="#FFF2E2"/>
+<text x="357" y="461.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">7</text>
+<polyline points="239,404 197,450" fill="none" stroke="#2563EB" stroke-width="3"/>
+<polyline points="296,404 405,450" fill="none" stroke="#C46A13" stroke-width="3"/>
+<rect x="87" y="549" width="88" height="48" rx="12" fill="#EAF1FF"/>
+<text x="104" y="560.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">x</text>
+<rect x="220" y="549" width="88" height="48" rx="12" fill="#EAF1FF"/>
+<text x="237" y="560.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">3</text>
+<polyline points="173,502 131,549" fill="none" stroke="#2563EB" stroke-width="3"/>
+<polyline points="223,502 264,549" fill="none" stroke="#2563EB" stroke-width="3"/>
+<text x="505" y="222.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#172B43">λx. 3x+8</text>
+<rect x="594" y="269" width="210" height="52" rx="12" fill="#EAF1FF"/>
+<text x="611" y="280.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">λx : Int</text>
+<rect x="617" y="354" width="164" height="50" rx="12" fill="#EAF1FF"/>
+<text x="634" y="365.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">add</text>
+<polyline points="699,321 699,354" fill="none" stroke="#2563EB" stroke-width="3"/>
+<rect x="515" y="450" width="228" height="52" rx="12" fill="#EAF1FF"/>
+<text x="532" y="461.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">multiply</text>
+<rect x="772" y="450" width="130" height="52" rx="12" fill="#FFF2E2"/>
+<text x="789" y="461.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">8</text>
+<polyline points="671,404 629,450" fill="none" stroke="#2563EB" stroke-width="3"/>
+<polyline points="728,404 837,450" fill="none" stroke="#C46A13" stroke-width="3"/>
+<rect x="519" y="549" width="88" height="48" rx="12" fill="#EAF1FF"/>
+<text x="536" y="560.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">x</text>
+<rect x="652" y="549" width="88" height="48" rx="12" fill="#EAF1FF"/>
+<text x="669" y="560.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">3</text>
+<polyline points="605,502 563,549" fill="none" stroke="#2563EB" stroke-width="3"/>
+<polyline points="655,502 696,549" fill="none" stroke="#2563EB" stroke-width="3"/>
+<polyline points="904,420 976,420" fill="none" stroke="#C46A13" stroke-width="4"/>
+<polygon points="976,420 962.0,413.0 962.0,427.0" fill="#C46A13"/>
+<text x="978" y="222.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#172B43">Anti-unify：差异位置 → β</text>
+<rect x="1067" y="269" width="210" height="52" rx="12" fill="#EAF1FF"/>
+<text x="1084" y="280.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">λx : Int</text>
+<rect x="1090" y="354" width="164" height="50" rx="12" fill="#EAF1FF"/>
+<text x="1107" y="365.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">add</text>
+<polyline points="1172,321 1172,354" fill="none" stroke="#2563EB" stroke-width="3"/>
+<rect x="988" y="450" width="228" height="52" rx="12" fill="#EAF1FF"/>
+<text x="1005" y="461.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">multiply</text>
+<rect x="1245" y="450" width="130" height="52" rx="12" fill="#FFF2E2"/>
+<text x="1262" y="461.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">β:Int</text>
+<polyline points="1144,404 1102,450" fill="none" stroke="#2563EB" stroke-width="3"/>
+<polyline points="1201,404 1310,450" fill="none" stroke="#C46A13" stroke-width="3"/>
+<rect x="992" y="549" width="88" height="48" rx="12" fill="#EAF1FF"/>
+<text x="1009" y="560.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">x</text>
+<rect x="1125" y="549" width="88" height="48" rx="12" fill="#EAF1FF"/>
+<text x="1142" y="560.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">3</text>
+<polyline points="1078,502 1036,549" fill="none" stroke="#2563EB" stroke-width="3"/>
+<polyline points="1128,502 1169,549" fill="none" stroke="#2563EB" stroke-width="3"/>
+<rect x="1463" y="269" width="376" height="72" rx="12" fill="#E7F5F4"/>
+<text x="1480" y="280.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#172B43">λβ : Int</text>
+<rect x="1487" y="387" width="328" height="72" rx="12" fill="#E7F5F4"/>
+<text x="1504" y="398.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#172B43">λx : Int</text>
+<rect x="1487" y="505" width="328" height="72" rx="12" fill="#E7F5F4"/>
+<text x="1504" y="516.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#172B43">add(3x,β)</text>
+<polyline points="1651,341 1651,387" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="1651,459 1651,505" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="1396,477 1449,477" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="1449,477 1435.0,470.0 1435.0,484.0" fill="#087F8C"/>
+<text x="1468" y="620.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#087F8C">Lift 后：所有变量均已绑定</text>
+<polyline points="73,693 1838,693" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="84" y="727.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#172B43">MDL：重复四次是否值得存一个函数？</text>
+<rect x="88" y="806" width="133" height="65" rx="12" fill="#EAF1FF"/>
+<text x="105" y="817.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">AST 6</text>
+<rect x="248" y="806" width="133" height="65" rx="12" fill="#EAF1FF"/>
+<text x="265" y="817.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">AST 6</text>
+<rect x="408" y="806" width="133" height="65" rx="12" fill="#EAF1FF"/>
+<text x="425" y="817.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">AST 6</text>
+<rect x="568" y="806" width="133" height="65" rx="12" fill="#EAF1FF"/>
+<text x="585" y="817.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">AST 6</text>
+<text x="87" y="910.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#172B43">before = 4 × 6 = 24</text>
+<polyline points="744,851 873,851" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="873,851 859.0,844.0 859.0,858.0" fill="#087F8C"/>
+<rect x="905" y="794" width="343" height="88" rx="12" fill="#E7F5F4"/>
+<text x="922" y="805.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#172B43">definition 7 + 2</text>
+<text x="922" y="842.7" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#172B43">= 9</text>
+<text x="1275" y="825.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="34" fill="#087F8C">+</text>
+<rect x="1334" y="807" width="112" height="65" rx="12" fill="#E7F5F4"/>
+<text x="1351" y="818.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">ref 3</text>
+<rect x="1462" y="807" width="112" height="65" rx="12" fill="#E7F5F4"/>
+<text x="1479" y="818.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">ref 3</text>
+<rect x="1590" y="807" width="112" height="65" rx="12" fill="#E7F5F4"/>
+<text x="1607" y="818.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">ref 3</text>
+<rect x="1718" y="807" width="112" height="65" rx="12" fill="#E7F5F4"/>
+<text x="1735" y="818.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">ref 3</text>
+<text x="925" y="910.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#087F8C">after = 9 + 4 × 3 = 21  →  接受：saving = 3</text>
+<polyline points="72,1017 1848,1017" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="74" y="1033.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="20" fill="#52677E">交给 07：closed typed definition + parameters + saving · reference = 2 + 参数 AST cost · 非重叠 cover · type mismatch / binder capture / 非正 saving 均拒绝</text>
+</svg>

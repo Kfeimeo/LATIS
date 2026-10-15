@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect width="1920" height="1080" fill="#F5F7FB"/>
+<title>反馈已经发生，但时间收益仍需改善</title>
+<text x="72" y="37.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#2563EB">LATIS  /  v0.3R.1</text>
+<text x="72" y="86.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="48" fill="#172B43">反馈已经发生，但时间收益仍需改善</text>
+<text x="74" y="151.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">专门 stress：同一 task 内，先由 Learn 合成 prefix，再求解 40 个新 step demands。</text>
+<text x="1780" y="42.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">05 / 05</text>
+<text x="76" y="231.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">后续 synthesis 的逻辑搜索计数</text>
+<text x="80" y="300.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">NoOnlineAbstraction</text>
+<rect x="80" y="347" width="620" height="37" rx="3" fill="#E6ECF4"/>
+<rect x="80" y="347" width="620.0" height="37" rx="3" fill="#8CA0B7"/>
+<text x="722" y="343.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#172B43">46,320</text>
+<text x="80" y="438.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">Full</text>
+<rect x="80" y="485" width="620" height="37" rx="3" fill="#E6ECF4"/>
+<rect x="80" y="485" width="5" height="37" rx="3" fill="#087F8C"/>
+<text x="722" y="481.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#172B43">280</text>
+<text x="80" y="569.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#087F8C">实际 invention hits = 40</text>
+<text x="80" y="620.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">所有 41 个 demands 与独立 future inputs 均 exact。</text>
+<text x="1040" y="231.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">包含 discovery 的整个 session</text>
+<rect x="1040" y="300" width="380" height="150" rx="18" fill="#E7F5F4"/>
+<rect x="1040" y="300" width="6" height="150" rx="3" fill="#087F8C"/>
+<text x="1064" y="320.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">总逻辑工作 / Full</text>
+<text x="1064" y="378.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="38" fill="#52677E">71,579</text>
+<rect x="1460" y="300" width="388" height="150" rx="18" fill="white"/>
+<rect x="1460" y="300" width="6" height="150" rx="3" fill="#2563EB"/>
+<text x="1484" y="320.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">总逻辑工作 / Baseline</text>
+<text x="1484" y="378.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="38" fill="#52677E">82,043</text>
+<rect x="1040" y="482" width="808" height="172" rx="18" fill="#FFF2E2"/>
+<rect x="1040" y="482" width="6" height="172" rx="3" fill="#C46A13"/>
+<text x="1064" y="502.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">总耗时仍较慢</text>
+<text x="1064" y="560.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#52677E">Full  27.8s    vs    Baseline  13.6s</text>
+<text x="1064" y="602.92" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#52677E">逻辑计数不是 CPU 步数，也不是时间。</text>
+<polyline points="72,701 1848,701" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="79" y="733.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">当前能得出的结论</text>
+<text x="79" y="792.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#172B43">已证明：自动发现的函数确实被后续 Learn 调用，并降低本 fixture 的搜索计数。</text>
+<text x="79" y="839.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">证据边界：40-demand 配置下可摊销 discovery；该 fixture 不证明 AU / lifting 必要。</text>
+<text x="79" y="906.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">回归 train 16/17 · heldout 14/17；固定 Base 的可达性尚未完全恢复。</text>
+<polyline points="72,1017 1848,1017" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="74" y="1033.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="20" fill="#52677E">真实数据：results/v03r1/abstraction_stress.json · 同一 task-local session，不是跨任务学习 · 参数化单元测试另行报告</text>
+</svg>

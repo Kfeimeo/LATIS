@@ -1,0 +1,15 @@
+{
+  "stress_secondary_solutions": 7,
+  "mean_delta_mdl": 5.857142857142857,
+  "mean_program_length_saved": 16,
+  "regressions_passed": 17,
+  "raw_solved": 0,
+  "train_exact": 0,
+  "heldout_exact": 0,
+  "failure_taxonomy": {
+    "LanguageFailure": 20,
+    "BudgetFailure": 8,
+    "RepresentationFailure-Level1": 1,
+    "RepresentationFailure-Level0": 1
+  }
+}

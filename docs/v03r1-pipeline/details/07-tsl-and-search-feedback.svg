@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect width="1920" height="1080" fill="#F5F7FB"/>
+<title>07  Task-local TSL：新函数真的进入下一次 Learn</title>
+<text x="72" y="37.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#2563EB">LATIS  /  v0.3R.1</text>
+<text x="72" y="86.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="48" fill="#172B43">07  Task-local TSL：新函数真的进入下一次 Learn</text>
+<text x="74" y="151.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">I0 是实际自动发现的 Pair(Placed,Placed) → Placed 函数；它通过普通 Base definition expansion 使用。</text>
+<text x="1780" y="42.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">07 / 07</text>
+<rect x="73" y="229" width="1505" height="535" rx="20" fill="white" stroke="#D7E0EC" stroke-width="2"/>
+<text x="93" y="244.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#2563EB">同一个 Engine / 同一个 task</text>
+<rect x="101" y="324" width="335" height="166" rx="12" fill="#EAF1FF"/>
+<text x="118" y="335.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">第一次 Learn</text>
+<text x="118" y="374.15" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">固定 Base bootstrap</text>
+<text x="118" y="413.3" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">得到受支持的符号</text>
+<rect x="494" y="324" width="429" height="166" rx="12" fill="#E7F5F4"/>
+<text x="511" y="335.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">接受 I0 / I1 / …</text>
+<text x="511" y="374.15" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">TSL = supported Base</text>
+<text x="511" y="413.3" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">         + inventions</text>
+<polyline points="436,410 479,410" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="479,410 465.0,403.0 465.0,417.0" fill="#087F8C"/>
+<rect x="994" y="318" width="545" height="88" rx="12" fill="#EAF1FF"/>
+<text x="1011" y="329.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#172B43">后来收到的新 subproblem Q</text>
+<polyline points="923,410 978,410" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="978,410 964.0,403.0 964.0,417.0" fill="#087F8C"/>
+<rect x="994" y="456" width="545" height="97" rx="12" fill="#E7F5F4"/>
+<text x="1011" y="467.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">试用 I0 / 实例化参数</text>
+<text x="1011" y="506.15" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">展开 Base AST；检查 Q 全部行</text>
+<polyline points="1266,406 1266,442" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="1266,442 1273.0,428.0 1259.0,428.0" fill="#087F8C"/>
+<rect x="821" y="619" width="310" height="73" rx="12" fill="#E7F5F4"/>
+<text x="838" y="630.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="23" fill="#172B43">命中 → Leaf(Base AST)</text>
+<rect x="1192" y="619" width="342" height="73" rx="12" fill="#EAF1FF"/>
+<text x="1209" y="630.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="23" fill="#172B43">未命中 → generic Learn</text>
+<polyline points="1120,553 976,606" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="976,606 991.5561840084466,607.7335337018211 986.7205373665248,594.5951730143353" fill="#087F8C"/>
+<polyline points="1390,553 1363,606" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="1363,606 1375.5922374178795,596.7029275139022 1363.1176844618494,590.3479665740377" fill="#2563EB"/>
+<polyline points="620,490 620,577 269,577 269,503" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="269,503 262.0,517.0 276.0,517.0" fill="#087F8C"/>
+<text x="105" y="630.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">在线 root replay：安装函数后清除旧 memo</text>
+<text x="105" y="686.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">继续 Learn → frontier → discovery（最多 2 rounds）</text>
+<rect x="1633" y="324" width="214" height="100" rx="12" fill="#FFF2E2"/>
+<text x="1650" y="335.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#172B43">另一个 task</text>
+<text x="1650" y="372.7" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#172B43">新 Engine</text>
+<rect x="1633" y="508" width="214" height="109" rx="12" fill="#FFF2E2"/>
+<text x="1650" y="519.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="23" fill="#172B43">从 Base 开始</text>
+<text x="1650" y="552.35" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="23" fill="#172B43">无前一 task</text>
+<text x="1650" y="585.7" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="23" fill="#172B43">的 inventions</text>
+<polyline points="1578,390 1622,390" fill="none" stroke="#C46A13" stroke-width="3" stroke-dasharray="10 8"/>
+<text x="1588" y="355.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#BE4155">×</text>
+<text x="86" y="817.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#172B43">真实 40-demand stress：后续逻辑搜索工作</text>
+<text x="85" y="880.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#172B43">NoOnline</text>
+<rect x="266" y="881" width="633" height="30" rx="3" fill="#91A3B7"/>
+<text x="918" y="873.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#172B43">46,320</text>
+<text x="85" y="943.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#087F8C">Full</text>
+<rect x="266" y="947" width="633" height="30" rx="3" fill="#E0E7EF"/>
+<rect x="266" y="947" width="3.826424870466321" height="30" rx="2" fill="#087F8C"/>
+<text x="918" y="936.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#087F8C">280</text>
+<rect x="1225" y="869" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1272" y="869" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1319" y="869" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1366" y="869" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1413" y="869" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1460" y="869" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1507" y="869" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1554" y="869" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1601" y="869" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1648" y="869" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1225" y="895" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1272" y="895" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1319" y="895" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1366" y="895" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1413" y="895" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1460" y="895" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1507" y="895" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1554" y="895" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1601" y="895" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1648" y="895" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1225" y="921" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1272" y="921" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1319" y="921" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1366" y="921" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1413" y="921" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1460" y="921" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1507" y="921" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1554" y="921" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1601" y="921" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1648" y="921" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1225" y="947" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1272" y="947" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1319" y="947" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1366" y="947" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1413" y="947" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1460" y="947" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1507" y="947" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1554" y="947" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1601" y="947" width="14" height="14" rx="7" fill="#087F8C"/>
+<rect x="1648" y="947" width="14" height="14" rx="7" fill="#087F8C"/>
+<text x="1215" y="813.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#087F8C">40 个 actual invention hits</text>
+<text x="1215" y="982.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="23" fill="#52677E">Full 27.8s &gt; Baseline 13.6s</text>
+<polyline points="72,1017 1848,1017" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="74" y="1033.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="20" fill="#52677E">终止：accepted 为空 / rounds 上限 / work budget · 参数域每 type 最多 6、每 invention 最多 64 组 · 命中会关闭该 subproblem · 无跨 task library</text>
+</svg>

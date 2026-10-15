@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect width="1920" height="1080" fill="#F5F7FB"/>
+<title>从相似 AST 到闭合、可调用的 invention</title>
+<text x="72" y="37.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#2563EB">LATIS  /  v0.3R.1</text>
+<text x="72" y="86.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="48" fill="#172B43">从相似 AST 到闭合、可调用的 invention</text>
+<text x="74" y="151.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">下面的 affine 例子来自参数化单元测试；候选 frontier 在该测试中人工提供并经 specification 检查。</text>
+<text x="1780" y="42.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">03 / 05</text>
+<rect x="72" y="230" width="545" height="252" rx="18" fill="white"/>
+<rect x="72" y="230" width="6" height="252" rx="3" fill="#2563EB"/>
+<text x="96" y="250.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">01  收集相似 typed AST</text>
+<text x="96" y="308.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">λx:Int. add(multiply(x,3),7)</text>
+<text x="96" y="345.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">λx:Int. add(multiply(x,3),8)</text>
+<text x="96" y="382.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">λx:Int. add(multiply(x,3),9)</text>
+<text x="96" y="419.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">λx:Int. add(multiply(x,3),10)</text>
+<rect x="680" y="230" width="551" height="252" rx="18" fill="#EAF1FF"/>
+<rect x="680" y="230" width="6" height="252" rx="3" fill="#2563EB"/>
+<text x="704" y="250.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">02  Typed anti-unification</text>
+<text x="704" y="308.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">λx:Int. add(multiply(x,3),β)</text>
+<text x="704" y="347.96" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E"></text>
+<text x="704" y="387.92" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">共同 syntax 保留；差异 → β:Int</text>
+<text x="704" y="427.88" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">x 是绑定变量，不被提升。</text>
+<rect x="1294" y="230" width="554" height="252" rx="18" fill="#E7F5F4"/>
+<rect x="1294" y="230" width="6" height="252" rx="3" fill="#087F8C"/>
+<text x="1318" y="250.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">03  Lambda lifting</text>
+<text x="1318" y="308.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">Iβ = λβ:Int. λx:Int.</text>
+<text x="1318" y="347.96" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">       add(multiply(x,3),β)</text>
+<text x="1318" y="387.92" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E"></text>
+<text x="1318" y="427.88" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">FV(Iβ) = ∅；kernel typecheck</text>
+<polyline points="617,354 665,354" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="665,354 651.0,347.0 651.0,361.0" fill="#2563EB"/>
+<polyline points="1231,354 1279,354" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="1279,354 1265.0,347.0 1265.0,361.0" fill="#2563EB"/>
+<rect x="72" y="551" width="805" height="266" rx="18" fill="#FFF2E2"/>
+<rect x="72" y="551" width="6" height="266" rx="3" fill="#C46A13"/>
+<text x="96" y="571.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">04  MDL 接受条件</text>
+<text x="96" y="629.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">J_before = Σ L(P)</text>
+<text x="96" y="670.44" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">J_after = L(dictionary) + Σ L(P | dictionary)</text>
+<text x="96" y="711.88" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">只接受 J_after &lt; J_before</text>
+<text x="96" y="753.3199999999999" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">显式计入参数成本；AST cover 不重叠。</text>
+<rect x="959" y="551" width="889" height="266" rx="18" fill="#E7F5F4"/>
+<rect x="959" y="551" width="6" height="266" rx="3" fill="#087F8C"/>
+<text x="983" y="571.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">05  定义反馈给后续 Learn</text>
+<text x="983" y="629.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">TSL_task += accepted invention</text>
+<text x="983" y="668.96" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">例如 Iβ(7) 展开为 λx. add(multiply(x,3),7)</text>
+<text x="983" y="708.92" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">展开后的普通 Base AST 满足 specification 才命中</text>
+<text x="983" y="748.88" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">不用手写 invention-specific witness。</text>
+<polyline points="877,685 944,685" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="944,685 930.0,678.0 930.0,692.0" fill="#087F8C"/>
+<text x="84" y="873.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="31" fill="#172B43">保护条件</text>
+<text x="84" y="928.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">类型一致 · 禁止 binder capture · 正 MDL saving · closed definition · 完全展开回 Base</text>
+<polyline points="72,1017 1848,1017" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="74" y="1033.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="20" fill="#52677E">当前为 first-order typed AU；依赖局部 binder 的 mismatch 被拒绝 · 此页是参数化机制示例，不是全程 Learn 发现的实证</text>
+</svg>

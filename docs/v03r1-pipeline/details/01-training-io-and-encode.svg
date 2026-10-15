@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect width="1920" height="1080" fill="#F5F7FB"/>
+<title>01  训练 IO：像素变成有位置的对象</title>
+<text x="72" y="37.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#2563EB">LATIS  /  v0.3R.1</text>
+<text x="72" y="86.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="48" fill="#172B43">01  训练 IO：像素变成有位置的对象</text>
+<text x="74" y="151.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">同一 Encode 分别处理 input 与 output；下面使用 03560426 的第一个真实 training input。</text>
+<text x="1780" y="42.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">01 / 07</text>
+<text x="90" y="226.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#172B43">Grid：10 × 10</text>
+<rect x="90" y="288" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="123" y="288" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="156" y="288" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="189" y="288" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="222" y="288" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="255" y="288" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="288" y="288" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="321" y="288" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="354" y="288" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="387" y="288" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="90" y="321" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="123" y="321" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="156" y="321" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="189" y="321" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="222" y="321" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="255" y="321" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="288" y="321" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="321" y="321" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="354" y="321" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="387" y="321" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="90" y="354" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="123" y="354" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="156" y="354" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="189" y="354" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="222" y="354" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="255" y="354" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="288" y="354" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="321" y="354" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="354" y="354" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="387" y="354" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="90" y="387" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="123" y="387" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="156" y="387" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="189" y="387" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="222" y="387" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="255" y="387" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="288" y="387" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="321" y="387" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="354" y="387" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="387" y="387" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="90" y="420" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="123" y="420" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="156" y="420" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="189" y="420" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="222" y="420" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="255" y="420" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="288" y="420" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="321" y="420" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="354" y="420" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="387" y="420" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="90" y="453" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="123" y="453" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="156" y="453" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="189" y="453" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="222" y="453" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="255" y="453" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="288" y="453" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="321" y="453" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="354" y="453" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="387" y="453" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="90" y="486" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="123" y="486" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="156" y="486" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="189" y="486" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="222" y="486" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="255" y="486" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="288" y="486" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="321" y="486" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="354" y="486" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="387" y="486" width="32" height="32" rx="0" fill="#FFDC00"/>
+<rect x="90" y="519" width="32" height="32" rx="0" fill="#0074D9"/>
+<rect x="123" y="519" width="32" height="32" rx="0" fill="#0074D9"/>
+<rect x="156" y="519" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="189" y="519" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="222" y="519" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="255" y="519" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="288" y="519" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="321" y="519" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="354" y="519" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="387" y="519" width="32" height="32" rx="0" fill="#FFDC00"/>
+<rect x="90" y="552" width="32" height="32" rx="0" fill="#0074D9"/>
+<rect x="123" y="552" width="32" height="32" rx="0" fill="#0074D9"/>
+<rect x="156" y="552" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="189" y="552" width="32" height="32" rx="0" fill="#FF4136"/>
+<rect x="222" y="552" width="32" height="32" rx="0" fill="#FF4136"/>
+<rect x="255" y="552" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="288" y="552" width="32" height="32" rx="0" fill="#2ECC40"/>
+<rect x="321" y="552" width="32" height="32" rx="0" fill="#2ECC40"/>
+<rect x="354" y="552" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="387" y="552" width="32" height="32" rx="0" fill="#FFDC00"/>
+<rect x="90" y="585" width="32" height="32" rx="0" fill="#0074D9"/>
+<rect x="123" y="585" width="32" height="32" rx="0" fill="#0074D9"/>
+<rect x="156" y="585" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="189" y="585" width="32" height="32" rx="0" fill="#FF4136"/>
+<rect x="222" y="585" width="32" height="32" rx="0" fill="#FF4136"/>
+<rect x="255" y="585" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="288" y="585" width="32" height="32" rx="0" fill="#2ECC40"/>
+<rect x="321" y="585" width="32" height="32" rx="0" fill="#2ECC40"/>
+<rect x="354" y="585" width="32" height="32" rx="0" fill="#101820"/>
+<rect x="387" y="585" width="32" height="32" rx="0" fill="#FFDC00"/>
+<text x="90" y="652.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">背景 0；相同颜色的 4 连通分量</text>
+<polyline points="454,450 570,450" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="570,450 556.0,443.0 556.0,457.0" fill="#2563EB"/>
+<text x="522" y="367.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#2563EB">Encode</text>
+<text x="655" y="226.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#172B43">Objects：拆开显示形状与全局原点</text>
+<rect x="665" y="295" width="28" height="28" rx="2" fill="#FFDC00"/>
+<rect x="665" y="325" width="28" height="28" rx="2" fill="#FFDC00"/>
+<rect x="665" y="355" width="28" height="28" rx="2" fill="#FFDC00"/>
+<rect x="665" y="385" width="28" height="28" rx="2" fill="#FFDC00"/>
+<text x="754" y="297.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">o0</text>
+<text x="754" y="348.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">origin=(9, 6)</text>
+<text x="754" y="393.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">4 pixels</text>
+<rect x="1000" y="295" width="28" height="28" rx="2" fill="#0074D9"/>
+<rect x="1000" y="325" width="28" height="28" rx="2" fill="#0074D9"/>
+<rect x="1000" y="355" width="28" height="28" rx="2" fill="#0074D9"/>
+<rect x="1030" y="295" width="28" height="28" rx="2" fill="#0074D9"/>
+<rect x="1030" y="325" width="28" height="28" rx="2" fill="#0074D9"/>
+<rect x="1030" y="355" width="28" height="28" rx="2" fill="#0074D9"/>
+<text x="1089" y="297.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">o1</text>
+<text x="1089" y="348.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">origin=(0, 7)</text>
+<text x="1089" y="393.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">6 pixels</text>
+<rect x="665" y="480" width="28" height="28" rx="2" fill="#FF4136"/>
+<rect x="665" y="510" width="28" height="28" rx="2" fill="#FF4136"/>
+<rect x="695" y="480" width="28" height="28" rx="2" fill="#FF4136"/>
+<rect x="695" y="510" width="28" height="28" rx="2" fill="#FF4136"/>
+<text x="754" y="482.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">o2</text>
+<text x="754" y="533.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">origin=(3, 8)</text>
+<text x="754" y="578.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">4 pixels</text>
+<rect x="1000" y="480" width="28" height="28" rx="2" fill="#2ECC40"/>
+<rect x="1000" y="510" width="28" height="28" rx="2" fill="#2ECC40"/>
+<rect x="1030" y="480" width="28" height="28" rx="2" fill="#2ECC40"/>
+<rect x="1030" y="510" width="28" height="28" rx="2" fill="#2ECC40"/>
+<text x="1089" y="482.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">o3</text>
+<text x="1089" y="533.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">origin=(6, 8)</text>
+<text x="1089" y="578.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">4 pixels</text>
+<polyline points="1270,450 1354,450" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="1354,450 1340.0,443.0 1340.0,457.0" fill="#2563EB"/>
+<rect x="1380" y="281" width="454" height="80" rx="12" fill="#E7F5F4"/>
+<text x="1397" y="292.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="36" fill="#172B43">Scene</text>
+<rect x="1380" y="396" width="454" height="61" rx="12" fill="#E7F5F4"/>
+<text x="1397" y="407.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">canvas : Size = (10,10)</text>
+<rect x="1380" y="478" width="454" height="61" rx="12" fill="#E7F5F4"/>
+<text x="1397" y="489.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">background : Color = 0</text>
+<rect x="1380" y="560" width="454" height="61" rx="12" fill="#E7F5F4"/>
+<text x="1397" y="571.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">objects : List Placed</text>
+<polyline points="1607,361 1607,391" fill="none" stroke="#087F8C" stroke-width="3"/>
+<text x="89" y="749.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#172B43">放大一个对象：位置与局部 geometry 分开保存</text>
+<rect x="116" y="819" width="43" height="43" rx="2" fill="#0074D9"/>
+<rect x="116" y="864" width="43" height="43" rx="2" fill="#0074D9"/>
+<rect x="116" y="909" width="43" height="43" rx="2" fill="#0074D9"/>
+<rect x="161" y="819" width="43" height="43" rx="2" fill="#0074D9"/>
+<rect x="161" y="864" width="43" height="43" rx="2" fill="#0074D9"/>
+<rect x="161" y="909" width="43" height="43" rx="2" fill="#0074D9"/>
+<polyline points="236,882 355,882" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="355,882 341.0,875.0 341.0,889.0" fill="#2563EB"/>
+<rect x="384" y="818" width="420" height="116" rx="12" fill="#EAF1FF"/>
+<text x="401" y="829.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#172B43">position = (0,7)</text>
+<text x="401" y="869.6" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#172B43">local origin = (0,0)</text>
+<rect x="846" y="818" width="635" height="116" rx="12" fill="#EAF1FF"/>
+<text x="863" y="829.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">geometry = 稀疏的局部彩色像素</text>
+<text x="863" y="868.15" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">(0,0), (1,0), …, (1,2)</text>
+<text x="1542" y="822.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#087F8C">Render 回原 grid</text>
+<text x="1542" y="877.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">原始训练 grids 保留</text>
+<polyline points="72,1017 1848,1017" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="74" y="1033.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="20" fill="#52677E">交给 02：Scene(input) / Scene(output) · 默认 Four connectivity + background 0 · 不在 Encode 阶段判断任务 family</text>
+</svg>

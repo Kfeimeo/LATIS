@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect width="1920" height="1080" fill="#F5F7FB"/>
+<title>04  Version space：保存候选 DAG，而不是立刻展开全部程序</title>
+<text x="72" y="37.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#2563EB">LATIS  /  v0.3R.1</text>
+<text x="72" y="86.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="48" fill="#172B43">04  Version space：保存候选 DAG，而不是立刻展开全部程序</text>
+<text x="74" y="151.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">左侧来自 03560426 的实际导出节点；# 编号可在 version_space.json 中核对。</text>
+<text x="1780" y="42.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">04 / 07</text>
+<polyline points="743.5,291 743.5,357" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="743.5,418 253.0,493" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="743.5,418 648.0,493" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="743.5,418 1093.0,493" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="1093.0,558 884.0,648" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="1093.0,558 1230.0,648" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="1248,525.5 1813,525.5 1813,632 1690,632 1690,648" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="1230.0,728 1093.5,838" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="1230.0,728 1435.0,838" fill="none" stroke="#087F8C" stroke-width="3"/>
+<rect x="561" y="230" width="365" height="61" rx="12" fill="#EAF1FF"/>
+<text x="578" y="241.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">#70  Join λs</text>
+<rect x="561" y="357" width="365" height="61" rx="12" fill="#E7F5F4"/>
+<text x="578" y="368.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">#69  Join mkScene</text>
+<rect x="83" y="493" width="340" height="65" rx="12" fill="#EAF1FF"/>
+<text x="100" y="504.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">#3  Union canvasSize</text>
+<rect x="504" y="493" width="288" height="65" rx="12" fill="#EAF1FF"/>
+<text x="521" y="504.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">#4  Leaf Color 0</text>
+<rect x="938" y="493" width="310" height="65" rx="12" fill="#E7F5F4"/>
+<text x="955" y="504.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">#68  Join scan</text>
+<rect x="715" y="648" width="338" height="80" rx="12" fill="#EAF1FF"/>
+<text x="732" y="659.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">#54  Leaf step</text>
+<text x="732" y="693.8" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">闭合函数 I0</text>
+<rect x="1068" y="648" width="324" height="80" rx="12" fill="#E7F5F4"/>
+<text x="1085" y="659.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">#66 Join Translate</text>
+<text x="1085" y="693.8" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">seed 子程序</text>
+<rect x="1407" y="648" width="351" height="80" rx="12" fill="#EAF1FF"/>
+<text x="1424" y="659.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">#67  Leaf tail</text>
+<text x="1424" y="693.8" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">排序后余下的对象</text>
+<rect x="936" y="838" width="315" height="67" rx="12" fill="#EAF1FF"/>
+<text x="953" y="849.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">#57 Union source</text>
+<rect x="1289" y="838" width="292" height="67" rx="12" fill="#EAF1FF"/>
+<text x="1306" y="849.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">#65 Union Vec</text>
+<text x="106" y="646.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#2563EB">Leaf</text>
+<text x="106" y="696.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#52677E">一个已匹配表达式</text>
+<text x="106" y="762.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#2563EB">Union  =  A 或 B</text>
+<text x="106" y="812.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#52677E">保留可选解，提取时合并</text>
+<text x="106" y="878.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#087F8C">Join  =  op(A,B,…)</text>
+<text x="106" y="928.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#52677E">组合同一分解中的 child 解</text>
+<text x="1305" y="241.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#172B43">实际共享：Int 0 节点</text>
+<rect x="1310" y="317" width="230" height="56" rx="12" fill="#EAF1FF"/>
+<text x="1327" y="328.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">#35 subtract</text>
+<rect x="1600" y="317" width="230" height="56" rx="12" fill="#EAF1FF"/>
+<text x="1617" y="328.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">#64 vec</text>
+<polyline points="1425,373 1580,432" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="1715,373 1580,432" fill="none" stroke="#087F8C" stroke-width="3"/>
+<rect x="1430" y="432" width="300" height="60" rx="12" fill="#E7F5F4"/>
+<text x="1447" y="443.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#172B43">#31 Leaf Int 0</text>
+<text x="1308" y="531.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">同一 NodeId 被多个 Join 引用</text>
+<text x="1308" y="577.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">memo 复用搜索；保留支持理由</text>
+<text x="945" y="938.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">55 / 56 两个 source 方案</text>
+<polyline points="72,1017 1848,1017" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="74" y="1033.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="20" fill="#52677E">交给 05：root NodeId + Space DAG · Union 不等于 Base union operator · 这张图省略部分 descendants，不是完整 70-node 图</text>
+</svg>

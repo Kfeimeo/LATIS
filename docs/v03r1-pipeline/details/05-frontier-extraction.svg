@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect width="1920" height="1080" fill="#F5F7FB"/>
+<title>05  Frontier：从候选 DAG 提取有限完整 AST</title>
+<text x="72" y="37.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#2563EB">LATIS  /  v0.3R.1</text>
+<text x="72" y="86.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="48" fill="#172B43">05  Frontier：从候选 DAG 提取有限完整 AST</text>
+<text x="74" y="151.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">实际 core 最终 portfolio = 32；下面用三棵简化树展示提取与重复子树，不代表全部候选的逐字 AST。</text>
+<text x="1780" y="42.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">05 / 07</text>
+<text x="72" y="246.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">候选 P1（局部示意）</text>
+<rect x="149" y="307" width="230" height="52" rx="12" fill="#EAF1FF"/>
+<text x="166" y="318.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">λs : Scene</text>
+<rect x="149" y="391" width="230" height="52" rx="12" fill="#EAF1FF"/>
+<text x="166" y="402.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">mkScene</text>
+<polyline points="264,359 264,391" fill="none" stroke="#2563EB" stroke-width="3"/>
+<rect x="149" y="476" width="230" height="52" rx="12" fill="#E7F5F4"/>
+<text x="166" y="487.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">scan</text>
+<polyline points="264,443 264,476" fill="none" stroke="#2563EB" stroke-width="3"/>
+<polyline points="264,528 264,562" fill="none" stroke="#087F8C" stroke-width="3"/>
+<rect x="77" y="562" width="377" height="250" rx="16" fill="#E7F5F4"/>
+<rect x="176" y="580" width="182" height="50" rx="12" fill="#E7F5F4"/>
+<text x="193" y="591.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">Translate</text>
+<rect x="87" y="662" width="151" height="49" rx="12" fill="#EAF1FF"/>
+<text x="104" y="673.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="23" fill="#172B43">snd(pair)</text>
+<rect x="260" y="662" width="181" height="49" rx="12" fill="#EAF1FF"/>
+<text x="277" y="673.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="23" fill="#172B43">coordDelta</text>
+<polyline points="243,630 162,662" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="293,630 348,662" fill="none" stroke="#087F8C" stroke-width="3"/>
+<text x="107" y="747.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#087F8C">Anchor BR      Anchor TL</text>
+<polyline points="322,711 190,740" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="364,711 359,740" fill="none" stroke="#087F8C" stroke-width="3"/>
+<text x="497" y="246.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">候选 P2（局部示意）</text>
+<rect x="574" y="307" width="230" height="52" rx="12" fill="#EAF1FF"/>
+<text x="591" y="318.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">λs : Scene</text>
+<rect x="574" y="391" width="230" height="52" rx="12" fill="#EAF1FF"/>
+<text x="591" y="402.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">mkScene</text>
+<polyline points="689,359 689,391" fill="none" stroke="#2563EB" stroke-width="3"/>
+<rect x="574" y="476" width="230" height="52" rx="12" fill="#E7F5F4"/>
+<text x="591" y="487.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">scan</text>
+<polyline points="689,443 689,476" fill="none" stroke="#2563EB" stroke-width="3"/>
+<polyline points="689,528 689,562" fill="none" stroke="#087F8C" stroke-width="3"/>
+<rect x="502" y="562" width="377" height="250" rx="16" fill="#E7F5F4"/>
+<rect x="601" y="580" width="182" height="50" rx="12" fill="#E7F5F4"/>
+<text x="618" y="591.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">Translate</text>
+<rect x="512" y="662" width="151" height="49" rx="12" fill="#EAF1FF"/>
+<text x="529" y="673.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="23" fill="#172B43">snd(pair)</text>
+<rect x="685" y="662" width="181" height="49" rx="12" fill="#EAF1FF"/>
+<text x="702" y="673.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="23" fill="#172B43">coordDelta</text>
+<polyline points="668,630 587,662" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="718,630 773,662" fill="none" stroke="#087F8C" stroke-width="3"/>
+<text x="532" y="747.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#087F8C">Anchor BR      Anchor TL</text>
+<polyline points="747,711 615,740" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="789,711 784,740" fill="none" stroke="#087F8C" stroke-width="3"/>
+<text x="922" y="246.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">候选 P3（局部示意）</text>
+<rect x="999" y="307" width="230" height="52" rx="12" fill="#EAF1FF"/>
+<text x="1016" y="318.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">λs : Scene</text>
+<rect x="999" y="391" width="230" height="52" rx="12" fill="#EAF1FF"/>
+<text x="1016" y="402.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">mkScene</text>
+<polyline points="1114,359 1114,391" fill="none" stroke="#2563EB" stroke-width="3"/>
+<rect x="999" y="476" width="230" height="52" rx="12" fill="#E7F5F4"/>
+<text x="1016" y="487.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">scan</text>
+<polyline points="1114,443 1114,476" fill="none" stroke="#2563EB" stroke-width="3"/>
+<polyline points="1114,528 1114,562" fill="none" stroke="#087F8C" stroke-width="3"/>
+<rect x="927" y="562" width="377" height="250" rx="16" fill="#E7F5F4"/>
+<rect x="1026" y="580" width="182" height="50" rx="12" fill="#E7F5F4"/>
+<text x="1043" y="591.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#172B43">Translate</text>
+<rect x="937" y="662" width="151" height="49" rx="12" fill="#EAF1FF"/>
+<text x="954" y="673.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="23" fill="#172B43">snd(pair)</text>
+<rect x="1110" y="662" width="181" height="49" rx="12" fill="#EAF1FF"/>
+<text x="1127" y="673.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="23" fill="#172B43">coordDelta</text>
+<polyline points="1093,630 1012,662" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="1143,630 1198,662" fill="none" stroke="#087F8C" stroke-width="3"/>
+<text x="957" y="747.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#087F8C">Anchor BR      Anchor TL</text>
+<polyline points="1172,711 1040,740" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="1214,711 1209,740" fill="none" stroke="#087F8C" stroke-width="3"/>
+<rect x="1372" y="236" width="468" height="118" rx="12" fill="#EAF1FF"/>
+<text x="1389" y="247.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">Materialize(root VS)</text>
+<text x="1389" y="286.15" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">去重 → Base rank → 截断</text>
+<rect x="1372" y="421" width="468" height="141" rx="12" fill="#E7F5F4"/>
+<text x="1389" y="432.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">matches(Q0,P)</text>
+<text x="1389" y="471.15" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">逐行检查 Scene 函数图</text>
+<text x="1389" y="510.3" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">只留 exact-spec 候选</text>
+<polyline points="1605,354 1605,407" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="1605,407 1612.0,393.0 1598.0,393.0" fill="#087F8C"/>
+<rect x="1372" y="634" width="468" height="156" rx="12" fill="#E7F5F4"/>
+<text x="1389" y="645.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#172B43">Extract 子树</text>
+<text x="1389" y="687.05" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#172B43">归一化 binder 名称</text>
+<text x="1389" y="729.1" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#172B43">相同 / 相似 AST → 06</text>
+<polyline points="1605,562 1605,620" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="1605,620 1612.0,606.0 1598.0,606.0" fill="#087F8C"/>
+<text x="82" y="888.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#087F8C">浅色绿色框：重复的通用 step 子树</text>
+<text x="82" y="945.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">提取并不保证覆盖全部程序；原始 grid exact verification 在最终选择前另做。</text>
+<polyline points="72,1017 1848,1017" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="74" y="1033.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="20" fill="#52677E">交给 06：exact-spec frontier ASTs · frontier 默认最多 32 · Join 提取最多 k² 组 child products · Base rank 与 invention MDL 是两个不同环节</text>
+</svg>

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect width="1920" height="1080" fill="#F5F7FB"/>
+<title>从训练示例到可执行程序</title>
+<text x="72" y="37.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#2563EB">LATIS  /  v0.3R.1</text>
+<text x="72" y="86.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="48" fill="#172B43">从训练示例到可执行程序</text>
+<text x="74" y="151.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">输入是 ARC 训练 IO；搜索得到普通 Base 程序，并在当前 task 内学习可复用的函数。</text>
+<text x="1780" y="42.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">01 / 05</text>
+<rect x="72" y="245" width="336" height="235" rx="18" fill="white"/>
+<rect x="72" y="245" width="6" height="235" rx="3" fill="#2563EB"/>
+<text x="96" y="265.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">01  训练 IO</text>
+<text x="96" y="323.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">输入 / 输出 grids</text>
+<text x="96" y="360.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">Encode → latent Scene</text>
+<text x="96" y="397.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">保留原 grid 做最终验证</text>
+<rect x="432" y="245" width="336" height="235" rx="18" fill="white"/>
+<rect x="432" y="245" width="6" height="235" rx="3" fill="#2563EB"/>
+<text x="456" y="265.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">02  类型化约束</text>
+<text x="456" y="323.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">Scene → Scene 函数图</text>
+<text x="456" y="360.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">每个示例是一条约束</text>
+<text x="456" y="397.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">只有训练 labels 进入搜索</text>
+<rect x="792" y="245" width="336" height="235" rx="18" fill="white"/>
+<rect x="792" y="245" width="6" height="235" rx="3" fill="#2563EB"/>
+<text x="816" y="265.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">03  Learn</text>
+<text x="816" y="323.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">类型 + 有限观测表达式</text>
+<text x="816" y="360.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">generic Base witnesses</text>
+<text x="816" y="397.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">递归求解子约束</text>
+<rect x="1152" y="245" width="336" height="235" rx="18" fill="white"/>
+<rect x="1152" y="245" width="6" height="235" rx="3" fill="#2563EB"/>
+<text x="1176" y="265.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">04  Version space</text>
+<text x="1176" y="323.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">Leaf：已匹配表达式</text>
+<text x="1176" y="360.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">Union：候选方案</text>
+<text x="1176" y="397.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">Join：组合子程序</text>
+<rect x="1512" y="245" width="336" height="235" rx="18" fill="white"/>
+<rect x="1512" y="245" width="6" height="235" rx="3" fill="#2563EB"/>
+<text x="1536" y="265.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">05  Frontier</text>
+<text x="1536" y="323.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">提取有限完整 AST</text>
+<text x="1536" y="360.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">过滤 exact-spec 程序</text>
+<text x="1536" y="397.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">作为 discovery 的证据</text>
+<polyline points="408,361 430,361" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="430,361 416.0,354.0 416.0,368.0" fill="#2563EB"/>
+<polyline points="768,361 790,361" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="790,361 776.0,354.0 776.0,368.0" fill="#2563EB"/>
+<polyline points="1128,361 1150,361" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="1150,361 1136.0,354.0 1136.0,368.0" fill="#2563EB"/>
+<polyline points="1488,361 1510,361" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="1510,361 1496.0,354.0 1496.0,368.0" fill="#2563EB"/>
+<rect x="1110" y="570" width="738" height="218" rx="18" fill="#E7F5F4"/>
+<rect x="1110" y="570" width="6" height="218" rx="3" fill="#087F8C"/>
+<text x="1134" y="590.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">06  自动 abstraction</text>
+<text x="1134" y="648.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">Typed anti-unification → lambda lifting</text>
+<text x="1134" y="689.44" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">检查 closed / typed / Base-expandable</text>
+<text x="1134" y="730.88" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">只有 portfolio MDL 净节省 &gt; 0 才接受</text>
+<polyline points="1680,480 1680,557" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="1680,557 1687.0,543.0 1673.0,543.0" fill="#087F8C"/>
+<rect x="650" y="570" width="410" height="218" rx="18" fill="#EAF1FF"/>
+<rect x="650" y="570" width="6" height="218" rx="3" fill="#2563EB"/>
+<text x="674" y="590.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">07  更新 task-local TSL</text>
+<text x="674" y="648.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">已获支持的 Base symbols</text>
+<text x="674" y="687.96" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">+ 接受的 inventions</text>
+<text x="674" y="727.92" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">当前 task 结束后丢弃</text>
+<polyline points="1110,680 1070,680" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="1070,680 1084.0,687.0 1084.0,673.0" fill="#087F8C"/>
+<polyline points="650,680 605,680 605,525 960,525 960,491" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="960,491 953.0,505.0 967.0,505.0" fill="#087F8C"/>
+<text x="80" y="570.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="34" fill="#087F8C">真正反馈给 Learn</text>
+<text x="80" y="630.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">安装函数 → 清除旧 memo</text>
+<text x="80" y="671.44" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">重学根问题 / 求解后续需求</text>
+<text x="80" y="712.88" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">调用时展开定义并检查约束</text>
+<rect x="72" y="846" width="1180" height="120" rx="18" fill="white"/>
+<rect x="72" y="846" width="6" height="120" rx="3" fill="#2563EB"/>
+<text x="96" y="866.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">08  选择与执行</text>
+<text x="96" y="924.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#52677E">最终 frontier → 原 grid exact verification → rank → 选程序 → heldout 预测</text>
+<polyline points="1848,430 1874,430 1874,831 1215,831 1215,842" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="1215,842 1222.0,828.0 1208.0,828.0" fill="#087F8C"/>
+<text x="1298" y="799.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="22" fill="#087F8C">停止循环：取最终 frontier</text>
+<text x="1300" y="850.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="31" fill="#172B43">有限循环</text>
+<text x="1300" y="898.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#52677E">最多 2 rounds / 6 inventions</text>
+<text x="1300" y="936.48" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#52677E">AST ≤ 96 / 参数 ≤ 4</text>
+<polyline points="72,1017 1848,1017" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="74" y="1033.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="20" fill="#52677E">固定 Base · StructuralPriorCount = 0 · 不跨 task 传递 dictionary · heldout 仅在程序选定后评估</text>
+</svg>

@@ -1,0 +1,239 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect width="1920" height="1080" fill="#F5F7FB"/>
+<title>03560426：自动发现的 Attach-like 函数</title>
+<text x="72" y="37.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#2563EB">LATIS  /  v0.3R.1</text>
+<text x="72" y="86.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="48" fill="#172B43">03560426：自动发现的 Attach-like 函数</text>
+<text x="74" y="151.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">实际训练示例与实际导出的 I0；“Attach-like”是事后解释，不是 Base primitive 或搜索规则。</text>
+<text x="1780" y="42.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">04 / 05</text>
+<text x="88" y="227.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="31" fill="#172B43">训练输入</text>
+<text x="611" y="227.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="31" fill="#172B43">训练输出</text>
+<rect x="88" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="124" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="160" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="196" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="232" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="268" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="304" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="340" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="376" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="412" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="88" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="124" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="160" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="196" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="232" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="268" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="304" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="340" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="376" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="412" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="88" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="124" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="160" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="196" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="232" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="268" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="304" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="340" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="376" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="412" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="88" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="124" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="160" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="196" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="232" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="268" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="304" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="340" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="376" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="412" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="88" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="124" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="160" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="196" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="232" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="268" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="304" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="340" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="376" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="412" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="88" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="124" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="160" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="196" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="232" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="268" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="304" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="340" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="376" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="412" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="88" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="124" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="160" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="196" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="232" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="268" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="304" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="340" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="376" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="412" y="502" width="35" height="35" rx="0" fill="#FFDC00"/>
+<rect x="88" y="538" width="35" height="35" rx="0" fill="#0074D9"/>
+<rect x="124" y="538" width="35" height="35" rx="0" fill="#0074D9"/>
+<rect x="160" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="196" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="232" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="268" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="304" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="340" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="376" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="412" y="538" width="35" height="35" rx="0" fill="#FFDC00"/>
+<rect x="88" y="574" width="35" height="35" rx="0" fill="#0074D9"/>
+<rect x="124" y="574" width="35" height="35" rx="0" fill="#0074D9"/>
+<rect x="160" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="196" y="574" width="35" height="35" rx="0" fill="#FF4136"/>
+<rect x="232" y="574" width="35" height="35" rx="0" fill="#FF4136"/>
+<rect x="268" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="304" y="574" width="35" height="35" rx="0" fill="#2ECC40"/>
+<rect x="340" y="574" width="35" height="35" rx="0" fill="#2ECC40"/>
+<rect x="376" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="412" y="574" width="35" height="35" rx="0" fill="#FFDC00"/>
+<rect x="88" y="610" width="35" height="35" rx="0" fill="#0074D9"/>
+<rect x="124" y="610" width="35" height="35" rx="0" fill="#0074D9"/>
+<rect x="160" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="196" y="610" width="35" height="35" rx="0" fill="#FF4136"/>
+<rect x="232" y="610" width="35" height="35" rx="0" fill="#FF4136"/>
+<rect x="268" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="304" y="610" width="35" height="35" rx="0" fill="#2ECC40"/>
+<rect x="340" y="610" width="35" height="35" rx="0" fill="#2ECC40"/>
+<rect x="376" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="412" y="610" width="35" height="35" rx="0" fill="#FFDC00"/>
+<rect x="611" y="286" width="35" height="35" rx="0" fill="#0074D9"/>
+<rect x="647" y="286" width="35" height="35" rx="0" fill="#0074D9"/>
+<rect x="683" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="719" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="755" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="791" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="827" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="863" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="899" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="935" y="286" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="611" y="322" width="35" height="35" rx="0" fill="#0074D9"/>
+<rect x="647" y="322" width="35" height="35" rx="0" fill="#0074D9"/>
+<rect x="683" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="719" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="755" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="791" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="827" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="863" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="899" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="935" y="322" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="611" y="358" width="35" height="35" rx="0" fill="#0074D9"/>
+<rect x="647" y="358" width="35" height="35" rx="0" fill="#FF4136"/>
+<rect x="683" y="358" width="35" height="35" rx="0" fill="#FF4136"/>
+<rect x="719" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="755" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="791" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="827" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="863" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="899" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="935" y="358" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="611" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="647" y="394" width="35" height="35" rx="0" fill="#FF4136"/>
+<rect x="683" y="394" width="35" height="35" rx="0" fill="#2ECC40"/>
+<rect x="719" y="394" width="35" height="35" rx="0" fill="#2ECC40"/>
+<rect x="755" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="791" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="827" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="863" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="899" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="935" y="394" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="611" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="647" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="683" y="430" width="35" height="35" rx="0" fill="#2ECC40"/>
+<rect x="719" y="430" width="35" height="35" rx="0" fill="#FFDC00"/>
+<rect x="755" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="791" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="827" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="863" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="899" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="935" y="430" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="611" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="647" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="683" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="719" y="466" width="35" height="35" rx="0" fill="#FFDC00"/>
+<rect x="755" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="791" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="827" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="863" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="899" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="935" y="466" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="611" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="647" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="683" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="719" y="502" width="35" height="35" rx="0" fill="#FFDC00"/>
+<rect x="755" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="791" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="827" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="863" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="899" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="935" y="502" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="611" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="647" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="683" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="719" y="538" width="35" height="35" rx="0" fill="#FFDC00"/>
+<rect x="755" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="791" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="827" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="863" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="899" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="935" y="538" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="611" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="647" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="683" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="719" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="755" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="791" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="827" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="863" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="899" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="935" y="574" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="611" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="647" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="683" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="719" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="755" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="791" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="827" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="863" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="899" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<rect x="935" y="610" width="35" height="35" rx="0" fill="#101820"/>
+<polyline points="473,466 576,466" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="576,466 562.0,459.0 562.0,473.0" fill="#2563EB"/>
+<text x="88" y="674.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">原始 ARC grid；这里展示第 1 个训练 pair。</text>
+<rect x="1070" y="228" width="778" height="179" rx="18" fill="#E7F5F4"/>
+<rect x="1070" y="228" width="6" height="179" rx="3" fill="#087F8C"/>
+<text x="1094" y="248.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">I0 : Pair(Placed, Placed) → Placed</text>
+<text x="1094" y="306.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">pair=(a,b) → 移动 b</text>
+<text x="1094" y="347.44" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">让 TL(b) 与 BR(a) 对齐</text>
+<rect x="1100" y="445" width="200" height="90" rx="18" fill="#EAF1FF"/>
+<rect x="1312" y="547" width="160" height="94" rx="18" fill="#E7F5F4"/>
+<text x="1118" y="464.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">a（前一个）</text>
+<text x="1327" y="568.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">b（当前）</text>
+<polyline points="1312,547 1300,535" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="1300,535 1304.949747468306,549.8492424049175 1314.8492424049175,539.9497474683058" fill="#087F8C"/>
+<text x="1249" y="501.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="22" fill="#087F8C">BR</text>
+<text x="1268" y="554.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="22" fill="#087F8C">TL</text>
+<text x="1510" y="458.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#087F8C">位移向量</text>
+<text x="1510" y="513.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#52677E">BR(a) − TL(b)</text>
+<text x="1510" y="551.48" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#52677E">改变位置，保留形状</text>
+<text x="1100" y="674.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">坐标关系示意；左侧是真实 IO。</text>
+<rect x="72" y="755" width="1776" height="217" rx="18" fill="white"/>
+<text x="99" y="776.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#172B43">完全由既有 Base 表达的定义</text>
+<text x="99" y="831.0" dominant-baseline="text-before-edge" font-family="Consolas, monospace" font-size="29" fill="#172B43">I0(pair) = Translate(snd(pair),</text>
+<text x="99" y="876.0" dominant-baseline="text-before-edge" font-family="Consolas, monospace" font-size="29" fill="#172B43">    coordDelta(Anchor(fst(pair),BR), Anchor(snd(pair),TL)))</text>
+<text x="1280" y="811.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#087F8C">generic scan 使用该 step</text>
+<text x="1280" y="865.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#52677E">排序 → seed → scan → mkScene</text>
+<text x="1280" y="903.48" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#52677E">train / heldout 均 exact</text>
+<polyline points="72,1017 1848,1017" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="74" y="1033.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="20" fill="#52677E">I0 自动从 frontier AST 发现，closed / typed / Base-expandable · 核心 task 实际命中 4 次 · StructuralPriorCount = 0</text>
+</svg>

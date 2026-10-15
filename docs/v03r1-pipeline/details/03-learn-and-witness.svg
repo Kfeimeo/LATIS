@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect width="1920" height="1080" fill="#F5F7FB"/>
+<title>03  Learn：用 operator 语义把大目标拆小</title>
+<text x="72" y="37.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#2563EB">LATIS  /  v0.3R.1</text>
+<text x="72" y="86.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="48" fill="#172B43">03  Learn：用 operator 语义把大目标拆小</text>
+<text x="74" y="151.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">这里放大 generic Translate 的一个反推；(0,−7) 是第一个训练输入中蓝色对象移到 (0,0) 的实际位移。</text>
+<text x="1780" y="42.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">03 / 07</text>
+<text x="80" y="226.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#172B43">有限 observed operands</text>
+<rect x="105" y="309" width="32" height="32" rx="2" fill="#0074D9"/>
+<rect x="105" y="343" width="32" height="32" rx="2" fill="#0074D9"/>
+<rect x="105" y="377" width="32" height="32" rx="2" fill="#0074D9"/>
+<rect x="139" y="309" width="32" height="32" rx="2" fill="#0074D9"/>
+<rect x="139" y="343" width="32" height="32" rx="2" fill="#0074D9"/>
+<rect x="139" y="377" width="32" height="32" rx="2" fill="#0074D9"/>
+<text x="206" y="311.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#172B43">source</text>
+<text x="206" y="361.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#52677E">TL=(0,7)</text>
+<rect x="105" y="504" width="32" height="32" rx="2" fill="#0074D9"/>
+<rect x="105" y="538" width="32" height="32" rx="2" fill="#0074D9"/>
+<rect x="105" y="572" width="32" height="32" rx="2" fill="#0074D9"/>
+<rect x="139" y="504" width="32" height="32" rx="2" fill="#0074D9"/>
+<rect x="139" y="538" width="32" height="32" rx="2" fill="#0074D9"/>
+<rect x="139" y="572" width="32" height="32" rx="2" fill="#0074D9"/>
+<text x="206" y="502.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#172B43">目标 output</text>
+<text x="206" y="552.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#52677E">TL=(0,0)</text>
+<polyline points="399,440 540,440" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="540,440 526.0,433.0 526.0,447.0" fill="#2563EB"/>
+<rect x="565" y="379" width="433" height="117" rx="12" fill="#EAF1FF"/>
+<text x="582" y="390.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#172B43">Q : Placed</text>
+<text x="582" y="432.05" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#172B43">返回类型筛选</text>
+<rect x="575" y="580" width="411" height="73" rx="12" fill="#E7F5F4"/>
+<text x="592" y="591.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#172B43">Translate(source, v)</text>
+<polyline points="779,496 779,566" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="779,566 786.0,552.0 772.0,552.0" fill="#087F8C"/>
+<polyline points="650,653 580,718" fill="none" stroke="#087F8C" stroke-width="3"/>
+<polyline points="915,653 1144,718" fill="none" stroke="#087F8C" stroke-width="3"/>
+<rect x="382" y="729" width="395" height="110" rx="12" fill="#EAF1FF"/>
+<text x="399" y="740.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">Q_source : Placed</text>
+<text x="399" y="779.15" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">source 保留形状与颜色</text>
+<rect x="969" y="729" width="397" height="110" rx="12" fill="#E7F5F4"/>
+<text x="986" y="740.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#172B43">Q_v : Vec</text>
+<text x="986" y="780.6" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#172B43">v = (0,−7)</text>
+<polyline points="1168,839 1168,890" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="1168,890 1175.0,876.0 1161.0,876.0" fill="#087F8C"/>
+<rect x="859" y="903" width="656" height="64" rx="12" fill="#E7F5F4"/>
+<text x="876" y="914.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#172B43">coordDelta((0,0), Anchor(source,TL))</text>
+<text x="94" y="751.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#087F8C">叶子已匹配</text>
+<rect x="115" y="803" width="44" height="44" rx="22" fill="#087F8C"/>
+<text x="170" y="811.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="26" fill="#172B43">Leaf(source)</text>
+<polyline points="382,775 303,775 303,798" fill="none" stroke="#087F8C" stroke-width="4"/>
+<polygon points="303,798 310.0,784.0 296.0,784.0" fill="#087F8C"/>
+<text x="1477" y="236.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#172B43">先看返回类型</text>
+<rect x="1476" y="310" width="365" height="62" rx="12" fill="#E7F5F4"/>
+<text x="1493" y="321.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">Translate → Placed</text>
+<rect x="1476" y="398" width="365" height="62" rx="12" fill="#FFF2E2"/>
+<text x="1493" y="409.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">mkScene → Scene</text>
+<text x="1779" y="414.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#BE4155">×</text>
+<rect x="1476" y="486" width="365" height="62" rx="12" fill="#FFF2E2"/>
+<text x="1493" y="497.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#172B43">range → List Int</text>
+<text x="1779" y="502.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#BE4155">×</text>
+<text x="1454" y="650.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="29" fill="#172B43">递归控制</text>
+<text x="1454" y="708.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">MRV：先解候选域更小的 child</text>
+<text x="1454" y="745.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">同一 Q 可查询 memo</text>
+<text x="1454" y="782.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">所有 children 非空才 Join</text>
+<polyline points="72,1017 1848,1017" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="74" y="1033.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="20" fill="#52677E">交给 04：Leaf / Union / Join 节点 · witness 是有限、条件化的逆语义 · depth=7 / budget=250000 · 找到 forward Leaf 后会提前结束该子问题</text>
+</svg>

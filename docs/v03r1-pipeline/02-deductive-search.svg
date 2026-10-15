@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect width="1920" height="1080" fill="#F5F7FB"/>
+<title>Witness：把输出约束反推为子问题</title>
+<text x="72" y="37.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#2563EB">LATIS  /  v0.3R.1</text>
+<text x="72" y="86.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="48" fill="#172B43">Witness：把输出约束反推为子问题</text>
+<text x="74" y="151.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">每个 witness 只解释一个 generic Base operator；不预设 Attach / Progression 等任务结构。</text>
+<text x="1780" y="42.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="24" fill="#52677E">02 / 05</text>
+<rect x="72" y="236" width="510" height="186" rx="18" fill="#EAF1FF"/>
+<rect x="72" y="236" width="6" height="186" rx="3" fill="#2563EB"/>
+<text x="96" y="256.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">父 specification Q</text>
+<text x="96" y="314.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">目标类型 + 环境 + IO points</text>
+<text x="96" y="353.96" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">函数图 / key ordering constraints</text>
+<rect x="675" y="236" width="565" height="186" rx="18" fill="#E7F5F4"/>
+<rect x="675" y="236" width="6" height="186" rx="3" fill="#087F8C"/>
+<text x="699" y="256.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">条件化 witness</text>
+<text x="699" y="314.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">先选有限 observed operands</text>
+<text x="699" y="353.96" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">按 operator 语义产生相关分解</text>
+<rect x="1335" y="236" width="513" height="186" rx="18" fill="#EAF1FF"/>
+<rect x="1335" y="236" width="6" height="186" rx="3" fill="#2563EB"/>
+<text x="1359" y="256.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">递归 Learn 子问题</text>
+<text x="1359" y="314.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">每个 child 都有非空 VS 才组合</text>
+<text x="1359" y="353.96" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="27" fill="#52677E">任何 child 为空则丢弃该分解</text>
+<polyline points="582,330 660,330" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="660,330 646.0,323.0 646.0,337.0" fill="#2563EB"/>
+<polyline points="1240,330 1320,330" fill="none" stroke="#2563EB" stroke-width="4"/>
+<polygon points="1320,330 1306.0,323.0 1306.0,337.0" fill="#2563EB"/>
+<rect x="72" y="484" width="847" height="366" rx="18" fill="white"/>
+<rect x="72" y="484" width="6" height="366" rx="3" fill="#2563EB"/>
+<text x="96" y="504.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">示例 A  /  filter 的 multiplicity</text>
+<text x="96" y="562.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">observed xs = [1, 1, 2]</text>
+<text x="96" y="603.44" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">目标输出 = [1, 1]</text>
+<text x="96" y="644.88" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">反推 predicate：p(1)=true，p(2)=false</text>
+<text x="96" y="686.3199999999999" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">再 Learn p；并检查构造出的 filter(p,xs)</text>
+<text x="96" y="727.76" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E"></text>
+<text x="96" y="769.2" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">固定 xs=[1,1] 时不能仅保留一个 1。</text>
+<rect x="959" y="484" width="889" height="366" rx="18" fill="#E7F5F4"/>
+<rect x="959" y="484" width="6" height="366" rx="3" fill="#087F8C"/>
+<text x="983" y="504.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#172B43">示例 B  /  generic scan 的 step graph</text>
+<text x="983" y="562.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">输出序列：[y0, y1, y2, …]</text>
+<text x="983" y="603.44" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">反推 seed = y0（结果包含 seed）</text>
+<text x="983" y="644.88" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">step((y0,x1)) = y1</text>
+<text x="983" y="686.3199999999999" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">step((y1,x2)) = y2</text>
+<text x="983" y="727.76" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#52677E">再 Learn step、seed、tail；由 Base scan 组合。</text>
+<text x="83" y="906.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="30" fill="#172B43">VS 保留候选与组合</text>
+<text x="83" y="953.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="25" fill="#52677E">Union 合并可选分解；Join 只组合同一分解的 children，避免破坏相关约束。</text>
+<polyline points="72,1017 1848,1017" fill="none" stroke="#D7E0EC" stroke-width="2"/>
+<text x="74" y="1033.0" dominant-baseline="text-before-edge" font-family="Microsoft YaHei, sans-serif" font-size="20" fill="#52677E">Sound partial witnesses · 有限 observations / aliases / depth / branches · 未找到 ≠ Base 无法表达；VS Union 不是新增 Base operator</text>
+</svg>

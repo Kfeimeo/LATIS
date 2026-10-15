@@ -1,0 +1,1388 @@
+# LATIS v0.3R.2
+StructuralPriorCount=0. Counterfactual labels never guide synthesis.
+```text
+Root specification Q0: ArrowT SceneT SceneT; observations=2; Gamma=[]. Original Grid targets reserved for exact verification.
+Learn(ArrowT SceneT SceneT; observations=2; Gamma=[]); return-compatible=["lambda","application","let","if","fst","snd","fold","head","index","get"]
+MRV immediate domains=[(0,12)]
+Learn(SceneT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get","mkScene"]
+MRV immediate domains=[(0,2),(1,3),(2,11)]
+Learn(SizeT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","size","canvasSize"]
+Learn(ColorT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get","background"]
+Learn(ListT PlacedT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","map","filter","fold","scan","zipWith","sortBy","head","tail","index","concat","setToList","get","objects"]
+MRV immediate domains=[(0,1),(1,5)]
+Learn(ArrowT PlacedT BoolT; observations=6; Gamma=[("v0",SceneT)]); return-compatible=["lambda","application","let","if","fst","snd","fold","head","index","get"]
+MRV immediate domains=[(0,38)]
+Learn(BoolT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","contains","get","equal","less","lessEqual"]
+MRV immediate domains=[(0,1),(1,9)]
+Learn(SetT ColorT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","ObjectColors"]
+Learn(ColorT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get","background"]
+Nonempty VS_contains node=17 children=[7,16]; conditional algebra witness; ObjectColors(objectOf(v1)) / ColorV 2
+MRV immediate domains=[(0,60),(1,1)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=79 children=[78,18]; conditional algebra witness; IntV 1 / add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1))
+MRV immediate domains=[(0,1),(1,60)]
+Nonempty VS_equal node=80 children=[18,78]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / IntV 1
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=83 children=[81,82]; conditional algebra witness; x(Anchor(v1,BL)) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=86 children=[84,85]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV 1) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_equal node=87 children=[82,81]; conditional algebra witness; add(cardinality(ObjectCells(objectOf(v1))),IntV (-1)) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_equal node=88 children=[85,84]; conditional algebra witness; cardinality(ObjectCells(objectOf(v1))) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,1),(1,21)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=112 children=[89,111]; conditional algebra witness; x(Anchor(v1,BR)) / add(y(Anchor(head(objects(v0)),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,28)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=143 children=[113,142]; conditional algebra witness; add(x(Anchor(v1,BR)),IntV 1) / y(Anchor(head(objects(v0)),TL))
+MRV immediate domains=[(0,55),(1,1)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=200 children=[199,144]; conditional algebra witness; IntV 2 / colorToInt(head(setToList(ObjectColors(objectOf(v1)))))
+MRV immediate domains=[(0,1),(1,55)]
+Nonempty VS_equal node=201 children=[144,199]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / IntV 2
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_equal node=202 children=[111,89]; conditional algebra witness; add(y(Anchor(head(objects(v0)),TL)),IntV (-1)) / x(Anchor(v1,BR))
+MRV immediate domains=[(0,28),(1,1)]
+Nonempty VS_equal node=203 children=[142,113]; conditional algebra witness; y(Anchor(head(objects(v0)),TL)) / add(x(Anchor(v1,BR)),IntV 1)
+MRV immediate domains=[(0,1),(1,21)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=205 children=[204,111]; conditional algebra witness; add(x(Anchor(v1,Center)),IntV 1) / add(y(Anchor(head(objects(v0)),TL)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_equal node=206 children=[111,204]; conditional algebra witness; add(y(Anchor(head(objects(v0)),TL)),IntV (-1)) / add(x(Anchor(v1,Center)),IntV 1)
+MRV immediate domains=[(0,7),(1,1)]
+Learn(ColorT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get","background"]
+Learn(SetT ColorT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","ObjectColors"]
+Nonempty VS_contains node=216 children=[215,207]; conditional algebra witness; ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))) / head(setToList(ObjectColors(objectOf(v1))))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(CellT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get"]
+Learn(SetT CellT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","cells","ObjectCells"]
+Nonempty VS_contains node=226 children=[225,217]; conditional algebra witness; ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))) / head(setToList(ObjectCells(objectOf(v1))))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(SetT CellT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","cells","ObjectCells"]
+Learn(CellT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get"]
+Nonempty VS_contains node=236 children=[227,235]; conditional algebra witness; ObjectCells(objectOf(v1)) / head(setToList(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))
+MRV immediate domains=[(0,1),(1,23)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=261 children=[81,260]; conditional algebra witness; x(Anchor(v1,BL)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL))
+MRV immediate domains=[(0,1),(1,14)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=278 children=[262,277]; conditional algebra witness; x(Anchor(v1,Center)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=288 children=[287,279]; conditional algebra witness; y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)) / y(Anchor(v1,TL))
+MRV immediate domains=[(0,23),(1,1)]
+Nonempty VS_equal node=289 children=[260,81]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL)) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,14),(1,1)]
+Nonempty VS_equal node=290 children=[277,262]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_equal node=291 children=[279,287]; conditional algebra witness; y(Anchor(v1,TL)) / y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL))
+MRV immediate domains=[(0,15),(1,1)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=309 children=[308,292]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_equal node=310 children=[292,308]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))))))
+MRV immediate domains=[(0,1),(1,15)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=327 children=[84,326]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV 1) / cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))
+MRV immediate domains=[(0,14),(1,1)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=329 children=[277,328]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)) / add(x(Anchor(v1,BR)),IntV (-1))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_equal node=330 children=[326,84]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,1),(1,14)]
+Nonempty VS_equal node=331 children=[328,277]; conditional algebra witness; add(x(Anchor(v1,BR)),IntV (-1)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=341 children=[340,332]; conditional algebra witness; add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV 1) / add(y(Anchor(v1,TL)),IntV 1)
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=351 children=[350,342]; conditional algebra witness; add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV (-1)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=361 children=[352,360]; conditional algebra witness; add(y(Anchor(v1,TL)),IntV (-1)) / add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_equal node=362 children=[342,350]; conditional algebra witness; add(x(Anchor(v1,Center)),IntV (-1)) / add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_equal node=363 children=[332,340]; conditional algebra witness; add(y(Anchor(v1,TL)),IntV 1) / add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV 1)
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_equal node=364 children=[360,352]; conditional algebra witness; add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV (-1)) / add(y(Anchor(v1,TL)),IntV (-1))
+MRV immediate domains=[(0,8),(1,1)]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=375 children=[374,365]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1)
+MRV immediate domains=[(0,1),(1,8)]
+Nonempty VS_equal node=376 children=[365,374]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1)
+Nonempty VS_lambda node=378 children=[377]; function graph -> parameter binding and output points
+Learn(ListT PlacedT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","map","filter","fold","scan","zipWith","sortBy","head","tail","index","concat","setToList","get","objects"]
+Nonempty VS_filter node=385 children=[378,384]; filter exact multiplicity/order inverse; predicate consistency retained across duplicate inputs
+MRV immediate domains=[(0,1),(1,3)]
+Learn(ListT PlacedT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","map","filter","fold","scan","zipWith","sortBy","head","tail","index","concat","setToList","get","objects"]
+Nonempty VS_filter node=390 children=[378,389]; filter exact multiplicity/order inverse; predicate consistency retained across duplicate inputs
+MRV immediate domains=[(0,1),(1,1)]
+Learn(ListT PlacedT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","map","filter","fold","scan","zipWith","sortBy","head","tail","index","concat","setToList","get","objects"]
+Nonempty VS_filter node=392 children=[378,391]; filter exact multiplicity/order inverse; predicate consistency retained across duplicate inputs
+MRV immediate domains=[(0,1),(1,1)]
+Learn(ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]); return-compatible=["lambda","application","let","if","fst","snd","fold","head","index","get"]
+MRV immediate domains=[(0,162)]
+Learn(BoolT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","contains","get","equal","less","lessEqual"]
+MRV immediate domains=[(0,1),(1,9)]
+Learn(SetT ColorT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","ObjectColors"]
+Learn(ColorT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get","background"]
+Nonempty VS_contains node=17 children=[7,16]; conditional algebra witness; ObjectColors(objectOf(v1)) / ColorV 2
+MRV immediate domains=[(0,60),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=393 children=[78,292]; conditional algebra witness; IntV 1 / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,60)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=80 children=[18,78]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / IntV 1
+MRV immediate domains=[(0,60),(1,1)]
+Nonempty VS_equal node=79 children=[78,18]; conditional algebra witness; IntV 1 / add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=83 children=[81,82]; conditional algebra witness; x(Anchor(v1,BL)) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=86 children=[84,85]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV 1) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_equal node=87 children=[82,81]; conditional algebra witness; add(cardinality(ObjectCells(objectOf(v1))),IntV (-1)) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_equal node=88 children=[85,84]; conditional algebra witness; cardinality(ObjectCells(objectOf(v1))) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=394 children=[144,81]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,2)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=396 children=[144,395]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,55),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=397 children=[199,81]; conditional algebra witness; IntV 2 / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,55)]
+Nonempty VS_equal node=201 children=[144,199]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / IntV 2
+MRV immediate domains=[(0,55),(1,1)]
+Nonempty VS_equal node=200 children=[199,144]; conditional algebra witness; IntV 2 / colorToInt(head(setToList(ObjectColors(objectOf(v1)))))
+MRV immediate domains=[(0,2),(1,21)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=399 children=[398,111]; conditional algebra witness; x(Anchor(v1,BR)) / add(y(Anchor(head(objects(v0)),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,28)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=143 children=[113,142]; conditional algebra witness; add(x(Anchor(v1,BR)),IntV 1) / y(Anchor(head(objects(v0)),TL))
+MRV immediate domains=[(0,21),(1,2)]
+Nonempty VS_equal node=400 children=[111,398]; conditional algebra witness; add(y(Anchor(head(objects(v0)),TL)),IntV (-1)) / x(Anchor(v1,BR))
+MRV immediate domains=[(0,28),(1,1)]
+Nonempty VS_equal node=203 children=[142,113]; conditional algebra witness; y(Anchor(head(objects(v0)),TL)) / add(x(Anchor(v1,BR)),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=401 children=[144,292]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=402 children=[144,342]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,55),(1,1)]
+Nonempty VS_less node=403 children=[199,292]; conditional algebra witness; IntV 2 / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,55),(1,1)]
+Nonempty VS_less node=404 children=[199,342]; conditional algebra witness; IntV 2 / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=405 children=[365,81]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,2)]
+Nonempty VS_less node=406 children=[365,395]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,1),(1,2)]
+Nonempty VS_less node=407 children=[365,398]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / x(Anchor(v1,BR))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=408 children=[144,292]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=409 children=[144,342]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,55),(1,1)]
+Nonempty VS_lessEqual node=410 children=[199,292]; conditional algebra witness; IntV 2 / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=411 children=[365,81]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,2)]
+Nonempty VS_lessEqual node=412 children=[365,395]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,8),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=422 children=[421,81]; conditional algebra witness; add(cardinality(ObjectCells(objectOf(head(objects(v0))))),IntV (-1)) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,8),(1,2)]
+Nonempty VS_lessEqual node=423 children=[421,395]; conditional algebra witness; add(cardinality(ObjectCells(objectOf(head(objects(v0))))),IntV (-1)) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,8),(1,2)]
+Nonempty VS_lessEqual node=424 children=[421,398]; conditional algebra witness; add(cardinality(ObjectCells(objectOf(head(objects(v0))))),IntV (-1)) / x(Anchor(v1,BR))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=433 children=[432,81]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(tail(objects(v0)))))))) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,7),(1,2)]
+Nonempty VS_less node=434 children=[432,395]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(tail(objects(v0)))))))) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=435 children=[18,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=436 children=[18,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=459 children=[458,81]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,21),(1,2)]
+Nonempty VS_less node=460 children=[458,395]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,21),(1,2)]
+Nonempty VS_less node=461 children=[458,398]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))) / x(Anchor(v1,BR))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=462 children=[365,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=463 children=[365,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=464 children=[365,84]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_lessEqual node=465 children=[458,81]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,21),(1,2)]
+Nonempty VS_lessEqual node=466 children=[458,395]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=467 children=[365,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=468 children=[365,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=477 children=[476,292]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(objects(v0))))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,8),(1,1)]
+Nonempty VS_lessEqual node=478 children=[421,84]; conditional algebra witness; add(cardinality(ObjectCells(objectOf(head(objects(v0))))),IntV (-1)) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=487 children=[486,81]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(objects(v0))))))),IntV 1) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,7),(1,2)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=496 children=[495,398]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(objects(v0)))))))),IntV 1) / x(Anchor(v1,BR))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=497 children=[432,292]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(tail(objects(v0)))))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=498 children=[432,342]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(tail(objects(v0)))))))) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=499 children=[495,81]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(objects(v0)))))))),IntV 1) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,7),(1,2)]
+Nonempty VS_lessEqual node=500 children=[495,395]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(objects(v0)))))))),IntV 1) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,8),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=510 children=[509,81]; conditional algebra witness; x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,21),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=533 children=[532,81]; conditional algebra witness; x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),Center)) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,21),(1,2)]
+Nonempty VS_less node=534 children=[532,395]; conditional algebra witness; x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),Center)) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=543 children=[542,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(objects(v0))))))),IntV (-1)) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_less node=544 children=[458,292]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_less node=545 children=[458,342]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_less node=546 children=[458,84]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_lessEqual node=547 children=[458,292]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_lessEqual node=548 children=[458,342]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,22),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=572 children=[571,81]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))),IntV 1) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,22),(1,2)]
+Nonempty VS_lessEqual node=573 children=[571,395]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))),IntV 1) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,22),(1,2)]
+Nonempty VS_lessEqual node=574 children=[571,398]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))),IntV 1) / x(Anchor(v1,BR))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=575 children=[486,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(objects(v0))))))),IntV 1) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=576 children=[486,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(objects(v0))))))),IntV 1) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(ColorT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get","background"]
+Learn(SetT ColorT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","ObjectColors"]
+Nonempty VS_contains node=216 children=[215,207]; conditional algebra witness; ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))) / head(setToList(ObjectColors(objectOf(v1))))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(SetT CellT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","cells","ObjectCells"]
+Learn(CellT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get"]
+Nonempty VS_contains node=236 children=[227,235]; conditional algebra witness; ObjectCells(objectOf(v1)) / head(setToList(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(CellT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get"]
+Learn(SetT CellT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","cells","ObjectCells"]
+Nonempty VS_contains node=226 children=[225,217]; conditional algebra witness; ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))) / head(setToList(ObjectCells(objectOf(v1))))
+MRV immediate domains=[(0,1),(1,23)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=261 children=[81,260]; conditional algebra witness; x(Anchor(v1,BL)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL))
+MRV immediate domains=[(0,2),(1,14)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=577 children=[395,277]; conditional algebra witness; x(Anchor(v1,Center)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=288 children=[287,279]; conditional algebra witness; y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)) / y(Anchor(v1,TL))
+MRV immediate domains=[(0,23),(1,1)]
+Nonempty VS_equal node=289 children=[260,81]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL)) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,14),(1,2)]
+Nonempty VS_equal node=578 children=[277,395]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_equal node=291 children=[279,287]; conditional algebra witness; y(Anchor(v1,TL)) / y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=587 children=[586,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(objects(v0)))))))),IntV (-1)) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_less node=588 children=[586,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(objects(v0)))))))),IntV (-1)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_less node=589 children=[495,84]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(objects(v0)))))))),IntV 1) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,1),(1,15)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=310 children=[292,308]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))))))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_equal node=309 children=[308,292]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,8),(1,1)]
+Nonempty VS_less node=590 children=[509,292]; conditional algebra witness; x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,8),(1,1)]
+Nonempty VS_less node=591 children=[509,342]; conditional algebra witness; x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_less node=592 children=[532,292]; conditional algebra witness; x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),Center)) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_less node=593 children=[532,342]; conditional algebra witness; x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),Center)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=602 children=[601,81]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,7),(1,2)]
+Nonempty VS_less node=603 children=[601,395]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,9),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=614 children=[613,81]; conditional algebra witness; add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV 1) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,9),(1,2)]
+Nonempty VS_less node=615 children=[613,395]; conditional algebra witness; add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV 1) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,8),(1,1)]
+Nonempty VS_lessEqual node=616 children=[509,292]; conditional algebra witness; x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_lessEqual node=617 children=[532,292]; conditional algebra witness; x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),Center)) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_lessEqual node=618 children=[532,342]; conditional algebra witness; x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),Center)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,9),(1,1)]
+Nonempty VS_lessEqual node=619 children=[613,81]; conditional algebra witness; add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV 1) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,22),(1,1)]
+Nonempty VS_lessEqual node=620 children=[571,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))),IntV 1) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,22),(1,1)]
+Nonempty VS_lessEqual node=621 children=[571,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))),IntV 1) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,22),(1,1)]
+Nonempty VS_lessEqual node=622 children=[571,84]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))),IntV 1) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=631 children=[630,81]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,7),(1,2)]
+Nonempty VS_lessEqual node=632 children=[630,395]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,7),(1,2)]
+Nonempty VS_lessEqual node=633 children=[630,398]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))) / x(Anchor(v1,BR))
+MRV immediate domains=[(0,1),(1,15)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=327 children=[84,326]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV 1) / cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_equal node=330 children=[326,84]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,8),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=643 children=[642,292]; conditional algebra witness; add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV (-1)) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=652 children=[651,292]; conditional algebra witness; add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),Center)),IntV (-1)) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_less node=653 children=[651,342]; conditional algebra witness; add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),Center)),IntV (-1)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_less node=654 children=[601,292]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_less node=655 children=[601,342]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,9),(1,1)]
+Nonempty VS_less node=656 children=[613,292]; conditional algebra witness; add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV 1) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,9),(1,1)]
+Nonempty VS_less node=657 children=[613,342]; conditional algebra witness; add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV 1) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,9),(1,1)]
+Nonempty VS_less node=658 children=[613,84]; conditional algebra witness; add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV 1) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,14),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=674 children=[673,81]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV 1) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,14),(1,2)]
+Nonempty VS_less node=675 children=[673,395]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV 1) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,14),(1,2)]
+Nonempty VS_less node=676 children=[673,398]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV 1) / x(Anchor(v1,BR))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=677 children=[601,292]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=678 children=[601,342]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,9),(1,1)]
+Nonempty VS_lessEqual node=679 children=[613,292]; conditional algebra witness; add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV 1) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,9),(1,1)]
+Nonempty VS_lessEqual node=680 children=[613,342]; conditional algebra witness; add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV 1) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,14),(1,1)]
+Nonempty VS_lessEqual node=681 children=[673,81]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV 1) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,14),(1,2)]
+Nonempty VS_lessEqual node=682 children=[673,395]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV 1) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=683 children=[630,292]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=684 children=[630,342]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=685 children=[630,84]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,1),(1,7)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=362 children=[342,350]; conditional algebra witness; add(x(Anchor(v1,Center)),IntV (-1)) / add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=363 children=[332,340]; conditional algebra witness; add(y(Anchor(v1,TL)),IntV 1) / add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV 1)
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_equal node=341 children=[340,332]; conditional algebra witness; add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV 1) / add(y(Anchor(v1,TL)),IntV 1)
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_equal node=351 children=[350,342]; conditional algebra witness; add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV (-1)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=361 children=[352,360]; conditional algebra witness; add(y(Anchor(v1,TL)),IntV (-1)) / add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_equal node=364 children=[360,352]; conditional algebra witness; add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV (-1)) / add(y(Anchor(v1,TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=687 children=[686,81]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,2)]
+Nonempty VS_less node=688 children=[686,395]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,1),(1,2)]
+Nonempty VS_less node=689 children=[686,398]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))) / x(Anchor(v1,BR))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=690 children=[686,81]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,2)]
+Nonempty VS_lessEqual node=691 children=[686,395]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,8),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=692 children=[374,81]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=701 children=[700,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV (-1)) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_less node=702 children=[700,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV (-1)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,14),(1,1)]
+Nonempty VS_less node=703 children=[673,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV 1) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,14),(1,1)]
+Nonempty VS_less node=704 children=[673,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV 1) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,14),(1,1)]
+Nonempty VS_less node=705 children=[673,84]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV 1) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,14),(1,1)]
+Nonempty VS_lessEqual node=706 children=[673,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV 1) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,14),(1,1)]
+Nonempty VS_lessEqual node=707 children=[673,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV 1) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=709 children=[708,81]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1)))))) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,2)]
+Nonempty VS_lessEqual node=710 children=[708,395]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1)))))) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=712 children=[711,81]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))),IntV (-1)) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,2)]
+Nonempty VS_less node=713 children=[711,395]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))),IntV (-1)) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=714 children=[686,84]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=715 children=[686,292]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=716 children=[686,342]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,8),(1,1)]
+Nonempty VS_lessEqual node=717 children=[374,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,8),(1,1)]
+Nonempty VS_lessEqual node=718 children=[374,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=719 children=[708,292]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1)))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=720 children=[708,342]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1)))))) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=721 children=[708,84]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1)))))) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=723 children=[722,81]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1)))))),IntV 1) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,8)]
+Nonempty VS_equal node=376 children=[365,374]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1)
+MRV immediate domains=[(0,8),(1,1)]
+Nonempty VS_equal node=375 children=[374,365]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=724 children=[711,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))),IntV (-1)) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=725 children=[711,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))),IntV (-1)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=726 children=[711,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))),IntV (-1)) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=727 children=[711,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))))))))),IntV (-1)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=728 children=[722,292]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1)))))),IntV 1) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=729 children=[722,342]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1)))))),IntV 1) / add(x(Anchor(v1,Center)),IntV (-1))
+Nonempty VS_lambda node=731 children=[730]; function graph -> parameter binding and output points
+Learn(ListT PlacedT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","map","filter","fold","scan","zipWith","sortBy","head","tail","index","concat","setToList","get","objects"]
+Nonempty VS_filter node=733 children=[731,732]; filter exact multiplicity/order inverse; predicate consistency retained across duplicate inputs
+MRV immediate domains=[(0,1),(1,3)]
+Learn(ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]); return-compatible=["lambda","application","let","if","fst","snd","fold","head","index","get"]
+MRV immediate domains=[(0,178)]
+Learn(BoolT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","contains","get","equal","less","lessEqual"]
+MRV immediate domains=[(0,1),(1,9)]
+Learn(SetT ColorT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","ObjectColors"]
+Learn(ColorT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get","background"]
+Nonempty VS_contains node=17 children=[7,16]; conditional algebra witness; ObjectColors(objectOf(v1)) / ColorV 2
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=734 children=[81,279]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(v1,TL))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=736 children=[81,735]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(v1,Center))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=737 children=[81,85]; conditional algebra witness; x(Anchor(v1,BL)) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=738 children=[81,279]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(v1,TL))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=739 children=[81,735]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(v1,Center))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=740 children=[81,85]; conditional algebra witness; x(Anchor(v1,BL)) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,60),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=79 children=[78,18]; conditional algebra witness; IntV 1 / add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1))
+MRV immediate domains=[(0,1),(1,60)]
+Nonempty VS_equal node=80 children=[18,78]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / IntV 1
+MRV immediate domains=[(0,1),(1,60)]
+Nonempty VS_lessEqual node=741 children=[18,78]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / IntV 1
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=83 children=[81,82]; conditional algebra witness; x(Anchor(v1,BL)) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_equal node=87 children=[82,81]; conditional algebra witness; add(cardinality(ObjectCells(objectOf(v1))),IntV (-1)) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=86 children=[84,85]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV 1) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_equal node=88 children=[85,84]; conditional algebra witness; cardinality(ObjectCells(objectOf(v1))) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=742 children=[292,279]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / y(Anchor(v1,TL))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=743 children=[292,735]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / y(Anchor(v1,Center))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=744 children=[292,85]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,1),(1,89)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=835 children=[81,834]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=844 children=[81,843]; conditional algebra witness; x(Anchor(v1,BL)) / x(Anchor(head(objects(v0)),BR))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=846 children=[81,845]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(v1,Center)),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=847 children=[81,332]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(v1,TL)),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=849 children=[81,848]; conditional algebra witness; x(Anchor(v1,BL)) / add(cardinality(ObjectCells(objectOf(v1))),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=850 children=[292,279]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / y(Anchor(v1,TL))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=851 children=[292,85]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=852 children=[81,332]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(v1,TL)),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=853 children=[81,82]; conditional algebra witness; x(Anchor(v1,BL)) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=854 children=[81,848]; conditional algebra witness; x(Anchor(v1,BL)) / add(cardinality(ObjectCells(objectOf(v1))),IntV 1)
+MRV immediate domains=[(0,1),(1,28)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=855 children=[81,142]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(head(objects(v0)),TL))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=856 children=[81,352]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(v1,TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=858 children=[81,857]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,50)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=910 children=[81,909]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(head(objects(v0)),Center))
+MRV immediate domains=[(0,55),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=200 children=[199,144]; conditional algebra witness; IntV 2 / colorToInt(head(setToList(ObjectColors(objectOf(v1)))))
+MRV immediate domains=[(0,1),(1,55)]
+Nonempty VS_equal node=201 children=[144,199]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / IntV 2
+MRV immediate domains=[(0,1),(1,21)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=112 children=[89,111]; conditional algebra witness; x(Anchor(v1,BR)) / add(y(Anchor(head(objects(v0)),TL)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_equal node=202 children=[111,89]; conditional algebra witness; add(y(Anchor(head(objects(v0)),TL)),IntV (-1)) / x(Anchor(v1,BR))
+MRV immediate domains=[(0,1),(1,28)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=143 children=[113,142]; conditional algebra witness; add(x(Anchor(v1,BR)),IntV 1) / y(Anchor(head(objects(v0)),TL))
+MRV immediate domains=[(0,28),(1,1)]
+Nonempty VS_equal node=203 children=[142,113]; conditional algebra witness; y(Anchor(head(objects(v0)),TL)) / add(x(Anchor(v1,BR)),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=911 children=[144,82]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=912 children=[365,85]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=913 children=[292,332]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(v1,TL)),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=914 children=[292,82]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=915 children=[292,848]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(v1))),IntV 1)
+MRV immediate domains=[(0,1),(1,28)]
+Nonempty VS_less node=916 children=[292,142]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / y(Anchor(head(objects(v0)),TL))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=917 children=[292,352]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(v1,TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=918 children=[292,857]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,50)]
+Nonempty VS_less node=919 children=[292,909]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / y(Anchor(head(objects(v0)),Center))
+MRV immediate domains=[(0,1),(1,21)]
+Nonempty VS_less node=920 children=[81,111]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(head(objects(v0)),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,55)]
+Nonempty VS_lessEqual node=921 children=[144,199]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / IntV 2
+MRV immediate domains=[(0,1),(1,7)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=930 children=[292,929]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / cardinality(ObjectCells(objectOf(head(objects(v0)))))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=931 children=[292,82]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=932 children=[292,848]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(v1))),IntV 1)
+MRV immediate domains=[(0,1),(1,28)]
+Nonempty VS_lessEqual node=933 children=[292,142]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / y(Anchor(head(objects(v0)),TL))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=934 children=[292,352]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(v1,TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=935 children=[292,857]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=944 children=[81,943]; conditional algebra witness; x(Anchor(v1,BL)) / add(cardinality(ObjectCells(objectOf(head(objects(v0))))),IntV 1)
+MRV immediate domains=[(0,1),(1,21)]
+Nonempty VS_lessEqual node=945 children=[81,111]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(head(objects(v0)),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=954 children=[81,953]; conditional algebra witness; x(Anchor(v1,BL)) / add(x(Anchor(head(objects(v0)),BR)),IntV (-1))
+MRV immediate domains=[(0,1),(1,23)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=979 children=[292,978]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / cardinality(ObjectCells(objectOf(head(tail(objects(v0))))))
+MRV immediate domains=[(0,1),(1,23)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1004 children=[81,1003]; conditional algebra witness; x(Anchor(v1,BL)) / add(cardinality(ObjectCells(objectOf(head(tail(objects(v0)))))),IntV 1)
+MRV immediate domains=[(0,1),(1,21)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=205 children=[204,111]; conditional algebra witness; add(x(Anchor(v1,Center)),IntV 1) / add(y(Anchor(head(objects(v0)),TL)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_equal node=206 children=[111,204]; conditional algebra witness; add(y(Anchor(head(objects(v0)),TL)),IntV (-1)) / add(x(Anchor(v1,Center)),IntV 1)
+MRV immediate domains=[(0,1),(1,55)]
+Nonempty VS_less node=1005 children=[18,199]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / IntV 2
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=1006 children=[365,82]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_less node=1007 children=[292,943]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(head(objects(v0))))),IntV 1)
+MRV immediate domains=[(0,1),(1,21)]
+Nonempty VS_less node=1008 children=[292,111]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(head(objects(v0)),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_less node=1009 children=[292,953]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(x(Anchor(head(objects(v0)),BR)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=1010 children=[365,82]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_lessEqual node=1011 children=[292,943]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(head(objects(v0))))),IntV 1)
+MRV immediate domains=[(0,1),(1,21)]
+Nonempty VS_lessEqual node=1012 children=[292,111]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(head(objects(v0)),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,23)]
+Nonempty VS_less node=1013 children=[292,1003]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(head(tail(objects(v0)))))),IntV 1)
+MRV immediate domains=[(0,1),(1,23)]
+Nonempty VS_lessEqual node=1014 children=[292,1003]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(head(tail(objects(v0)))))),IntV 1)
+MRV immediate domains=[(0,15),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1015 children=[308,85]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,1),(1,29)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1046 children=[81,1045]; conditional algebra witness; x(Anchor(v1,BL)) / x(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),Center))
+MRV immediate domains=[(0,1),(1,22)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1070 children=[81,1069]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL))
+MRV immediate domains=[(0,1),(1,21)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1071 children=[144,458]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1))))))
+MRV immediate domains=[(0,1),(1,22)]
+Nonempty VS_lessEqual node=1072 children=[81,1069]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL))
+MRV immediate domains=[(0,1),(1,36)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1110 children=[81,1109]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),TL))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(ColorT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get","background"]
+Learn(SetT ColorT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","ObjectColors"]
+Nonempty VS_contains node=216 children=[215,207]; conditional algebra witness; ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))) / head(setToList(ObjectColors(objectOf(v1))))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(CellT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get"]
+Learn(SetT CellT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","cells","ObjectCells"]
+Nonempty VS_contains node=226 children=[225,217]; conditional algebra witness; ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))) / head(setToList(ObjectCells(objectOf(v1))))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(SetT CellT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","cells","ObjectCells"]
+Learn(CellT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get"]
+Nonempty VS_contains node=236 children=[227,235]; conditional algebra witness; ObjectCells(objectOf(v1)) / head(setToList(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))
+MRV immediate domains=[(0,11),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=1123 children=[1122,735]; conditional algebra witness; y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)) / y(Anchor(v1,Center))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=288 children=[287,279]; conditional algebra witness; y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)) / y(Anchor(v1,TL))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_equal node=291 children=[279,287]; conditional algebra witness; y(Anchor(v1,TL)) / y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL))
+MRV immediate domains=[(0,1),(1,11)]
+Nonempty VS_equal node=1124 children=[735,1122]; conditional algebra witness; y(Anchor(v1,Center)) / y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,1),(1,23)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=261 children=[81,260]; conditional algebra witness; x(Anchor(v1,BL)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL))
+MRV immediate domains=[(0,23),(1,1)]
+Nonempty VS_equal node=289 children=[260,81]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL)) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,14)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=278 children=[262,277]; conditional algebra witness; x(Anchor(v1,Center)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,1),(1,15)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=1125 children=[85,326]; conditional algebra witness; cardinality(ObjectCells(objectOf(v1))) / cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))
+MRV immediate domains=[(0,14),(1,1)]
+Nonempty VS_equal node=290 children=[277,262]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_equal node=1126 children=[326,85]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,1),(1,11)]
+Nonempty VS_less node=1127 children=[81,1122]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_less node=1128 children=[81,287]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_less node=1129 children=[81,326]; conditional algebra witness; x(Anchor(v1,BL)) / cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))
+MRV immediate domains=[(0,1),(1,23)]
+Nonempty VS_lessEqual node=1130 children=[81,260]; conditional algebra witness; x(Anchor(v1,BL)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL))
+MRV immediate domains=[(0,1),(1,14)]
+Nonempty VS_lessEqual node=1131 children=[81,277]; conditional algebra witness; x(Anchor(v1,BL)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_lessEqual node=1132 children=[81,326]; conditional algebra witness; x(Anchor(v1,BL)) / cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_equal node=309 children=[308,292]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_equal node=310 children=[292,308]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))))))
+MRV immediate domains=[(0,1),(1,21)]
+Nonempty VS_less node=1133 children=[18,458]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1))))))
+MRV immediate domains=[(0,1),(1,22)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1134 children=[144,571]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))),IntV 1)
+MRV immediate domains=[(0,22),(1,1)]
+Nonempty VS_less node=1135 children=[571,82]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))),IntV 1) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_less node=1136 children=[308,82]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,22)]
+Nonempty VS_less node=1137 children=[292,1069]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL))
+MRV immediate domains=[(0,1),(1,36)]
+Nonempty VS_less node=1138 children=[292,1109]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / y(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),TL))
+MRV immediate domains=[(0,1),(1,15)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1155 children=[81,1154]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL)),IntV (-1))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_lessEqual node=1156 children=[308,82]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_lessEqual node=1157 children=[292,308]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))))))
+MRV immediate domains=[(0,1),(1,22)]
+Nonempty VS_lessEqual node=1158 children=[292,1069]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_lessEqual node=1159 children=[81,1154]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,11)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1172 children=[81,1171]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(head(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),TL))
+MRV immediate domains=[(0,1),(1,23)]
+Nonempty VS_equal node=1173 children=[82,260]; conditional algebra witness; add(cardinality(ObjectCells(objectOf(v1))),IntV (-1)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL))
+MRV immediate domains=[(0,23),(1,1)]
+Nonempty VS_equal node=1174 children=[260,82]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL)) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_equal node=327 children=[84,326]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV 1) / cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))
+MRV immediate domains=[(0,14),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=329 children=[277,328]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)) / add(x(Anchor(v1,BR)),IntV (-1))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_equal node=330 children=[326,84]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,1),(1,14)]
+Nonempty VS_equal node=331 children=[328,277]; conditional algebra witness; add(x(Anchor(v1,BR)),IntV (-1)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,1),(1,23)]
+Nonempty VS_less node=1175 children=[292,260]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL))
+MRV immediate domains=[(0,1),(1,14)]
+Nonempty VS_less node=1176 children=[292,277]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_less node=1177 children=[292,326]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))
+MRV immediate domains=[(0,1),(1,2)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1181 children=[81,1180]; conditional algebra witness; x(Anchor(v1,BL)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0)))),Center))
+MRV immediate domains=[(0,1),(1,23)]
+Nonempty VS_lessEqual node=1182 children=[292,260]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL))
+MRV immediate domains=[(0,1),(1,14)]
+Nonempty VS_lessEqual node=1183 children=[292,277]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_lessEqual node=1184 children=[292,326]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1185 children=[81,360]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_equal node=1186 children=[848,1154]; conditional algebra witness; add(cardinality(ObjectCells(objectOf(v1))),IntV 1) / add(y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL)),IntV (-1))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_equal node=1187 children=[1154,848]; conditional algebra witness; add(y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(v1))),IntV 1)
+MRV immediate domains=[(0,1),(1,11)]
+Nonempty VS_equal node=1188 children=[857,1171]; conditional algebra witness; add(y(Anchor(v1,Center)),IntV (-1)) / y(Anchor(head(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),TL))
+MRV immediate domains=[(0,11),(1,1)]
+Nonempty VS_equal node=1189 children=[1171,857]; conditional algebra witness; y(Anchor(head(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),TL)) / add(y(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1190 children=[144,630]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))))))))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_less node=1191 children=[630,82]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_less node=1192 children=[365,308]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))))))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1201 children=[1200,85]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))),IntV 1) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_less node=1202 children=[292,1154]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,11)]
+Nonempty VS_less node=1203 children=[292,1171]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / y(Anchor(head(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),TL))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1205 children=[81,1204]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1),TL))
+MRV immediate domains=[(0,1),(1,8)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1206 children=[18,509]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL))
+MRV immediate domains=[(0,1),(1,21)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1207 children=[18,532]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),Center))
+MRV immediate domains=[(0,1),(1,9)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1208 children=[144,613]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV 1)
+MRV immediate domains=[(0,1),(1,22)]
+Nonempty VS_lessEqual node=1209 children=[365,571]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))),IntV 1)
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_lessEqual node=1210 children=[292,1154]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=1211 children=[81,1204]; conditional algebra witness; x(Anchor(v1,BL)) / y(Anchor(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1),TL))
+MRV immediate domains=[(0,1),(1,2)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1215 children=[81,1214]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(head(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,10)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=1227 children=[845,1226]; conditional algebra witness; add(y(Anchor(v1,Center)),IntV 1) / add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV 1)
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=341 children=[340,332]; conditional algebra witness; add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV 1) / add(y(Anchor(v1,TL)),IntV 1)
+MRV immediate domains=[(0,10),(1,1)]
+Nonempty VS_equal node=1228 children=[1226,845]; conditional algebra witness; add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV 1) / add(y(Anchor(v1,Center)),IntV 1)
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_equal node=363 children=[332,340]; conditional algebra witness; add(y(Anchor(v1,TL)),IntV 1) / add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV 1)
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=351 children=[350,342]; conditional algebra witness; add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV (-1)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_equal node=362 children=[342,350]; conditional algebra witness; add(x(Anchor(v1,Center)),IntV (-1)) / add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_equal node=361 children=[352,360]; conditional algebra witness; add(y(Anchor(v1,TL)),IntV (-1)) / add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_equal node=364 children=[360,352]; conditional algebra witness; add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV (-1)) / add(y(Anchor(v1,TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_less node=1229 children=[292,360]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_lessEqual node=1230 children=[292,350]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1232 children=[81,1231]; conditional algebra witness; x(Anchor(v1,BL)) / add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0)))),Center)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=1233 children=[350,82]; conditional algebra witness; add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,9)]
+Nonempty VS_less node=1234 children=[18,613]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=1235 children=[292,1204]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / y(Anchor(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1),TL))
+MRV immediate domains=[(0,1),(1,2)]
+Nonempty VS_less node=1236 children=[292,1214]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(head(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1238 children=[81,1237]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1239 children=[18,601]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))
+MRV immediate domains=[(0,1),(1,14)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1240 children=[144,673]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV 1)
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_lessEqual node=1241 children=[365,630]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))))))))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=1242 children=[1200,82]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))),IntV 1) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_lessEqual node=1243 children=[292,1200]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))),IntV 1)
+MRV immediate domains=[(0,1),(1,2)]
+Nonempty VS_lessEqual node=1244 children=[292,1214]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(head(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=1245 children=[81,1237]; conditional algebra witness; x(Anchor(v1,BL)) / add(y(Anchor(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,8)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1246 children=[144,374]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=1247 children=[292,1231]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0)))),Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,14)]
+Nonempty VS_less node=1248 children=[18,673]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1249 children=[144,708]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1))))))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_less node=1250 children=[365,1200]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=1251 children=[292,1237]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1),TL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=1252 children=[292,1237]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / add(y(Anchor(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1),TL)),IntV (-1))
+MRV immediate domains=[(0,8),(1,1)]
+Nonempty VS_equal node=375 children=[374,365]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1)
+MRV immediate domains=[(0,1),(1,8)]
+Nonempty VS_equal node=376 children=[365,374]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1)
+MRV immediate domains=[(0,1),(1,8)]
+Nonempty VS_lessEqual node=1253 children=[365,374]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1254 children=[722,82]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1)))))),IntV 1) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=1255 children=[365,708]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1))))))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=1256 children=[365,722]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1)))))),IntV 1)
+Nonempty VS_lambda node=1258 children=[1257]; function graph -> parameter binding and output points
+Learn(ListT PlacedT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","map","filter","fold","scan","zipWith","sortBy","head","tail","index","concat","setToList","get","objects"]
+Nonempty VS_filter node=1263 children=[1258,1262]; filter exact multiplicity/order inverse; predicate consistency retained across duplicate inputs
+MRV immediate domains=[(0,1),(1,1)]
+Learn(ListT PlacedT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","map","filter","fold","scan","zipWith","sortBy","head","tail","index","concat","setToList","get","objects"]
+Nonempty VS_filter node=1265 children=[378,1264]; filter exact multiplicity/order inverse; predicate consistency retained across duplicate inputs
+MRV immediate domains=[(0,1),(1,1)]
+Learn(ListT PlacedT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","map","filter","fold","scan","zipWith","sortBy","head","tail","index","concat","setToList","get","objects"]
+Nonempty VS_filter node=1267 children=[378,1266]; filter exact multiplicity/order inverse; predicate consistency retained across duplicate inputs
+MRV immediate domains=[(0,1),(1,3)]
+Learn(ListT PlacedT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","map","filter","fold","scan","zipWith","sortBy","head","tail","index","concat","setToList","get","objects"]
+Nonempty VS_filter node=1272 children=[378,1271]; filter exact multiplicity/order inverse; predicate consistency retained across duplicate inputs
+MRV immediate domains=[(0,1),(1,1)]
+Learn(ListT PlacedT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","map","filter","fold","scan","zipWith","sortBy","head","tail","index","concat","setToList","get","objects"]
+Nonempty VS_filter node=1274 children=[378,1273]; filter exact multiplicity/order inverse; predicate consistency retained across duplicate inputs
+MRV immediate domains=[(0,1),(1,3)]
+Learn(ListT PlacedT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","map","filter","fold","scan","zipWith","sortBy","head","tail","index","concat","setToList","get","objects"]
+Nonempty VS_filter node=1279 children=[731,1278]; filter exact multiplicity/order inverse; predicate consistency retained across duplicate inputs
+MRV immediate domains=[(0,1),(1,1)]
+Learn(ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]); return-compatible=["lambda","application","let","if","fst","snd","fold","head","index","get"]
+MRV immediate domains=[(0,83)]
+Learn(BoolT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","contains","get","equal","less","lessEqual"]
+MRV immediate domains=[(0,1),(1,9)]
+Learn(SetT ColorT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","ObjectColors"]
+Learn(ColorT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get","background"]
+Nonempty VS_contains node=17 children=[7,16]; conditional algebra witness; ObjectColors(objectOf(v1)) / ColorV 2
+MRV immediate domains=[(0,60),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=79 children=[78,18]; conditional algebra witness; IntV 1 / add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1))
+MRV immediate domains=[(0,1),(1,60)]
+Nonempty VS_equal node=80 children=[18,78]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / IntV 1
+MRV immediate domains=[(0,1),(1,60)]
+Nonempty VS_lessEqual node=741 children=[18,78]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / IntV 1
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=83 children=[81,82]; conditional algebra witness; x(Anchor(v1,BL)) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_equal node=87 children=[82,81]; conditional algebra witness; add(cardinality(ObjectCells(objectOf(v1))),IntV (-1)) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=86 children=[84,85]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV 1) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_equal node=88 children=[85,84]; conditional algebra witness; cardinality(ObjectCells(objectOf(v1))) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,55),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=200 children=[199,144]; conditional algebra witness; IntV 2 / colorToInt(head(setToList(ObjectColors(objectOf(v1)))))
+MRV immediate domains=[(0,1),(1,55)]
+Nonempty VS_equal node=201 children=[144,199]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / IntV 2
+MRV immediate domains=[(0,1),(1,21)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=112 children=[89,111]; conditional algebra witness; x(Anchor(v1,BR)) / add(y(Anchor(head(objects(v0)),TL)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_equal node=202 children=[111,89]; conditional algebra witness; add(y(Anchor(head(objects(v0)),TL)),IntV (-1)) / x(Anchor(v1,BR))
+MRV immediate domains=[(0,1),(1,28)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=143 children=[113,142]; conditional algebra witness; add(x(Anchor(v1,BR)),IntV 1) / y(Anchor(head(objects(v0)),TL))
+MRV immediate domains=[(0,28),(1,1)]
+Nonempty VS_equal node=203 children=[142,113]; conditional algebra witness; y(Anchor(head(objects(v0)),TL)) / add(x(Anchor(v1,BR)),IntV 1)
+MRV immediate domains=[(0,1),(1,55)]
+Nonempty VS_lessEqual node=921 children=[144,199]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / IntV 2
+MRV immediate domains=[(0,1),(1,21)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=205 children=[204,111]; conditional algebra witness; add(x(Anchor(v1,Center)),IntV 1) / add(y(Anchor(head(objects(v0)),TL)),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Nonempty VS_equal node=206 children=[111,204]; conditional algebra witness; add(y(Anchor(head(objects(v0)),TL)),IntV (-1)) / add(x(Anchor(v1,Center)),IntV 1)
+MRV immediate domains=[(0,1),(1,55)]
+Nonempty VS_less node=1005 children=[18,199]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / IntV 2
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1006 children=[365,82]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,21),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1280 children=[111,848]; conditional algebra witness; add(y(Anchor(head(objects(v0)),TL)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(v1))),IntV 1)
+MRV immediate domains=[(0,15),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1015 children=[308,85]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(ColorT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get","background"]
+Learn(SetT ColorT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","ObjectColors"]
+Nonempty VS_contains node=216 children=[215,207]; conditional algebra witness; ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))) / head(setToList(ObjectColors(objectOf(v1))))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(CellT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get"]
+Learn(SetT CellT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","cells","ObjectCells"]
+Nonempty VS_contains node=226 children=[225,217]; conditional algebra witness; ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))) / head(setToList(ObjectCells(objectOf(v1))))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(SetT CellT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","head","index","get","cells","ObjectCells"]
+Learn(CellT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","head","index","get"]
+Nonempty VS_contains node=236 children=[227,235]; conditional algebra witness; ObjectCells(objectOf(v1)) / head(setToList(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))
+MRV immediate domains=[(0,11),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=1123 children=[1122,735]; conditional algebra witness; y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)) / y(Anchor(v1,Center))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=288 children=[287,279]; conditional algebra witness; y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)) / y(Anchor(v1,TL))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_equal node=291 children=[279,287]; conditional algebra witness; y(Anchor(v1,TL)) / y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL))
+MRV immediate domains=[(0,1),(1,11)]
+Nonempty VS_equal node=1124 children=[735,1122]; conditional algebra witness; y(Anchor(v1,Center)) / y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,1),(1,23)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=261 children=[81,260]; conditional algebra witness; x(Anchor(v1,BL)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL))
+MRV immediate domains=[(0,23),(1,1)]
+Nonempty VS_equal node=289 children=[260,81]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL)) / x(Anchor(v1,BL))
+MRV immediate domains=[(0,1),(1,14)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=278 children=[262,277]; conditional algebra witness; x(Anchor(v1,Center)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,1),(1,15)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=1125 children=[85,326]; conditional algebra witness; cardinality(ObjectCells(objectOf(v1))) / cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))
+MRV immediate domains=[(0,14),(1,1)]
+Nonempty VS_equal node=290 children=[277,262]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)) / x(Anchor(v1,Center))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_equal node=1126 children=[326,85]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,23),(1,1)]
+Nonempty VS_less node=1281 children=[260,85]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL)) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,23),(1,1)]
+Nonempty VS_lessEqual node=1282 children=[260,85]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL)) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,14),(1,1)]
+Nonempty VS_lessEqual node=1283 children=[277,85]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_lessEqual node=1284 children=[326,85]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,15),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=309 children=[308,292]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))) / add(x(Anchor(v1,BL)),IntV (-1))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_equal node=310 children=[292,308]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV (-1)) / cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))))))
+MRV immediate domains=[(0,22),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1135 children=[571,82]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(objects(v0)),IntV 1)))))),IntV 1) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_less node=1136 children=[308,82]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_lessEqual node=1156 children=[308,82]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,23)]
+Nonempty VS_equal node=1173 children=[82,260]; conditional algebra witness; add(cardinality(ObjectCells(objectOf(v1))),IntV (-1)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL))
+MRV immediate domains=[(0,23),(1,1)]
+Nonempty VS_equal node=1174 children=[260,82]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL)) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,15)]
+Nonempty VS_equal node=327 children=[84,326]; conditional algebra witness; add(x(Anchor(v1,BL)),IntV 1) / cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))))
+MRV immediate domains=[(0,14),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=329 children=[277,328]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)) / add(x(Anchor(v1,BR)),IntV (-1))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_equal node=330 children=[326,84]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))) / add(x(Anchor(v1,BL)),IntV 1)
+MRV immediate domains=[(0,1),(1,14)]
+Nonempty VS_equal node=331 children=[328,277]; conditional algebra witness; add(x(Anchor(v1,BR)),IntV (-1)) / x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1285 children=[350,85]; conditional algebra witness; add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV (-1)) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,23),(1,1)]
+Nonempty VS_less node=1286 children=[260,848]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL)) / add(cardinality(ObjectCells(objectOf(v1))),IntV 1)
+MRV immediate domains=[(0,14),(1,1)]
+Nonempty VS_less node=1287 children=[277,848]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)) / add(cardinality(ObjectCells(objectOf(v1))),IntV 1)
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_less node=1288 children=[326,848]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))) / add(cardinality(ObjectCells(objectOf(v1))),IntV 1)
+MRV immediate domains=[(0,23),(1,1)]
+Nonempty VS_lessEqual node=1289 children=[260,82]; conditional algebra witness; x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),BL)) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_lessEqual node=1290 children=[326,848]; conditional algebra witness; cardinality(ObjectCells(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))) / add(cardinality(ObjectCells(objectOf(v1))),IntV 1)
+MRV immediate domains=[(0,1),(1,15)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=1186 children=[848,1154]; conditional algebra witness; add(cardinality(ObjectCells(objectOf(v1))),IntV 1) / add(y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL)),IntV (-1))
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_equal node=1187 children=[1154,848]; conditional algebra witness; add(y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(v1))),IntV 1)
+MRV immediate domains=[(0,1),(1,11)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=1188 children=[857,1171]; conditional algebra witness; add(y(Anchor(v1,Center)),IntV (-1)) / y(Anchor(head(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),TL))
+MRV immediate domains=[(0,11),(1,1)]
+Nonempty VS_equal node=1189 children=[1171,857]; conditional algebra witness; y(Anchor(head(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),TL)) / add(y(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1191 children=[630,82]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1201 children=[1200,85]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))),IntV 1) / cardinality(ObjectCells(objectOf(v1)))
+MRV immediate domains=[(0,1),(1,8)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1206 children=[18,509]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL))
+MRV immediate domains=[(0,1),(1,9)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_lessEqual node=1208 children=[144,613]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV 1)
+MRV immediate domains=[(0,15),(1,1)]
+Nonempty VS_lessEqual node=1291 children=[1154,848]; conditional algebra witness; add(y(Anchor(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))),TL)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(v1))),IntV 1)
+MRV immediate domains=[(0,1),(1,10)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=1227 children=[845,1226]; conditional algebra witness; add(y(Anchor(v1,Center)),IntV 1) / add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV 1)
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=341 children=[340,332]; conditional algebra witness; add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV 1) / add(y(Anchor(v1,TL)),IntV 1)
+MRV immediate domains=[(0,10),(1,1)]
+Nonempty VS_equal node=1228 children=[1226,845]; conditional algebra witness; add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV 1) / add(y(Anchor(v1,Center)),IntV 1)
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_equal node=363 children=[332,340]; conditional algebra witness; add(y(Anchor(v1,TL)),IntV 1) / add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV 1)
+MRV immediate domains=[(0,7),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=351 children=[350,342]; conditional algebra witness; add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV (-1)) / add(x(Anchor(v1,Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Nonempty VS_equal node=362 children=[342,350]; conditional algebra witness; add(x(Anchor(v1,Center)),IntV (-1)) / add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV (-1))
+MRV immediate domains=[(0,1),(1,7)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_equal node=361 children=[352,360]; conditional algebra witness; add(y(Anchor(v1,TL)),IntV (-1)) / add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_equal node=364 children=[360,352]; conditional algebra witness; add(y(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),TL)),IntV (-1)) / add(y(Anchor(v1,TL)),IntV (-1))
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=1233 children=[350,82]; conditional algebra witness; add(x(Anchor(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))),Center)),IntV (-1)) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,9)]
+Nonempty VS_less node=1234 children=[18,613]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)) / add(x(Anchor(head(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))),BL)),IntV 1)
+MRV immediate domains=[(0,7),(1,1)]
+Nonempty VS_lessEqual node=1242 children=[1200,82]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))))),IntV 1) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,8)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1246 children=[144,374]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1249 children=[144,708]; conditional algebra witness; colorToInt(head(setToList(ObjectColors(objectOf(v1))))) / colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1))))))
+MRV immediate domains=[(0,8),(1,1)]
+Nonempty VS_equal node=375 children=[374,365]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1)
+MRV immediate domains=[(0,1),(1,8)]
+Nonempty VS_equal node=376 children=[365,374]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1)
+MRV immediate domains=[(0,1),(1,8)]
+Nonempty VS_lessEqual node=1253 children=[365,374]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))))),IntV 1)
+MRV immediate domains=[(0,1),(1,1)]
+Learn(IntT; observations=4; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-compatible=["application","let","if","fst","snd","fold","argminBy","argmaxBy","length","head","index","cardinality","get","add","subtract","multiply","x","y","dx","dy","width","height","colorToInt"]
+Nonempty VS_less node=1254 children=[722,82]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1)))))),IntV 1) / add(cardinality(ObjectCells(objectOf(v1))),IntV (-1))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_lessEqual node=1255 children=[365,708]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1))))))
+MRV immediate domains=[(0,1),(1,1)]
+Nonempty VS_less node=1256 children=[365,722]; conditional algebra witness; add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV 1) / add(colorToInt(head(setToList(ObjectColors(objectOf(index(tail(sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0))),IntV 1)))))),IntV 1)
+Nonempty VS_lambda node=1293 children=[1292]; function graph -> parameter binding and output points
+Learn(ListT PlacedT; observations=2; Gamma=[("v0",SceneT)]); return-compatible=["application","let","if","fst","snd","map","filter","fold","scan","zipWith","sortBy","head","tail","index","concat","setToList","get","objects"]
+Nonempty VS_filter node=1295 children=[1293,1294]; filter exact multiplicity/order inverse; predicate consistency retained across duplicate inputs
+Nonempty VS_mkScene node=1297 children=[3,6,1296]; mkScene residual: canonical correspondence + Render-validated paint order; branch=0
+Nonempty VS_lambda node=1298 children=[1297]; function graph -> parameter binding and output points
+Task TSL supported Base=["Anchor","ObjectCells","ObjectColors","add","background","canvasSize","cardinality","colorToInt","contains","coord","equal","filter","head","height","index","lambda","less","lessEqual","literal","mkScene","objectOf","objects","setToList","sortBy","subtract","tail","width","x","y"]
+Cost saturation C=1..25 root representatives=[(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(11,0),(12,0),(13,0),(14,1),(15,2),(16,2),(17,2),(18,2),(19,4),(20,17),(21,32),(22,51),(23,72),(24,91),(25,142)]
+Abstraction round=0; exact frontier=142; accepted=["I0","I1","I2","I3","I4","I5"]
+Learn uses I0 by typed definition expansion; ArrowT PlacedT BoolT; observations=6; Gamma=[("v0",SceneT)]
+Learn uses I1 by typed definition expansion; ArrowT PlacedT BoolT; observations=6; Gamma=[("v0",SceneT)]
+Learn uses I2 by typed definition expansion; ArrowT PlacedT BoolT; observations=6; Gamma=[("v0",SceneT)]
+Learn uses I3 by typed definition expansion; ArrowT PlacedT BoolT; observations=6; Gamma=[("v0",SceneT)]
+Learn uses I4 by typed definition expansion; ArrowT PlacedT BoolT; observations=6; Gamma=[("v0",SceneT)]
+Learn uses I5 by typed definition expansion; ArrowT PlacedT BoolT; observations=6; Gamma=[("v0",SceneT)]
+Learn uses I0 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I1 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I2 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I3 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I4 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I5 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I0 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I1 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I2 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I3 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I4 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I5 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I0 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I1 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I2 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I3 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I4 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Learn uses I5 by typed definition expansion; ArrowT PlacedT BoolT; observations=4; Gamma=[("v0",SceneT)]
+Task TSL supported Base=["Anchor","ObjectCells","ObjectColors","add","background","canvasSize","cardinality","colorToInt","contains","coord","equal","filter","head","height","index","lambda","less","lessEqual","literal","mkScene","objectOf","objects","setToList","sortBy","subtract","tail","width","x","y"]
+Cost saturation C=1..25 root representatives=[(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(11,0),(12,0),(13,0),(14,1),(15,2),(16,2),(17,2),(18,2),(19,4),(20,17),(21,32),(22,51),(23,72),(24,91),(25,142)]
+Abstraction round=1; exact frontier=142; accepted=[]
+Cost saturation C=1..24 root representatives=[(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(11,0),(12,0),(13,0),(14,1),(15,2),(16,2),(17,2),(18,2),(19,4),(20,17),(21,32),(22,51),(23,72),(24,85)]
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(25,9,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(27,10,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(34,13,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(IntV 1,add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(34,13,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)),IntV 1)),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(35,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(35,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(35,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(35,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. x(Anchor(key,TL))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(35,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. y(Anchor(key,BR))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(35,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. y(Anchor(key,Center))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(35,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. y(Anchor(key,TL))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(35,13,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(add(cardinality(ObjectCells(objectOf(__r1b0))),IntV (-1)),x(Anchor(__r1b0,TL)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(35,13,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(add(x(Anchor(__r1b0,TL)),IntV 1),cardinality(ObjectCells(objectOf(__r1b0))))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(35,13,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(cardinality(ObjectCells(objectOf(__r1b0))),add(x(Anchor(__r1b0,TL)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(35,13,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(x(Anchor(v1,TL)),add(cardinality(ObjectCells(objectOf(v1))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(36,14,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. equal(IntV 1,add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(36,14,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)),IntV 1)),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. x(Anchor(key,TL))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. x(Anchor(key,TL))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. y(Anchor(key,BR))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. y(Anchor(key,Center))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. y(Anchor(key,TL))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,14,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. equal(add(cardinality(ObjectCells(objectOf(__r1b0))),IntV (-1)),x(Anchor(__r1b0,TL)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,14,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. equal(add(x(Anchor(__r1b0,TL)),IntV 1),cardinality(ObjectCells(objectOf(__r1b0))))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,14,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. equal(cardinality(ObjectCells(objectOf(__r1b0))),add(x(Anchor(__r1b0,TL)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,14,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(x(Anchor(v1,TL)),add(cardinality(ObjectCells(objectOf(v1))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(38,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(38,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,BR)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(38,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,Center)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(38,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,TL)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(38,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,y(Anchor(key,BR)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(38,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,y(Anchor(key,Center)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(38,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,y(Anchor(key,TL)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(38,14,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(cardinality(ObjectColors(objectOf(v1))),IntV 1),colorToInt(head(setToList(ObjectColors(objectOf(v1))))))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(38,14,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)),cardinality(ObjectColors(objectOf(v1))))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(x(Anchor(v1,BR)),IntV 1),y(Anchor(head(objects(v0)),TL)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(y(Anchor(head(objects(v0)),TL)),IntV (-1)),x(Anchor(v1,BR)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(38,14,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(cardinality(ObjectColors(objectOf(v1))),add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(38,14,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),add(cardinality(ObjectColors(objectOf(v1))),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(x(Anchor(v1,BR)),add(y(Anchor(head(objects(v0)),TL)),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(37,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(y(Anchor(head(objects(v0)),TL)),add(x(Anchor(v1,BR)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(39,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(39,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(39,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(39,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. x(Anchor(key,TL))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,BR)))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,Center)))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,TL)))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. subtract(IntV 0,y(Anchor(key,Center)))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(colorToInt(background(v0)),IntV 1),add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)),add(colorToInt(background(v0)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,cardinality(ObjectCells(objectOf(key))))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,BR)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,Center)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,TL)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,y(Anchor(key,BR)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,y(Anchor(key,Center)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),sortBy((lambda key:PlacedT. subtract(IntV 0,y(Anchor(key,TL)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,15,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(cardinality(ObjectColors(objectOf(v1))),IntV 1),colorToInt(head(setToList(ObjectColors(objectOf(v1))))))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,15,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)),cardinality(ObjectColors(objectOf(v1))))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(39,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(x(Anchor(v1,BR)),IntV 1),y(Anchor(head(objects(v0)),TL)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(39,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(y(Anchor(head(objects(v0)),TL)),IntV (-1)),x(Anchor(v1,BR)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,15,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(cardinality(ObjectColors(objectOf(v1))),add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,15,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),add(cardinality(ObjectColors(objectOf(v1))),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(39,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(x(Anchor(v1,BR)),add(y(Anchor(head(objects(v0)),TL)),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(39,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(y(Anchor(head(objects(v0)),TL)),add(x(Anchor(v1,BR)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(cardinality(ObjectColors(objectOf(head(objects(v0))))),IntV 1),colorToInt(head(setToList(ObjectColors(objectOf(v1))))))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,15,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)),add(x(coord(IntV 0,IntV 0)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,15,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)),add(y(coord(IntV 0,IntV 0)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)),cardinality(ObjectColors(objectOf(head(objects(v0))))))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(39,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(x(Anchor(v1,BR)),IntV 1),add(y(Anchor(head(objects(v0)),Center)),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(39,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(x(Anchor(v1,Center)),IntV 1),add(y(Anchor(head(objects(v0)),TL)),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,15,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(x(coord(IntV 0,IntV 0)),IntV 1),add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(39,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(y(Anchor(head(objects(v0)),Center)),IntV (-1)),add(x(Anchor(v1,BR)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(39,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(y(Anchor(head(objects(v0)),TL)),IntV (-1)),add(x(Anchor(v1,Center)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,15,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(y(coord(IntV 0,IntV 0)),IntV 1),add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(cardinality(ObjectColors(objectOf(head(objects(v0))))),add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),add(cardinality(ObjectColors(objectOf(head(objects(v0))))),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(42,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. less(IntV 1,add(x(Anchor(v1,TL)),IntV (-1)))),tail(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(42,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,BR)))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(42,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,Center)))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(42,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,TL)))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(42,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),tail(sortBy((lambda key:PlacedT. subtract(IntV 0,y(Anchor(key,Center)))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(colorToInt(background(v0)),IntV 1),add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)),add(colorToInt(background(v0)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(IntV 1,add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)))),sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(IntV 1,add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)))),sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(IntV 1,add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)))),sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(IntV 1,add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)))),sortBy((lambda key:PlacedT. x(Anchor(key,TL))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(IntV 1,add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)))),sortBy((lambda key:PlacedT. y(Anchor(key,BR))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(IntV 1,add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)))),sortBy((lambda key:PlacedT. y(Anchor(key,Center))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(IntV 1,add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)))),sortBy((lambda key:PlacedT. y(Anchor(key,TL))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)),IntV 1)),sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)),IntV 1)),sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)),IntV 1)),sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)),IntV 1)),sortBy((lambda key:PlacedT. x(Anchor(key,TL))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)),IntV 1)),sortBy((lambda key:PlacedT. y(Anchor(key,BR))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)),IntV 1)),sortBy((lambda key:PlacedT. y(Anchor(key,Center))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)),IntV 1)),sortBy((lambda key:PlacedT. y(Anchor(key,TL))),objects(v0)))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(43,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(cardinality(ObjectColors(objectOf(head(tail(objects(v0)))))),IntV 1),colorToInt(head(setToList(ObjectColors(objectOf(v1))))))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(43,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)),cardinality(ObjectColors(objectOf(head(tail(objects(v0)))))))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(x(Anchor(v1,BR)),IntV 1),add(y(Anchor(head(tail(objects(v0))),TL)),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(add(y(Anchor(head(tail(objects(v0))),TL)),IntV (-1)),add(x(Anchor(v1,BR)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(43,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(cardinality(ObjectColors(objectOf(head(tail(objects(v0)))))),add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(43,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. equal(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),add(cardinality(ObjectColors(objectOf(head(tail(objects(v0)))))),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(42,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. less(x(Anchor(v1,TL)),cardinality(ObjectCells(objectOf(v1))))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(42,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. less(x(Anchor(v1,TL)),cardinality(ObjectCells(objectOf(v1))))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(42,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. less(x(Anchor(v1,TL)),cardinality(ObjectCells(objectOf(v1))))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,TL))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. less(x(Anchor(v1,TL)),y(Anchor(v1,Center)))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. less(x(Anchor(v1,TL)),y(Anchor(v1,Center)))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. less(x(Anchor(v1,TL)),y(Anchor(v1,Center)))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,TL))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. less(x(Anchor(v1,TL)),y(Anchor(v1,TL)))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. less(x(Anchor(v1,TL)),y(Anchor(v1,TL)))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. less(x(Anchor(v1,TL)),y(Anchor(v1,TL)))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,TL))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(42,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. lessEqual(x(Anchor(v1,TL)),cardinality(ObjectCells(objectOf(v1))))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(42,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. lessEqual(x(Anchor(v1,TL)),cardinality(ObjectCells(objectOf(v1))))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(42,14,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. lessEqual(x(Anchor(v1,TL)),cardinality(ObjectCells(objectOf(v1))))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,TL))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. lessEqual(x(Anchor(v1,TL)),y(Anchor(v1,Center)))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. lessEqual(x(Anchor(v1,TL)),y(Anchor(v1,Center)))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. lessEqual(x(Anchor(v1,TL)),y(Anchor(v1,Center)))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,TL))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. lessEqual(x(Anchor(v1,TL)),y(Anchor(v1,TL)))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. lessEqual(x(Anchor(v1,TL)),y(Anchor(v1,TL)))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(40,12,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda v1:PlacedT. lessEqual(x(Anchor(v1,TL)),y(Anchor(v1,TL)))),tail(sortBy((lambda key:PlacedT. x(Anchor(key,TL))),objects(v0))))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(43,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(cardinality(ObjectColors(objectOf(head(objects(v0))))),IntV 1),colorToInt(head(setToList(ObjectColors(objectOf(v1))))))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(43,16,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)),add(x(coord(IntV 0,IntV 0)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(43,16,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)),add(y(coord(IntV 0,IntV 0)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(43,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)),cardinality(ObjectColors(objectOf(head(objects(v0))))))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(x(Anchor(v1,BR)),IntV 1),add(y(Anchor(head(objects(v0)),Center)),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(x(Anchor(v1,Center)),IntV 1),add(y(Anchor(head(objects(v0)),TL)),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(43,16,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(x(coord(IntV 0,IntV 0)),IntV 1),add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(y(Anchor(head(objects(v0)),Center)),IntV (-1)),add(x(Anchor(v1,BR)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(41,13,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(y(Anchor(head(objects(v0)),TL)),IntV (-1)),add(x(Anchor(v1,Center)),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(43,16,2,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(add(y(coord(IntV 0,IntV 0)),IntV 1),add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(43,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(cardinality(ObjectColors(objectOf(head(objects(v0))))),add(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),IntV (-1)))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(43,15,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. equal(colorToInt(head(setToList(ObjectColors(objectOf(v1))))),add(cardinality(ObjectColors(objectOf(head(objects(v0))))),IntV 1))),objects(v0))))")
+Exact original Render(P(Encode(x)))=y: True; MDL rank=(44,16,3,0,"(lambda v0:SceneT. mkScene(canvasSize(v0),background(v0),filter((lambda v1:PlacedT. less(IntV 1,add(x(Anchor(v1,TL)),IntV (-1)))),tail(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))))))")
+Selected AST; FV=[]; (lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,filter((lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)),objects(v0))))
+TaskInvented I0: (lambda __r1b0:PlacedT. contains(ObjectColors(objectOf(__r1b0)),ColorV 2)); repeats=20; portfolio MDL saving=72
+TaskInvented I1: (lambda __r1b0:PlacedT. equal(IntV 1,add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)))); repeats=2; portfolio MDL saving=5
+TaskInvented I2: (lambda __r1b0:PlacedT. equal(add(colorToInt(head(setToList(ObjectColors(objectOf(__r1b0))))),IntV (-1)),IntV 1)); repeats=2; portfolio MDL saving=5
+TaskInvented I3: (lambda __r1b0:PlacedT. equal(add(cardinality(ObjectCells(objectOf(__r1b0))),IntV (-1)),x(Anchor(__r1b0,TL)))); repeats=2; portfolio MDL saving=6
+TaskInvented I4: (lambda __r1b0:PlacedT. equal(add(x(Anchor(__r1b0,TL)),IntV 1),cardinality(ObjectCells(objectOf(__r1b0))))); repeats=2; portfolio MDL saving=6
+TaskInvented I5: (lambda __r1b0:PlacedT. equal(cardinality(ObjectCells(objectOf(__r1b0))),add(x(Anchor(__r1b0,TL)),IntV 1))); repeats=2; portfolio MDL saving=6
+Induced TSL=Signature(root VS) union inventions. BaseActivated=["Anchor","ObjectCells","ObjectColors","add","background","canvasSize","cardinality","colorToInt","contains","coord","equal","filter","head","height","index","lambda","less","lessEqual","literal","mkScene","objectOf","objects","setToList","sortBy","subtract","tail","width","x","y"]; TaskInvented=["I0","I1","I2","I3","I4","I5"]; StructuralPriorCount=0
+```

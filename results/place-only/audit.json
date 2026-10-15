@@ -1,0 +1,21 @@
+{
+  "executions": 226,
+  "unique_executions": 226,
+  "source_binary_input_hashes_verified": true,
+  "original_baseline_sources_unchanged": true,
+  "no_base_translate_or_poseOf": true,
+  "semantic_checks_passed": true,
+  "post_search_expressibility_certificates": 8,
+  "external_timeouts": [
+    [
+      "diagnostic",
+      "484b58aa",
+      "Full"
+    ],
+    [
+      "diagnostic",
+      "c444b776",
+      "Full"
+    ]
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "task": "484b58aa",
+  "mode": "InducedTSLFull",
+  "train_exact": false,
+  "heldout_exact": false,
+  "verification_completed": false,
+  "program": null,
+  "failure": "SearchFailure",
+  "failure_evidence": "external 60s process budget",
+  "statistics": {
+    "wall_clock_seconds": 60.076092100000096
+  },
+  "external_timeout": true
+}

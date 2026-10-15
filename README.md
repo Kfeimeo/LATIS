@@ -1,5 +1,25 @@
 # LATIS — Latent Task-Induced Synthesis
 
+最新入口是 **v0.3R.1**：固定 typed Base，扩充 generic deductive witnesses，并让 typed anti-unification / lambda lifting 产生的 task-local inventions 回馈后续 Learn。StructuralPriorCount=0；v0.3R 和 legacy 路径保留。结果与限制见 [LATIS_V03R1_REPORT.md](LATIS_V03R1_REPORT.md)，前一轮见 [LATIS_V03R_REPORT.md](LATIS_V03R_REPORT.md)。
+
+```powershell
+cabal --config-file=scripts/cabal.config run latis --offline -- solve-v03r1 --task data/03560426.json --out results/v03r1/single --mode Full
+```
+
+新增 **v0.3 — Hierarchical Latent Discovery**：固定 canonical object ontology 上的 symbolic local/global/fusion coordinate discovery。原 v0.2A source 与入口保留；高阶表示具有可逆 decoder、typed pose expressions、provenance、完整 codec MDL 与 exact Grid verification。
+
+```powershell
+./scripts/run-v03.ps1
+cabal --config-file=scripts/cabal.config run latis --offline -- solve-v03 --task data/03560426.json --out results/v03/core
+cabal --config-file=scripts/cabal.config run latis --offline -- solve-v02a --task data/03560426.json --out results/v02a/run
+```
+
+`v03-stress` 跑 A–J；`v03-regression` 比较旧 v0.2A / LatentDisabled / Full；`v03-ablation` 跑八组 v0.3 mode 并保留真实 v0.2A。`--mode` 支持 `V03Full|NoLocalLatent|NoGlobalLatent|NoFusion|NoLatentMDL|EagerLatentEnumeration|NoProgramToLatent|LatentDisabled`。开发套件用 `python scripts/run_v03.py --no-audit`。每个任务输出 `solution.json`、`hypotheses.json`、`task.json`、`latent_trace.md`。
+
+30-task 官方 ARC-1 training 随机抽样在核心实现前固定于 `results/v03/frozen_arc1_tasks.json`；`scripts/freeze_arc1.py` 验证已有文件时不会重新选题。首次 audit 的 source/binary/预算/开启时间另行封存于 `audit_opened.json`；之后源或 protocol 改变会拒绝覆盖首次 audit。详细研究结论、MDL 比较范围、消融与保守 failure taxonomy 见 [LATIS_V03_REPORT.md](LATIS_V03_REPORT.md)。没有加入 split/union/occlusion search、neural 或新的 Level-0 object semantics。
+
+v0.3 先尝试真实旧 solver；高成本或失败后才发现 abstraction。新坐标程序同时可展开为独立可执行的 Z0 reference AST，比完整 `A→P→D` 与 legacy 两者的最小成本。该 reference 不代表原 v0.2A 搜索出了程序，也没有 unrestricted CSE/let 优化；报告明确区分 legacy 成本与展开参考成本。`LatentDisabled` 完全复现原 solver。
+
 当前新增 **v0.2A — Constraint-Driven Joint Synthesis**：在同一 constraint state 中传播 effect、typed schema、witness、参数表达式、自由变量与 Map/Scan 支持，达到 fixed point 后才分支。v0.1 的所有语义模块、参数语法、原 11 项任务与完整搜索入口均保留。
 
 ```powershell
@@ -124,3 +144,81 @@ flowchart LR
 测试包括 1,518 次 round-trip、遮挡／稀疏渲染、类型/schema、安全 fuel、非可逆 recolor witness、correspondence 歧义与限制、MDL dependency closure、11 个合成留出样例及官方任务的训练与测试输入。`test/negative/BadHole.hs` 是故意无法编译的负例，可用 `ghc -fno-code -isrc -outputdir build/type-negative test/negative/BadHole.hs` 检查 `Param Vec` 不能装入 Int 表达式。
 
 官方样例的来源、SHA256 与上游许可证见 [data/README.md](data/README.md)。
+
+## LATIS v0.3R — independent Induced-TSL rebaseline
+
+`solve-v03r` 是独立入口。它不调用旧 `Synthesis.Skeleton`、joint solver 或 v0.3 handwritten latent codecs。固定 Base 在 `Language.Induced.Base`；新 TSL 是 **非空 root version space 的 signature，加上合成后发现的 task-local inventions**，而不是 winning program 的 used-symbol closure。
+
+```powershell
+cabal --config-file=scripts/cabal.config run latis --offline -- solve-v03r --task data/03560426.json --out results/v03r/03560426
+python scripts/run_v03r.py --tests
+python scripts/make_v03r_report.py
+```
+
+新模式为 `InducedTSLFull`、`NoWitness`、`NoVersionSpaceSharing`、`NoTaskAbstraction`、`NoEffectPropagation`、`NoFVDependency`。实验 runner 另外调用保留的 `solve-v03`，标为 `LegacyFamilies`。默认新 solver bounds 是 250000 work units、depth 7、frontier 32、correspondence 32；diagnostic set 使用 25000 work units。独立进程每题每模式限时 60 秒。
+
+`lambda/application/let/if`、polymorphic tuples/lists/sets/options、map/filter/fold/scan/zipWith/sortBy/argmin/argmax、标量及坐标代数都有 typed constructor 与 forward semantics。PlacedObject 是原 Object × Pose 的 adapter，`cells` 是同一 canonical Scene 的 lossless observation。AnchorType 和 D4 是参数；Base 没有 Attach、ScanP、MapPose 或 progression family。
+
+新搜索是 `Learn(type,spec,env)`：return-type filtering → conditional effects → operator witness → child tasks → MRV → shared Union/Join → bounded ranked extraction → original Grid exact verification。Witness 是 partial；通用 bounded forward observers 条件化 inverse semantics。已有 exact observation 会作为 terminal domain，避免无限 identity 展开。这里得到的是 **bounded discovered support**；未激活的 symbol 不等于数学上不可能支持该 task。
+
+`I<n>` inventions 来自多个 distinct exact-valid portfolio 程序中的 repeated alpha-equivalent lambda subtrees。定义与引用都计成本；saving 明确以 portfolio 为范围，不能冒充单个 scan AST 的节省。所有数据沿用 v0.3 snapshots；原 30 题标为 `PreviouslyOpenedDiagnosticSet`。结果、回归退化、witness/representation coverage 与 Q1–Q10 见 [LATIS_V03R_REPORT.md](LATIS_V03R_REPORT.md)；核心 trace 位于 [results/v03r/03560426/induced_tsl_trace.md](results/v03r/03560426/induced_tsl_trace.md)。
+
+## v0.3R.1：deductive coverage 与在线 task abstraction
+
+固定 Base 不变。新 witness 覆盖 filter/fold/sortBy/argminBy/argmaxBy/zipWith/range/if/let 及更多算术、Coord/Vec inverse domains；这些仍是有界 partial witnesses。排序使用 key inequalities，fold 使用经 Base 求值验证的中间 transition graph。
+
+在线 loop 从 actual exact-spec frontier 做 typed anti-unification，提升 free variables，计算包含定义与显式参数的非重叠 portfolio MDL；正 saving 才安装 task-local definition。后续 Learn 使用普通 checked Base lambda/application 展开，所有 dictionaries 都在一次 task/session 结束时丢弃。没有 Attach/Progression 专用 operator/witness，没有 cross-task library。
+
+```powershell
+$env:PATH = 'E:\ghcup\bin;' + $env:PATH
+E:\anaconda3\python.exe scripts/run_v03r1.py --tests --timeout 90
+E:\anaconda3\python.exe scripts/make_v03r1_report.py
+
+# 新参数、新输出目录；同参数会缓存，--force 可强制重新测时。
+E:\anaconda3\python.exe scripts/run_v03r1.py `
+  --out results/v03r1-rerun --budget 500000 --diagnostic-budget 50000 `
+  --depth 9 --frontier 64 --branches 64 --timeout 180 `
+  --rounds 2 --inventions 6 --ast-size 96 --parameters 4 --tests
+E:\anaconda3\python.exe scripts/make_v03r1_report.py `
+  --out results/v03r1-rerun --report LATIS_V03R1_RERUN_REPORT.md
+```
+
+消融 modes：Full / NoOnlineAbstraction / PostHocOnly / NoAntiUnification / NoLambdaLifting / NoNewWitnessCoverage / LegacyFamilies。可用 `--groups`、`--modes` 跑子集；完整报告生成器要求完整矩阵与 tests。原 30 题依然只能称 PreviouslyOpenedDiagnosticSet。
+
+`test/InducedR1Main.hs` 包括参数化 AU、lifting、false abstraction/capture rejection、generic progression、inverse soundness，以及从 Learn prefix 自动发现 Attach-like definition 后处理 40 个相关 demands 的反馈测试。相关 demands 是同一 task 的子问题，不是跨题 transfer。search work 与 wall time 分开记录；降低后续搜索量不等于整个 session 的运行时间加速。
+
+## v0.3R.2：结构多样性、共享与可达性
+
+独立命令 `solve-v03r2` 保持固定 Base。观测等价类保存每种重要结构签名的代表，包括依赖、literal/observer provenance 和 higher-order form。只有全输入成立的 Base 等式会归一化；training 相等本身不触发删除。通用 `let` CSE 按共享代码计成本；替换等价 initializer 时同时改变所有引用，并在原 training Grid 上重新验证。
+
+搜索先覆盖已有 deductive DAG 的完整 witnesses 和 single-hole alternatives，再按成本逐层细化；没有 Full semantic-alias cap 或 AST frontier beam。覆盖遍历不能替代完整 Cartesian saturation。有限 observation/witness domains、原来的 7 层 deductive 安全界和全局工作预算仍限制 reachability。字典反馈保留先前 Base VSA，再以 checked Base definition expansion 添加候选。counterfactual diagnosis 只在固定选择后运行。
+
+```powershell
+# 使用已编译的 O2 solver；完整七模式矩阵和 previously-opened diagnostics。
+python scripts/check_v03r2_tests.py
+python scripts/run_v03r2.py --binary build/latis-r2-final.exe --timeout 300
+python scripts/make_v03r2_report.py
+
+# 新实验目录；不覆盖旧版本结果。不会提高 depth/frontier。
+python scripts/check_v03r2_tests.py --out results/v03r2-rerun
+python scripts/run_v03r2.py --out results/v03r2-rerun `
+  --budget 250000 --cost 96 --saturation-budget 25000 --timeout 300
+python scripts/make_v03r2_report.py --out results/v03r2-rerun --report LATIS_V03R2_RERUN_REPORT.md `
+  --cover-out results/v03r2-rerun-cover-ablation --deadline-out results/v03r2-rerun-deadline-ablation
+
+# 单题：saturation-budget 是每次细化阶段的工作上限，仍受总 budget 约束。
+build/latis-r2-final.exe solve-v03r2 --task data/03560426.json `
+  --out results/v03r2-single --mode Full --budget 250000 --cost 96 --saturation-budget 25000
+```
+
+七项消融为 Full / NoDiversityPreservation / FixedAliasCap / NoLetSharing / NoGroundedLiteralPrior / BeamSearchLegacy / NoCounterfactualDiagnosis；额外 `NoPortfolioCover` 检查完整 witness 覆盖的作用。结果与限制见 `LATIS_V03R2_REPORT.md`。每次运行保存 source/binary/input hashes、完整命令、equivalence classes、共享上下文、VSA、portfolio 和原 training/heldout 验证。
+
+首次构建 runner 默认的二进制：`ghc -O2 -isrc -iapp -XGHC2021 -outputdir build/r2-opt app/Main.hs -o build/latis-r2-final.exe`。测试脚本可用 `--cabal`、`--ghc`、`--ghc-pkg` 指定工具路径；它将 R.1 兼容测试的新结果写入 R2 实验目录，保留旧报告数据。
+
+## 案例与程序可视化
+
+`python scripts/visualize_latis.py --solution results/v03r2/core/03560426/Full --out docs/03560426.html`
+
+生成可离线打开的 HTML：输入、标准输出、原 Base 内核重放的预测、像素差异、可折叠 typed AST 和 portfolio 统计。用 `--results results/v03r2` 批量展示 Full，`--mode all` 包含消融，`--runghc` 指定 GHC 路径，`--no-predict` 只看保存数据。完整用法见 [可视化说明](docs/LATIS_VISUALIZER.md)。已生成的批量页面为 `docs/latis-explorer.html`。
+
+页面还包含用户程序积木工作台：Base/TSL 工具箱、拖放或点击插槽、常量滑块、lambda/let 作用域、即时类型检查、撤销/重做和 JSON 导入导出。类型完整的 `Scene → Scene` 程序可导出并用上述脚本重放；inventions 导出时展开回 Base。

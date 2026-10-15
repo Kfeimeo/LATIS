@@ -1,0 +1,2 @@
+LatentMetrics {latentProposals = 55, localProposals = 24, globalProposals = 7, fusionProposals = 24, acceptedHypotheses = 0, rejectedHypotheses = 55, latentBranchPoints = 0, latentPropagationSteps = 2, latentContradictions = 55, decoderFailures = 0, reconstructionFailures = 0, discoveryChecks = 159, latentExpressionTests = 759, exactVerifierCalls = 0, totalExpanded = 1393, firstSolutionStates = Nothing, wallClock = 0.7505748, deltaMDL = Nothing, level0Cost = Nothing, level1Cost = Nothing, latentSymbols = 0, symbolsSaved = 0, descriptionsSaved = 0, hitBudget = False}
+UNSOLVED

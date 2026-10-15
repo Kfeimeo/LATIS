@@ -1,5 +1,7 @@
 # ARC-AGI sample provenance
 
+`arc1-frozen/` contains 30 unmodified official **training** task JSON files, uniformly sampled from the sorted 400 filenames with seed `20261004` before implementing v0.3. No grids were inspected in selection. Source commit, selection procedure, task IDs and per-file SHA256 are in `results/v03/frozen_arc1_tasks.json`; existing selection is verified, never replaced. The same upstream Apache-2.0 license below applies. This is a frozen subset of public ARC-1 training data, not the official private evaluation benchmark.
+
 `03560426.json` is an unmodified copy of François Chollet's ARC-AGI repository evaluation task, downloaded on 2026-10-04 (Asia/Shanghai).
 
 - [Official source JSON](https://raw.githubusercontent.com/fchollet/ARC-AGI/master/data/evaluation/03560426.json)
