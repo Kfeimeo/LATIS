@@ -87,7 +87,7 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/dev-progression-0/task.json",
-      "sha256": "460e84151a25992714d5c75ff0c1b93608b595dcfe2535cb93269818acd9201d"
+      "sha256": "63c3fbc2cf0f811550f4cd23aac906c17e649638f5750a8986299e467d6775bc"
     },
     {
       "name": "dev-progression-1",
@@ -114,7 +114,7 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/dev-progression-1/task.json",
-      "sha256": "0104fa44581390c44d9d06b4aa8c7ccd3d58fe1d684130121344fc3724a257b5"
+      "sha256": "33dd0ebd778ebb4f018eac5740620b79333924c6b5b7db39ba270e6ff85551f2"
     },
     {
       "name": "audit-same-relative-0",
@@ -141,7 +141,7 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/audit-same-relative-0/task.json",
-      "sha256": "3113b8fa6e2a5b13d2518eb82160d80df9f95b12e256f75e8eba70e41a8fd917"
+      "sha256": "299f8bf3fbff9a45cb24016bf1d9e3e713c4922880c29ab8effec492674c00a2"
     },
     {
       "name": "audit-same-relative-1",
@@ -168,7 +168,7 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/audit-same-relative-1/task.json",
-      "sha256": "cf509531dee1768c88665eae2f2329bebe37f95ed505cb5d675335b1529f079d"
+      "sha256": "99c0d515cef03762bd47aabf3b9edbe109f670d0240fb1fe8853d64bb3739f4a"
     },
     {
       "name": "audit-same-relative-2",
@@ -195,7 +195,7 @@
       ],
       "confusable_training": true,
       "path": "data/place-demand-generated/audit-same-relative-2/task.json",
-      "sha256": "101f6e44d30c72b154b5872a71d9b3fe308e0da3df51966660498c19eef2b256"
+      "sha256": "811f091dcc83a55c19525aa084979d9a15fab9fc2e9d7fd36423306427f3ae53"
     },
     {
       "name": "audit-same-progression-0",
@@ -222,7 +222,7 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/audit-same-progression-0/task.json",
-      "sha256": "02314f2921a66e17c4acc0348fd5e9179630fb1096b35b266b48d903df88f75f"
+      "sha256": "380ce0385f9fa2bc7ffa5ef35dd1f03a445566fc6112b49744747307a04f5599"
     },
     {
       "name": "audit-same-progression-1",
@@ -249,7 +249,7 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/audit-same-progression-1/task.json",
-      "sha256": "c94056de62ea6fad3548d7bdd6e07bc8faa1db3fe0878fd6c41f5a5a6c1fb529"
+      "sha256": "2797c78cf3c0e9804a0919f458b560572a26f2b2466985ee17e2e448cf4a43bb"
     },
     {
       "name": "audit-same-progression-2",
@@ -276,7 +276,7 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/audit-same-progression-2/task.json",
-      "sha256": "f4e383c136d3ed0947a0b933b7c6ddad7a55a46dea34b376f285374f66a635ff"
+      "sha256": "d4c5ee399001c174fbfbf2be2f02b25b6854cddc79a95b251bcfb28dededb1b4"
     },
     {
       "name": "audit-unseen-negated-0",
@@ -303,7 +303,7 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/audit-unseen-negated-0/task.json",
-      "sha256": "44cfbd1600fca0898504b26c8563f1cca0508a32e753e69748976a12a2f596d3"
+      "sha256": "67783ade3f25515b71fb3cdc1d82103b200dd39e449c5ff99c0adb3cfda5bc80"
     },
     {
       "name": "audit-unseen-negated-1",
@@ -330,7 +330,7 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/audit-unseen-negated-1/task.json",
-      "sha256": "001d4ec11fcd9d6828280c864e9ab39bf1d02b66ecba526c72ca4f36053e13df"
+      "sha256": "7dcf19869800d70267a521c51bf06ce8deb2836ef29346afbb427f8447227d10"
     },
     {
       "name": "audit-unseen-double-0",
@@ -357,7 +357,7 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/audit-unseen-double-0/task.json",
-      "sha256": "3e8d95c13630786fae179c7b149dbedd9c26cbe49a570700169b7baceb3bd638"
+      "sha256": "4f7d93a245bb435756b01d658d0c0e76ec36beede84a85106fd6786d0ff5e526"
     },
     {
       "name": "audit-unseen-double-1",
@@ -384,7 +384,7 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/audit-unseen-double-1/task.json",
-      "sha256": "ebcf2a005cdbd13b3dfa16ad5a505db42a661e7e62c5fe8471d96129bc117573"
+      "sha256": "0782dde97930ea462d4e378d3a02ce587eff6ec0f16d19232cabc6075edf3dd3"
     },
     {
       "name": "audit-unseen-xalign-0",
@@ -411,7 +411,7 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/audit-unseen-xalign-0/task.json",
-      "sha256": "57db2a1ee6116215b0099928c2e17753cf8495b546d7e6b9112170b4a5250cf8"
+      "sha256": "b8c8c9b2519f76a2cd638daa470db2bf0a7738354b8f5bea152d64eef9189022"
     },
     {
       "name": "audit-unseen-xalign-1",
@@ -438,8 +438,8 @@
       ],
       "confusable_training": false,
       "path": "data/place-demand-generated/audit-unseen-xalign-1/task.json",
-      "sha256": "c1138c0fc6e261181a89fe26248a4ecbf79b978eab5dd6686c4f3cc72e5f384f"
+      "sha256": "e1e06b212645fd55bb6fdb3562694036ff91c7bd8f62c95f54c6d73852354f6d"
     }
   ],
-  "manifest_hash": "223b867f9207756f22509e194d9ee40dfc0aab6211588d857157d49b601acade"
+  "manifest_hash": "277a53e492f2651408dc34e191dac1a8954da426b3d769e6b7830fce38587fc3"
 }

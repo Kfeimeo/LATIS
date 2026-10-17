@@ -89,10 +89,20 @@ def sample_scene(rng, rule, w, h, n, confusable=False):
     for _ in range(4000):
         colors = rng.sample(range(1, 10), n)
         objs = []
-        for i in range(n):
-            shape = SHAPES[rng.choice(list(SHAPES))]
-            x, y = rng.randrange(0, w-3), rng.randrange(0, h-3)
-            objs.append(((x, y), tuple(shape), colors[i]))
+        if rule == 'progression':
+            # precondition of the progression rule (as in original stress B): the
+            # INPUT objects already form an arithmetic progression start + i*step
+            sx, sy = rng.randrange(0, w//3), rng.randrange(0, h//3)
+            dx, dy = rng.randrange(-4, 5), rng.randrange(-4, 5)
+            if (dx, dy) == (0, 0) or (dx < 0 and sx < 4) or (dy < 0 and sy < 4): continue
+            for i in range(n):
+                shape = SHAPES[rng.choice(list(SHAPES))]
+                objs.append(((sx+i*dx, sy+i*dy), tuple(shape), colors[i]))
+        else:
+            for i in range(n):
+                shape = SHAPES[rng.choice(list(SHAPES))]
+                x, y = rng.randrange(0, w-3), rng.randrange(0, h-3)
+                objs.append(((x, y), tuple(shape), colors[i]))
         if confusable and rule == 'relative':
             # TL(second)-TL(first) == TL(first): absolute coordinate of the first object equals the displacement
             (ax, ay), s0, c0 = objs[0]
@@ -106,7 +116,9 @@ def sample_scene(rng, rule, w, h, n, confusable=False):
         if gout is None: continue
         if gin == gout: continue                   # identity examples carry no information
         if rule == 'relative' and vec(tl(inp[1]), tl(inp[0])) == (0, 0): continue
-        if rule == 'progression' and vec(tl(inp[1]), tl(inp[0])) == (0, 0): continue
+        if rule == 'progression':
+            step = vec(tl(inp[1]), tl(inp[0]))
+            if step == (0, 0) or any(vec(tl(inp[i]), tl(inp[0])) != (i*step[0], i*step[1]) for i in range(n)): continue
         return gin, gout, inp
     raise RuntimeError(f'could not sample a valid scene for {rule} {w}x{h} n={n}')
 
