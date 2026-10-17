@@ -56,6 +56,10 @@ def main():
         A('')
         A(f"binary `{proto['fingerprint']['binary_sha256'][:16]}…`，预算与第一轮相同（250000 / cost 96 / saturation 25000 / 300 s），B1Q/B1QX 的延后份额 62500（含在总预算内），固定 3 worker。generated-round2 是冻结于任何第二轮求解之前的新 audit（manifest hash `{json.loads((ROOT/'data/place-demand-generated-round2/manifest.json').read_text())['manifest_hash'][:16]}…`）：audit2-same（同规则新实例）、audit2-nonlocal（seedshift_x/y，seed 需要非局部基点+常数位移）、audit2-newstruct（mirror_relative）。")
         A('')
+        oom = [r for r in rows if r['failure'] == 'ImplementationBug']
+        solo = [r for r in rows if r.get('note')]
+        A(f"执行失败：矩阵中被主机 cgroup OOM 杀死的行（3 并发时单个 scan-* 任务 RSS 约 5.8 GB）已用 `--workers 1` 单独重跑并替换（重跑 protocol 另存为 `protocol-rerun-*.json`）；当前仍标 ImplementationBug 的行：{[(r['group'], r['task'], r['variant']) for r in oom] or '无'}。")
+        A('')
         A('| 组 | 变体 | 完成 | 训练正确 | 留出正确 | 超时 |'); A('|---|---|---:|---:|---:|---:|')
         for g in GROUPS:
             for v in VARS:
