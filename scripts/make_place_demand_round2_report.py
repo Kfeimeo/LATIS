@@ -93,6 +93,36 @@ def main():
         nlh = {v: {r['task'] for r in rows if r['group'] == 'generated-round2' and 'nonlocal' in r['task'] and r['variant'] == v and r['heldout']} for v in VARS}
         A('- 必须使用非局部基点的任务（audit2-nonlocal，3 题）：' + '; '.join(f"{v}: train {len(nl[v])} / held {len(nlh[v])}" for v in VARS) + '。局部硬限制 B1L 若在此为 0 而 B1Q/B1QX 不为 0，说明延后而非删除保住了非局部规则的求解能力；若所有变体都为 0，则该能力在协议预算内对任何变体都未达成，不能据此偏好任一方案。')
         A('')
+    if rows:
+        A('## 研究问题的回答')
+        A('')
+        def held(g, v): return {r['task'] for r in rows if r['group'] == g and r['variant'] == v and r['heldout']}
+        def train(g, v): return {r['task'] for r in rows if r['group'] == g and r['variant'] == v and r['train']}
+        gs = ['regression', 'stress', 'generated-dev', 'generated-audit', 'generated-round2']
+        def tot(v, f): return sum(len(f(g, v)) for g in gs)
+        ntot = sum(n(g, 'B1') for g in gs)
+        A('问题：在保留双向 witness 分解的条件下，能否通过公平调度（Q）与惰性提取（X）获得局部限制（B1L）的效率，同时保留非局部规则的求解能力？')
+        A('')
+        A('| 变体 | 五组合计 train | 五组合计 heldout | 相对 B1L 留出差集（B1L 有而它没有） | 它有而 B1L 没有 |'); A('|---|---:|---:|---|---|')
+        HL = {g: held(g, 'B1L') for g in gs}
+        for v in VARS:
+            lost = [f"{g}/{t}" for g in gs for t in sorted(HL[g] - held(g, v))]
+            gained = [f"{g}/{t}" for g in gs for t in sorted(held(g, v) - HL[g])]
+            A(f"| {v} | {tot(v, train)}/{ntot} | {tot(v, held)}/{ntot} | {', '.join(lost) or '无'} | {', '.join(gained) or '无'} |")
+        A('')
+        qx = tot('B1QX', held); q = tot('B1Q', held); x = tot('B1X', held); l = tot('B1L', held); b1 = tot('B1', held); b0 = tot('B0', held)
+        A(f"- **Q（延后调度）**：五组合计留出 {q}（B1 {b1}，B1L {l}，B0 {b0}）。延后而非删除非局部 residual，在 regression 上" + ('保住了 B0 的全部 16 项' if held('regression', 'B1Q') >= held('regression', 'B0') else f"丢失 {sorted(held('regression','B0')-held('regression','B1Q'))}") + f"，在 stress 上得到 {sorted(t[:1] for t in held('stress','B1Q'))}。与 B1L 的差集见表：差异来自延后份额（62500）本身的工作消耗与它加入 DAG 的非局部备选对提取/选择的影响。")
+        A(f"- **X（惰性提取）单独**：合计留出 {x}。它修复的是提取层（A/C/G 等“DAG 中有可组装正确程序但 cover 预算不足”的情形），但不减少推导工作，所以在推导阶段就耗尽预算的任务（regression map-translate/map-scan-ambiguity、多数 generated）上仍失败。")
+        A(f"- **Q+X**：合计留出 {qx}。" + ('两者互补（优于各自单独）。' if qx > max(q, x) else ('不优于单独的 Q：惰性 cover 的候选集与 refine cover 不同，改变了部分任务的 portfolio 与选择（见逐题表中 B1Q 对 B1QX 的差异），说明两个机制在本预算下不是简单叠加。' if qx <= q else '与单独 X 相当。')))
+        nlb = {v: (len(train('generated-round2', v) & {t for t in train('generated-round2','B0') if 'nonlocal' in t} if False else {t for t in train('generated-round2', v) if 'nonlocal' in t}), {t for t in held('generated-round2', v) if 'nonlocal' in t}) for v in VARS}
+        A('- **非局部基点代价（audit2-nonlocal，3 题）**：' + '; '.join(f"{v} train {len(nlb[v][0])}/3, held {len(nlb[v][1])}/3" for v in VARS) + '。该家族没有按设计区分局部硬限制与延后调度：连 B0 也能在训练上求解其中的 seed（经 `coord`/算术分量路径而非 coordAdd），所以它测到的不是“非局部 residual 的必要性”，而是另一条已有路径；要测量局部偏好的真实代价，需要构造 `coord`/算术路径也不可达的非局部规则。这是本轮 audit 设计的一个失误，如实记录。')
+        A('- **B1L 仍是有用的参考而非方案**：它在 audit2-same-negated-0 等任务上优于 B1Q（延后份额的成本），但它删除了合法规则；Q 用可恢复的方式得到接近的覆盖。')
+        A('')
+        A('## 下一步')
+        A('')
+        A('1. 非局部代价的 audit 需要重做：规则必须使 `coord(add(x,·),add(y,·))` 等分量路径不可用（例如位移随场景变化、且不等于任何可观察标量之差），再冻结后评估 B1L/B1Q/B1QX。')
+        A('2. Q 的份额与 X 的候选集相互作用（B1QX 在若干任务上不如 B1Q）需要单独消融：固定 Q，比较 refine/lazy cover 的 portfolio 与选择差异，并把 lazy cover 的 phase-2 扩展与 saturation 的分工写清楚。')
+        A('3. 推导预算耗尽（而非提取）仍是 generated 集上的主要失败：延后份额之外，第一遍局部队列本身在多对象实例上也很重，需要按子规格约束强度（行数/依赖）对分支排序的下一版调度。')
     (ROOT / 'results/place-demand-round2/REPORT_ROUND2.md' if rows else ROOT / 'results/place-demand/REPORT_ROUND2_draft.md').write_text('\n'.join(L) + '\n', encoding='utf-8')
     print('wrote round-2 report with', len(L), 'lines')
 if __name__ == '__main__': main()

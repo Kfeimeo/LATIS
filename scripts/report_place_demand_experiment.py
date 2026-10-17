@@ -10,7 +10,8 @@ STAT_KEYS = ['total_expanded_work', 'first_solution_states', 'witness_calls', 'b
              'materialized_complete_asts', 'exact_verifier_calls', 'portfolio_cover_work', 'extraction_work', 'deduction_milliseconds', 'extraction_milliseconds',
              'demands_registered', 'demands_distinct', 'demands_resumed', 'demands_still_blocked', 'demands_suspended', 'demand_rounds', 'demand_generated_terms',
              'demand_new_observations', 'demand_new_vec_observations', 'demand_new_coord_observations', 'demand_new_int_observations', 'demand_work',
-             'demand_memo_invalidations', 'demand_memo_reuse', 'memo_hits', 'invented_abstractions', 'observer_terms', 'wall_clock_seconds']
+             'demand_memo_invalidations', 'demand_memo_reuse', 'memo_hits', 'invented_abstractions', 'observer_terms', 'wall_clock_seconds',
+             'deferred_tasks', 'deferred_branches', 'deferred_released', 'deferred_pass_work', 'deferred_pass_memo_invalidations', 'cover_lazy_candidates']
 
 def digest(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 
