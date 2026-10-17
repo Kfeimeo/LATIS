@@ -21,8 +21,8 @@
     },
     "regression/B0": {
       "n": 17,
-      "train": 15,
-      "heldout": 15,
+      "train": 16,
+      "heldout": 16,
       "timeouts": 0
     },
     "regression/B1": {
@@ -532,36 +532,6 @@
       ]
     },
     {
-      "group": "regression",
-      "task": "scan-TR-TL",
-      "variant": "B1",
-      "B0": [
-        false,
-        false,
-        "ImplementationBug"
-      ],
-      "B1": [
-        true,
-        true,
-        "None"
-      ]
-    },
-    {
-      "group": "regression",
-      "task": "scan-TR-TL",
-      "variant": "B2",
-      "B0": [
-        false,
-        false,
-        "ImplementationBug"
-      ],
-      "B2": [
-        true,
-        true,
-        "None"
-      ]
-    },
-    {
       "group": "stress",
       "task": "B-repeated-progression",
       "variant": "B1",
@@ -712,22 +682,7 @@
       ]
     }
   ],
-  "B0_vs_frozen_place_only_outcome_mismatches": [
-    {
-      "group": "regression",
-      "task": "scan-TR-TL",
-      "B0": [
-        false,
-        false,
-        "ImplementationBug"
-      ],
-      "place_only": [
-        true,
-        true,
-        "None"
-      ]
-    }
-  ],
+  "B0_vs_frozen_place_only_outcome_mismatches": [],
   "timeouts": [
     [
       "diagnostic",

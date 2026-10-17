@@ -3,7 +3,7 @@
 | core | B0 | 1 | 1 | 1 | 0 | 1 |
 | core | B1 | 1 | 1 | 1 | 0 | 1 |
 | core | B2 | 1 | 1 | 1 | 0 | 1 |
-| regression | B0 | 17 | 15 | 15 | 0 | 16 |
+| regression | B0 | 17 | 16 | 16 | 0 | 16 |
 | regression | B1 | 17 | 14 | 14 | 1 | 16 |
 | regression | B2 | 17 | 14 | 14 | 2 | 16 |
 | stress | B0 | 10 | 6 | 3 | 0 | 3 |
