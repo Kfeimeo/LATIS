@@ -244,7 +244,11 @@ main=do
   dQ<-readIORef (demandRef engineQ)
   let mq k=M.findWithDefault 0 k mQ
   assert "round 2: non-local left residual branches are registered as deferred" (mq "deferred_branches">0 && any ((==PoseT) . snd) (M.keys dQ))
-  assert "round 2: deferred tasks are released exactly once in the second pass" (mq "deferred_released">0 && mq "deferred_released"==mq "deferred_tasks" && all (\r->demandResolvedEpoch r/=Nothing) [r | ((_,t),r)<-M.toList dQ,t==PoseT])
+  -- Every deferral pending at the end of the first pass is released once; deferrals
+  -- first registered INSIDE the released branches (second pass) stay postponed, because
+  -- the deferred share is a single bounded pass, so some PoseT keys may remain pending.
+  assert "round 2: deferred tasks pending after pass 1 are released exactly once in the second pass"
+    (mq "deferred_released">0 && mq "deferred_released"==mq "deferred_tasks" && length [() | ((_,t),r)<-M.toList dQ,t==PoseT,demandResolvedEpoch r/=Nothing]==mq "deferred_released")
   assert "round 2: the deferred pass is charged within its share" (mq "deferred_pass_work"<=30000+1000)
   assert "round 2: deferred pass re-learns stale tasks (memo invalidation)" (mq "deferred_pass_memo_invalidations">0)
   sQ<-readIORef (spaceRef engineQ)

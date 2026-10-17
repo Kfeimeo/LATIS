@@ -10,3 +10,13 @@ regression/constant-transform/B1U: train=True held=True failure=None elapsed=26.
 regression/equivalent-expressions/B1U: train=True held=True failure=None elapsed=43.48s
 stress/I-equivalent-representations/B1U: train=True held=True failure=None elapsed=198.80s
 regression/fold-bbox/B1U: train=False held=False failure=BaseExpressibilityUnknown elapsed=0.67s
+regression/filter-color/B1U: train=True held=True failure=None elapsed=46.49s
+regression/grid-without-prev/B1U: train=True held=True failure=None elapsed=32.11s
+stress/J-no-useful-abstraction/B1U: train=False held=False failure=SearchFailure elapsed=221.63s
+regression/map-recolor/B1U: train=True held=True failure=None elapsed=20.17s
+regression/iterate-chain/B1U: train=True held=True failure=None elapsed=34.42s
+regression/map-reflectH/B1U: train=True held=True failure=None elapsed=20.86s
+regression/map-rotate90/B1U: train=True held=True failure=None elapsed=21.01s
+regression/map-scan-ambiguity/B1U: train=False held=False failure=SearchFailure elapsed=157.45s
+regression/scan-BL-TL/B1U: train=True held=True failure=None elapsed=170.51s
+regression/map-translate/B1U: train=False held=False failure=SearchFailure elapsed=180.44s
