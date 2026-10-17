@@ -82,7 +82,23 @@ def rule_double(objs):        # unseen: moved by 2*(TL(second)-TL(first))
     d = vec(tl(objs[1]), tl(objs[0])); return [move(o, (2*d[0], 2*d[1])) for o in objs]
 def rule_xalign(objs):        # unseen: x aligned to first object's x, y kept
     x0 = tl(objs[0])[0]; return [((x0, o[0][1]), o[1], o[2]) for o in objs]
-RULES = {'relative': rule_relative, 'progression': rule_progression, 'negated': rule_negated, 'double': rule_double, 'xalign': rule_xalign}
+def _chain(order, seed_shift):
+    out = []; prev = None
+    for o in order:
+        if prev is None: pos = (o[0][0]+seed_shift[0], o[0][1]+seed_shift[1])
+        else:
+            (px, py), pshape, _ = prev; w = max(dx for dx, _ in pshape)+1; h = max(dy for _, dy in pshape)+1
+            pos = (px+w-1+1, py+h-1+1)
+        prev = (pos, o[1], o[2]); out.append(prev)
+    return out
+def rule_seedshift_x(objs):   # round-2 non-local: sort by TL x; first object moves by (2,1); each next sits at previous BR + (1,1)
+    return _chain(sorted(objs, key=lambda o: (o[0][0], o[0][1])), (2, 1))
+def rule_seedshift_y(objs):   # same with sort by TL y and seed shift (1,3)
+    return _chain(sorted(objs, key=lambda o: (o[0][1], o[0][0])), (1, 3))
+def rule_mirror_relative(objs):  # round-2 new structure: moved by (-dx, dy) where (dx,dy)=TL(second)-TL(first)
+    d = vec(tl(objs[1]), tl(objs[0])); return [move(o, (-d[0], d[1])) for o in objs]
+RULES = {'relative': rule_relative, 'progression': rule_progression, 'negated': rule_negated, 'double': rule_double, 'xalign': rule_xalign,
+         'seedshift_x': rule_seedshift_x, 'seedshift_y': rule_seedshift_y, 'mirror_relative': rule_mirror_relative}
 
 def sample_scene(rng, rule, w, h, n, confusable=False):
     """Random input scene satisfying the rule's preconditions; returns (input objects, output objects)."""
@@ -115,7 +131,11 @@ def sample_scene(rng, rule, w, h, n, confusable=False):
         gout = valid_scene(w, h, out)
         if gout is None: continue
         if gin == gout: continue                   # identity examples carry no information
-        if rule == 'relative' and vec(tl(inp[1]), tl(inp[0])) == (0, 0): continue
+        if rule in ('relative', 'mirror_relative') and (vec(tl(inp[1]), tl(inp[0])) == (0, 0) or (rule == 'mirror_relative' and vec(tl(inp[1]), tl(inp[0]))[0] == 0)): continue
+        if rule in ('seedshift_x', 'seedshift_y'):
+            key = (lambda o: (o[0][0], o[0][1])) if rule == 'seedshift_x' else (lambda o: (o[0][1], o[0][0]))
+            ks = [key(o) for o in inp]
+            if len(set(k[0] for k in ks)) != len(ks): continue   # sort key must be strict so the order is unambiguous
         if rule == 'progression':
             step = vec(tl(inp[1]), tl(inp[0]))
             if step == (0, 0) or any(vec(tl(inp[i]), tl(inp[0])) != (i*step[0], i*step[1]) for i in range(n)): continue
@@ -136,6 +156,7 @@ def make_task(rng, rule, sizes, counts, confusable_train=False):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
+    if '--round2' in sys.argv: return main_round2()
     rng = random.Random(20261017)
     specs = []  # (name, rule, sizes, counts, confusable)
     specs += [(f'dev-relative-{i}', 'relative', [(16+2*i, 14+3*i), (20, 18), (24+i, 22)], [3, 4, 3], False) for i in range(2)]
@@ -159,4 +180,32 @@ def main():
     manifest['manifest_hash'] = hashlib.sha256(body).hexdigest()
     (OUT / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
     print(f'wrote {len(specs)} tasks; manifest hash {manifest["manifest_hash"]}')
+
+# ------------------------------------------------------------------ round 2
+# Frozen BEFORE any round-2 solver run. Three audit families:
+#   audit2-same     : same rules as before, fresh instances (new seed)
+#   audit2-nonlocal : scan-seed rules whose seed REQUIRES a non-Scene-local base
+#                     point plus a constant displacement (seedshift_x/y)
+#   audit2-newstruct: mirror_relative, a composition absent from every earlier set
+def main_round2():
+    out = ROOT / 'data/place-demand-generated-round2'; out.mkdir(parents=True, exist_ok=True)
+    rng = random.Random(20261018)
+    specs = [(f'audit2-same-{r}-0', r, [(18, 16), (22, 20), (26, 24)], [3, 4, 3], False) for r in ['relative', 'progression', 'negated', 'double', 'xalign']]
+    specs += [(f'audit2-nonlocal-seedshift-x-{i}', 'seedshift_x', [(20+i, 18), (24, 22), (28, 26)], [3, 3, 4], False) for i in range(2)]
+    specs += [('audit2-nonlocal-seedshift-y-0', 'seedshift_y', [(20, 20), (24, 24), (28, 28)], [3, 4, 3], False)]
+    specs += [(f'audit2-newstruct-mirror-{i}', 'mirror_relative', [(20, 18+i), (24, 22), (28, 26)], [3, 4, 3], False) for i in range(2)]
+    manifest = {'generator': 'scripts/generate_place_demand_samples.py --round2', 'seed': 20261018, 'object_order': 'raster order of 4-connected same-color components of the INPUT grid',
+                'splits': {'audit2-same': 'same rules, fresh instances', 'audit2-nonlocal': 'scan-seed shift: the seed needs a non-local base point + constant displacement', 'audit2-newstruct': 'mirror_relative: new composition'}, 'tasks': []}
+    for name, rule, sizes, counts, conf in specs:
+        task = make_task(rng, rule, sizes, counts, confusable_train=conf)
+        d = out / name; d.mkdir(exist_ok=True)
+        p = d / 'task.json'; p.write_text(json.dumps(task, separators=(',', ':')) + '\n', encoding='utf-8')
+        split = 'audit2-nonlocal' if 'nonlocal' in name else ('audit2-newstruct' if 'newstruct' in name else 'audit2-same')
+        manifest['tasks'].append({'name': name, 'rule': rule, 'split': split, 'canvas_sizes': sizes, 'object_counts': counts, 'confusable_training': conf,
+                                  'path': str(p.relative_to(ROOT)), 'sha256': hashlib.sha256(p.read_bytes()).hexdigest()})
+    body = json.dumps(manifest, sort_keys=True, separators=(',', ':')).encode()
+    manifest['manifest_hash'] = hashlib.sha256(body).hexdigest()
+    (out / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
+    print(f'wrote {len(specs)} round-2 tasks; manifest hash {manifest["manifest_hash"]}')
+
 if __name__ == '__main__': main()

@@ -1,0 +1,15 @@
+deduction: root=2902 nodes=2902 work=50684 joins=670
+unbounded cover: candidates=7024 attempts=149768
+training-exact assembled programs: 7024
+  cost=29 heldout(post-hoc)=True symbols=["Anchor","canvasSize","coordAdd","coordDelta","head","lambda","literal","map","mkScene","objectOf","objects","place","tail"]
+  (lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))),objects(v0))))
+  cost=29 heldout(post-hoc)=True symbols=["Anchor","canvasSize","coordAdd","coordDelta","head","lambda","literal","map","mkScene","objectOf","objects","place","tail"]
+  (lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BR))))),objects(v0))))
+  cost=29 heldout(post-hoc)=True symbols=["Anchor","canvasSize","coordAdd","coordDelta","head","lambda","literal","map","mkScene","objectOf","objects","place","tail"]
+  (lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),Center))))),objects(v0))))
+  cost=29 heldout(post-hoc)=True symbols=["Anchor","canvasSize","coordAdd","coordDelta","head","lambda","literal","map","mkScene","objectOf","objects","place","tail"]
+  (lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))))
+  cost=29 heldout(post-hoc)=True symbols=["Anchor","canvasSize","coordAdd","coordDelta","head","lambda","literal","map","mkScene","objectOf","objects","place","tail"]
+  (lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TR))))),objects(v0))))
+protocol cover (12500): candidates=0 attempts=12500 exact=0
+exit=0

@@ -36,6 +36,12 @@ data InducedMode = InducedTSLFull | NoWitness | NoVersionSpaceSharing
 -- place-demand experiment switches. Off/Unidirectional reproduces the frozen
 -- place-only Full path (B0). B1 = Bidirectional witnesses. B2 = B1 + DemandOn.
 data DemandPolicy = DemandOff | DemandOn deriving (Eq,Ord,Show,Read,Enum,Bounded)
+-- Round-2 switches. DeferNonLocal: left residuals whose base point depends on
+-- no non-Scene variable are postponed to a second pass with its own work share
+-- (never deleted). CoverLazy: extraction first materializes one complete
+-- composition per node, then expands single-hole alternatives breadth-first.
+data SchedulePolicy = ScheduleAll | DeferNonLocal deriving (Eq,Ord,Show,Read,Enum,Bounded)
+data CoverPolicy = CoverRefine | CoverLazy deriving (Eq,Ord,Show,Read,Enum,Bounded)
 data InducedConfig = InducedConfig
   { workBudget :: Int, depthBound :: Int, frontierBound :: Int
   , inducedCorrespondenceBudget :: Int, inducedEncoder :: EncoderConfig
@@ -47,15 +53,19 @@ data InducedConfig = InducedConfig
   , demandWorkBudget :: Int   -- total demand-expansion work, counted inside workBudget
   , demandOperandCap :: Int   -- operands per type offered to each typed generator
   , demandRounds :: Int       -- maximum resolve/retry rounds
+  , schedulePolicy :: SchedulePolicy
+  , deferredWorkBudget :: Int -- work share of the deferred pass, inside workBudget
+  , coverPolicy :: CoverPolicy
   } deriving (Eq,Show)
 defaultInduced :: InducedConfig
-defaultInduced=InducedConfig 250000 7 32 32 defaultEncoder 96 25000 defaultLimits Unidirectional DemandOff 25000 24 3
+defaultInduced=InducedConfig 250000 7 32 32 defaultEncoder 96 25000 defaultLimits Unidirectional DemandOff 25000 24 3 ScheduleAll 62500 CoverRefine
 variantLabel :: InducedConfig -> String
-variantLabel conf=case (witnessPolicy conf,demandPolicy conf) of
-  (Unidirectional,DemandOff)->"B0"; (Bidirectional,DemandOff)->"B1"; (Bidirectional,DemandOn)->"B2"
-  (Unidirectional,DemandOn)->"B0+demand"
-  (BidirectionalLocal,DemandOff)->"B1L"; (BidirectionalLocal,DemandOn)->"B2L"
-  (BidirectionalUnpruned,DemandOff)->"B1U"; (BidirectionalUnpruned,DemandOn)->"B2U"
+variantLabel conf=base++(if schedulePolicy conf==DeferNonLocal then "Q" else "")++(if coverPolicy conf==CoverLazy then "X" else "")
+  where base=case (witnessPolicy conf,demandPolicy conf) of
+          (Unidirectional,DemandOff)->"B0"; (Bidirectional,DemandOff)->"B1"; (Bidirectional,DemandOn)->"B2"
+          (Unidirectional,DemandOn)->"B0+demand"
+          (BidirectionalLocal,DemandOff)->"B1L"; (BidirectionalLocal,DemandOn)->"B2L"
+          (BidirectionalUnpruned,DemandOff)->"B1U"; (BidirectionalUnpruned,DemandOn)->"B2U"
 data InducedResult = InducedResult
   { inducedProgram :: Maybe Expr, inducedPortfolio :: [Expr], inducedSpace :: Space
   , inducedRoot :: NodeId, inducedSignature :: M.Map String [Support]
@@ -82,7 +92,14 @@ data Engine = Engine
   , demandRef :: IORef (M.Map DemandKey DemandRecord)           -- every registered demand, keyed by (pool key, missing type)
   , epochRef :: IORef Int                                        -- incremented whenever any observation pool grows
   , poolEnvRef :: IORef (M.Map String LearningTask)              -- representative task per pool key (environments for evaluation)
+  , budgetCapRef :: IORef (Maybe Int)                            -- temporary work cap for the deferred pass
   }
+-- Deferred-branch keys share the demand registry; the marker type PoseT is not
+-- part of the Place language, so it cannot collide with a typed demand.
+deferredMarker :: Type
+deferredMarker=PoseT
+deferredKey :: LearningTask -> DemandKey
+deferredKey q="deferred:"++canonical q `seq` ("deferred:"++canonical q,deferredMarker)
 -- A demand names the observation pool (environment key) and the operand type
 -- the witness could not condition on. Its record tracks the resolution epoch.
 type DemandKey=(String,Type)
@@ -92,12 +109,12 @@ data DemandRecord = DemandRecord
   } deriving (Eq,Show)
 
 metricNames :: [String]
-metricNames=words "demands_registered demands_distinct demands_suspended demands_resumed demands_still_blocked demand_rounds demand_generated_terms demand_new_observations demand_new_vec_observations demand_new_coord_observations demand_new_int_observations demand_work demand_memo_invalidations demand_memo_reuse bidirectional_left_decompositions root_learning_tasks recursive_learning_tasks memoized_learning_tasks memo_queries memo_hits witness_calls lookahead_witness_calls successful_witness_decompositions failed_witness_decompositions version_space_nodes union_nodes join_nodes materialized_complete_asts materialized_child_asts structural_deduplications semantic_deduplications exact_verifier_calls propagation_steps branch_points expression_tests invented_abstractions induced_tsl_symbol_count base_symbols_activated base_symbols_rejected program_ast_length distinct_symbol_count first_solution_states total_expanded_work effect_pruned fv_bindings_eliminated witness_unavailable depth_cutoffs observer_terms bottom_up_terms structural_prior_count abstraction_rounds invention_expansion_tests invention_hits abstraction_discovery_work synthesis_work_after_discovery synthesis_work_before_discovery equivalence_classes structural_representatives max_representatives_per_class pruned_representatives cost_bound_reached cost_strata let_cse_sharing cse_nodes_saved grounded_expressions ungrounded_literal_cost extraction_work cycle_cutoffs"
+metricNames=words "deferred_tasks deferred_branches deferred_released deferred_pass_work deferred_pass_memo_invalidations cover_lazy_candidates demands_registered demands_distinct demands_suspended demands_resumed demands_still_blocked demand_rounds demand_generated_terms demand_new_observations demand_new_vec_observations demand_new_coord_observations demand_new_int_observations demand_work demand_memo_invalidations demand_memo_reuse bidirectional_left_decompositions root_learning_tasks recursive_learning_tasks memoized_learning_tasks memo_queries memo_hits witness_calls lookahead_witness_calls successful_witness_decompositions failed_witness_decompositions version_space_nodes union_nodes join_nodes materialized_complete_asts materialized_child_asts structural_deduplications semantic_deduplications exact_verifier_calls propagation_steps branch_points expression_tests invented_abstractions induced_tsl_symbol_count base_symbols_activated base_symbols_rejected program_ast_length distinct_symbol_count first_solution_states total_expanded_work effect_pruned fv_bindings_eliminated witness_unavailable depth_cutoffs observer_terms bottom_up_terms structural_prior_count abstraction_rounds invention_expansion_tests invention_hits abstraction_discovery_work synthesis_work_after_discovery synthesis_work_before_discovery equivalence_classes structural_representatives max_representatives_per_class pruned_representatives cost_bound_reached cost_strata let_cse_sharing cse_nodes_saved grounded_expressions ungrounded_literal_cost extraction_work cycle_cutoffs"
 
 newEngine :: InducedMode -> InducedConfig -> IO Engine
 newEngine runMode conf=Engine conf runMode <$> newIORef emptySpace <*> newIORef M.empty
     <*> newIORef (M.fromList [(n,0) | n<-metricNames]) <*> newIORef [] <*> newIORef M.empty <*> newIORef [] <*> newIORef S.empty <*> newIORef M.empty <*> newIORef M.empty <*> newIORef Nothing <*> newIORef M.empty <*> newIORef Nothing <*> newIORef M.empty
-    <*> newIORef M.empty <*> newIORef [] <*> newIORef M.empty <*> newIORef 0 <*> newIORef M.empty
+    <*> newIORef M.empty <*> newIORef [] <*> newIORef M.empty <*> newIORef 0 <*> newIORef M.empty <*> newIORef Nothing
 
 rulesFor :: Engine -> IO [Primitive]
 rulesFor engine=do
@@ -152,7 +169,10 @@ bump engine key n=modifyIORef' (metricsRef engine) (M.insertWith (+) key n)
 work :: Engine -> Int -> IO ()
 work engine n=bump engine "total_expanded_work" n
 exhausted :: Engine -> IO Bool
-exhausted engine=(>=workBudget (config engine)) . M.findWithDefault 0 "total_expanded_work" <$> readIORef (metricsRef engine)
+exhausted engine=do
+  cap<-readIORef (budgetCapRef engine)
+  spent<-M.findWithDefault 0 "total_expanded_work" <$> readIORef (metricsRef engine)
+  pure (spent>=maybe (workBudget (config engine)) (min (workBudget (config engine))) cap)
 note :: Engine -> String -> IO ()
 note engine s=modifyIORef' (traceRef engine) (\xs->if length xs<2500 then s:xs else xs)
 node :: Engine -> String -> VSNode -> Support -> IO NodeId
@@ -316,10 +336,19 @@ learnBase engine remaining q=do
             let ds=nubBy (\a b->map canonical (decompositionChildren a)==map canonical (decompositionChildren b)) (witnessFor engine remaining p q inversePool)
             when (debug==Just "1") (putStrLn ("witness "++primitiveName p++" "++show (length ds)) >> hFlush stdout)
             when (null ds) (bump engine "witness_unavailable" 1)
-            bump engine "bidirectional_left_decompositions" (length [() | d<-ds,take 36 (decompositionEvidence d)=="coordinate/vector inverse: condition"])
+            bump engine "bidirectional_left_decompositions" (length [() | d<-ds,isLeftResidual d])
             when (demandPolicy (config engine)==DemandOn) $
               mapM_ (registerDemand engine q (primitiveName p)) (missingOperands p q inversePool)
-            pure [(p,d) | d<-ds]
+            -- DeferNonLocal: postpone tagged branches unless this task's
+            -- deferral has been released by the second pass.
+            released<-if schedulePolicy (config engine)/=DeferNonLocal then pure True else do
+              demands<-readIORef (demandRef engine)
+              pure (maybe False ((/=Nothing) . demandResolvedEpoch) (M.lookup (deferredKey q) demands))
+            let (deferred,immediate)=if released then ([],ds) else span' isDeferred ds
+            when (not (null deferred)) $ do
+              bump engine "deferred_branches" (length deferred)
+              registerDeferred engine q (primitiveName p) (length deferred)
+            pure [(p,d) | d<-immediate]
         let branches=concat decompositions
         when (length branches>1) (bump engine "branch_points" 1)
         scheduled<-forM branches $ \branch@(_,d)->do
@@ -389,6 +418,31 @@ learnBase engine remaining q=do
 -- ---------------------------------------------------------------------------
 -- place-demand phase B: demand bookkeeping and bounded typed domain growth.
 -- ---------------------------------------------------------------------------
+isDeferred :: Decomposition -> Bool
+isDeferred d=take 18 (decompositionEvidence d)=="deferred-nonlocal:"
+isLeftResidual :: Decomposition -> Bool
+isLeftResidual d=let e=decompositionEvidence d in take 36 e=="coordinate/vector inverse: condition" || take 18 e=="deferred-nonlocal:"
+span' :: (a->Bool) -> [a] -> ([a],[a])
+span' f xs=(filter f xs,filter (not . f) xs)
+registerDeferred :: Engine -> LearningTask -> String -> Int -> IO ()
+registerDeferred engine q sym count=do
+  let key=deferredKey q
+  modifyIORef' (demandRef engine) (\m->case M.lookup key m of
+    Just r->M.insert key r {demandSymbols=S.insert sym (demandSymbols r)} m
+    Nothing->M.insert key (DemandRecord (M.size m) (S.singleton (summary q)) (S.singleton sym) Nothing Nothing "deferred: non-local left residual branches postponed") m)
+  modifyIORef' (demandStackRef engine) (pushDemands (S.singleton key))
+  note engine ("Deferred "++show count++" non-local residual branches of "++sym++"; "++summary q)
+-- Second pass: release every deferred task at once (epoch+1 so their memo
+-- entries become stale), cap the work at the deferred share, re-enter Learn.
+releaseDeferred :: Engine -> IO Int
+releaseDeferred engine=do
+  demands<-readIORef (demandRef engine)
+  let pending=[k | (k,r)<-M.toList demands,snd k==deferredMarker,demandResolvedEpoch r==Nothing]
+  if null pending then pure 0 else do
+    modifyIORef' (epochRef engine) (+1)
+    epochNow<-readIORef (epochRef engine)
+    modifyIORef' (demandRef engine) (\m->foldr (M.adjust (\r->r {demandResolvedEpoch=Just epochNow,demandGrowth=Just 1,demandStatus="released: deferred branches explored in the second pass"})) m pending)
+    pure (length pending)
 pushDemands :: S.Set DemandKey -> [S.Set DemandKey] -> [S.Set DemandKey]
 pushDemands ds (f:fs)=S.union f ds:fs
 pushDemands _ []=[]
@@ -505,7 +559,25 @@ countStaleMemo engine=do
 learnWithDemands :: Engine -> LearningTask -> IO NodeId
 learnWithDemands engine q=do
   root0<-learn engine (depthBound (config engine)) q
-  if demandPolicy (config engine)/=DemandOn then pure root0 else go (1::Int) root0
+  rootD<-if demandPolicy (config engine)/=DemandOn then pure root0 else go (1::Int) root0
+  if schedulePolicy (config engine)/=DeferNonLocal then pure rootD else do
+    released<-releaseDeferred engine
+    bump engine "deferred_tasks" released
+    bump engine "deferred_released" released
+    stop<-exhausted engine
+    if released==0 || stop then pure rootD else do
+      stale<-countStaleMemo engine
+      bump engine "deferred_pass_memo_invalidations" stale
+      before<-M.findWithDefault 0 "total_expanded_work" <$> readIORef (metricsRef engine)
+      writeIORef (budgetCapRef engine) (Just (before+deferredWorkBudget (config engine)))
+      note engine ("Deferred pass: released="++show released++" stale memo="++show stale++" share="++show (deferredWorkBudget (config engine)))
+      root'<-learn engine (depthBound (config engine)) q
+      writeIORef (budgetCapRef engine) Nothing
+      after<-M.findWithDefault 0 "total_expanded_work" <$> readIORef (metricsRef engine)
+      bump engine "deferred_pass_work" (after-before)
+      if root'==rootD || root'==0 then pure rootD
+        else if rootD==0 then pure root'
+        else node engine ("deferred-union:"++show (rootD,root')) (Union [rootD,root']) (Support (summary q) "retain first-pass alternatives; add alternatives reachable through deferred non-local residual branches")
   where
     go r root
       | r>demandRounds (config engine)=pure root
@@ -954,7 +1026,8 @@ extractFresh engine store root cached=do
       sharing=mode engine/=NoLetSharing
       prior=mode engine/=NoGroundedLiteralPrior
   (covered,coverUnits)<-if mode engine `elem` [BeamSearchLegacy,NoPortfolioCover] then pure ([],0)
-    else coverPortfolio aliasCap sharing prior bound (min allowance (workBudget (config engine) `div` 20)) store root
+    else (if coverPolicy (config engine)==CoverLazy then coverLazy else coverPortfolio) aliasCap sharing prior bound (min allowance (workBudget (config engine) `div` 20)) store root
+  when (coverPolicy (config engine)==CoverLazy) (bump engine "cover_lazy_candidates" (length covered))
   (correlated,correlatedUnits)<-if not sharing || mode engine `elem` [BeamSearchLegacy,NoPortfolioCover] then pure ([],0)
     else sharedAliasProposals prior bound (min (allowance-coverUnits) (workBudget (config engine) `div` 20)) store covered
   let (fresh,units,reached,strata)=if mode engine==BeamSearchLegacy then let (xs,n)=materialize (frontierBound (config engine)) store root in (xs,n,0,[])

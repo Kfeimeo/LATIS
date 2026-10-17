@@ -177,12 +177,17 @@ witnessAt policy remaining corrLimit p q pool=take 64 $ case primitiveName p of
     -- is computed row by row from zip ys (observedValues left). Candidate
     -- left operands are ordered by the ordinary grounded MDL rank (shortest,
     -- least-ungrounded first) and capped like the right-conditioned residual.
+    -- Evidence prefix "deferred-nonlocal:" tags a left residual whose base
+    -- point depends on no non-Scene variable. Learn's DeferNonLocal schedule
+    -- postpones such branches to a second, budget-shared pass; ScheduleAll
+    -- explores them immediately. Nothing is deleted by the tag itself.
     leftResidual=filter childLearnable
       [decomp [child leftType (observedValues left),child rightType inferred]
-         "coordinate/vector inverse: condition on left operand and deduce right component specification"
+         ((if isLocal left then "" else "deferred-nonlocal: ")++"coordinate/vector inverse: condition on left operand and deduce right component specification")
       | let (leftType,rightType)=case n of "coordDelta"->(CoordT,CoordT); "coordAdd"->(CoordT,VecT); _->(VecT,VecT)
       ,left<-take 16 (sortOn (rankWith True . observedExpr) (filter localOperand (available leftType)))
       ,Just inferred<-[traverse inverseRight (zip ys (observedValues left))]]
+    isLocal o=any (\v->M.lookup v (environment q)/=Just SceneT) (S.toList (freeVars (observedExpr o)))
     inverseRight (CoordV (Coord x y),CoordV (Coord a b)) | n=="coordAdd"=Just (VecV (Vec (x-a) (y-b)))
     inverseRight (VecV (Vec x y),CoordV (Coord a b)) | n=="coordDelta"=Just (CoordV (Coord (a-x) (b-y)))
     inverseRight (VecV (Vec x y),VecV (Vec a b)) | n=="vecAdd"=Just (VecV (Vec (x-a) (y-b)))

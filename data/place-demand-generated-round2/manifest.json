@@ -1,0 +1,283 @@
+{
+  "generator": "scripts/generate_place_demand_samples.py --round2",
+  "seed": 20261018,
+  "object_order": "raster order of 4-connected same-color components of the INPUT grid",
+  "splits": {
+    "audit2-same": "same rules, fresh instances",
+    "audit2-nonlocal": "scan-seed shift: the seed needs a non-local base point + constant displacement",
+    "audit2-newstruct": "mirror_relative: new composition"
+  },
+  "tasks": [
+    {
+      "name": "audit2-same-relative-0",
+      "rule": "relative",
+      "split": "audit2-same",
+      "canvas_sizes": [
+        [
+          18,
+          16
+        ],
+        [
+          22,
+          20
+        ],
+        [
+          26,
+          24
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated-round2/audit2-same-relative-0/task.json",
+      "sha256": "adaa29cb2ba83545044ce8baac19753ba312fdaa9537feab1ed29e19230ce1db"
+    },
+    {
+      "name": "audit2-same-progression-0",
+      "rule": "progression",
+      "split": "audit2-same",
+      "canvas_sizes": [
+        [
+          18,
+          16
+        ],
+        [
+          22,
+          20
+        ],
+        [
+          26,
+          24
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated-round2/audit2-same-progression-0/task.json",
+      "sha256": "00d96768b0c9cf31f78db72ce09ec51f4cb4f884a7a5086d829d7ff2e26e5d31"
+    },
+    {
+      "name": "audit2-same-negated-0",
+      "rule": "negated",
+      "split": "audit2-same",
+      "canvas_sizes": [
+        [
+          18,
+          16
+        ],
+        [
+          22,
+          20
+        ],
+        [
+          26,
+          24
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated-round2/audit2-same-negated-0/task.json",
+      "sha256": "54ab4ed4012bd5c9eacb8e55458b594fc18a41e3ee51d363dbe7c059b89358e9"
+    },
+    {
+      "name": "audit2-same-double-0",
+      "rule": "double",
+      "split": "audit2-same",
+      "canvas_sizes": [
+        [
+          18,
+          16
+        ],
+        [
+          22,
+          20
+        ],
+        [
+          26,
+          24
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated-round2/audit2-same-double-0/task.json",
+      "sha256": "ad53e75bacb53ca39e57328e19c0dbfa7244090cc2829005b5b54a0e2cb3da51"
+    },
+    {
+      "name": "audit2-same-xalign-0",
+      "rule": "xalign",
+      "split": "audit2-same",
+      "canvas_sizes": [
+        [
+          18,
+          16
+        ],
+        [
+          22,
+          20
+        ],
+        [
+          26,
+          24
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated-round2/audit2-same-xalign-0/task.json",
+      "sha256": "4c9f75969889b4b0c520de0a28774589fc3913fc06ff3425f8fe7aba12489768"
+    },
+    {
+      "name": "audit2-nonlocal-seedshift-x-0",
+      "rule": "seedshift_x",
+      "split": "audit2-nonlocal",
+      "canvas_sizes": [
+        [
+          20,
+          18
+        ],
+        [
+          24,
+          22
+        ],
+        [
+          28,
+          26
+        ]
+      ],
+      "object_counts": [
+        3,
+        3,
+        4
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated-round2/audit2-nonlocal-seedshift-x-0/task.json",
+      "sha256": "9073ebe9131445341195b8eebfc7616fc797ef9025f6dd67918cb1f304b7b506"
+    },
+    {
+      "name": "audit2-nonlocal-seedshift-x-1",
+      "rule": "seedshift_x",
+      "split": "audit2-nonlocal",
+      "canvas_sizes": [
+        [
+          21,
+          18
+        ],
+        [
+          24,
+          22
+        ],
+        [
+          28,
+          26
+        ]
+      ],
+      "object_counts": [
+        3,
+        3,
+        4
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated-round2/audit2-nonlocal-seedshift-x-1/task.json",
+      "sha256": "0da5e07216606ac23957ef35234a7ff3aeef00bf0795e274bc328dd7c45d5935"
+    },
+    {
+      "name": "audit2-nonlocal-seedshift-y-0",
+      "rule": "seedshift_y",
+      "split": "audit2-nonlocal",
+      "canvas_sizes": [
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          28,
+          28
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated-round2/audit2-nonlocal-seedshift-y-0/task.json",
+      "sha256": "63b18fa07ecde4982c58f5a188237548cf32ac54e360e5232fe8aafd444dfd7a"
+    },
+    {
+      "name": "audit2-newstruct-mirror-0",
+      "rule": "mirror_relative",
+      "split": "audit2-newstruct",
+      "canvas_sizes": [
+        [
+          20,
+          18
+        ],
+        [
+          24,
+          22
+        ],
+        [
+          28,
+          26
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated-round2/audit2-newstruct-mirror-0/task.json",
+      "sha256": "04124f745d555c98c4cd9828b8c0ccf6b4dfaa4d95d8b286c99b7945891627b9"
+    },
+    {
+      "name": "audit2-newstruct-mirror-1",
+      "rule": "mirror_relative",
+      "split": "audit2-newstruct",
+      "canvas_sizes": [
+        [
+          20,
+          19
+        ],
+        [
+          24,
+          22
+        ],
+        [
+          28,
+          26
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated-round2/audit2-newstruct-mirror-1/task.json",
+      "sha256": "12b7531939bcfbf85d252538476ef8819f62489663a5411e4936e19fa9fdf9cb"
+    }
+  ],
+  "manifest_hash": "474087d241041af13993f519566cc4ca0d0e4b4bab227a2b7e760a1af8fe74e5"
+}
