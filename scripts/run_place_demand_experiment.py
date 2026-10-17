@@ -14,7 +14,7 @@ VARIANTS = {
 EXPERIMENT = ROOT / 'experiments/place-demand'
 
 def source_fingerprint(binary):
-    sources = list((EXPERIMENT / 'src').rglob('*.hs')) + list((EXPERIMENT / 'test').rglob('*.hs')) + [EXPERIMENT / 'app/Main.hs', EXPERIMENT / 'latis.cabal', pathlib.Path(__file__)]
+    sources = list((EXPERIMENT / 'src').rglob('*.hs')) + [EXPERIMENT / 'app/Main.hs', EXPERIMENT / 'latis.cabal', pathlib.Path(__file__)]  # binary-determining sources plus this protocol script
     return {'binary_sha256': digest(binary), 'source_sha256': {x.relative_to(ROOT).as_posix(): digest(x) for x in sorted(sources)}}
 
 def generated_tasks(manifest_path):

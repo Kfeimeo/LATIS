@@ -222,7 +222,8 @@ main=do
   assert "Phase B: same training values, different dependency structures => both representatives kept" (length merged==2 && signatureOf (observedExpr twinB)/=signatureOf (observedExpr twinC))
   _<-pure (twin1,twin2)
   -- VecT demand: coordAdd with CoordT-only pool registers VecT and grows VecT observations.
-  engineV<-newEngine Full confB {demandOperandCap=8}
+  -- depth 3 keeps the deduction inside the unit work budget so a demand round can run
+  engineV<-newEngine Full confB {demandOperandCap=8,depthBound=3,workBudget=120000}
   rootV<-learnWithDemands engineV qCoord
   metricsV<-readIORef (metricsRef engineV)
   demandsV<-readIORef (demandRef engineV)
