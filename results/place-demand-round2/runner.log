@@ -143,3 +143,4 @@ stress/F-global-better/B1Q: train=True held=False failure=AbstractionMissing ela
 stress/F-global-better/B1X: train=True held=False failure=AbstractionMissing elapsed=206.06s
 stress/G-fusion/B0: train=True held=False failure=AbstractionMissing elapsed=194.52s
 stress/F-global-better/B1QX: train=True held=False failure=AbstractionMissing elapsed=219.13s
+stress/G-fusion/B1L: train=True held=True failure=None elapsed=81.04s
