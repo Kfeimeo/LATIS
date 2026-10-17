@@ -20,3 +20,9 @@ regression/map-rotate90/B1U: train=True held=True failure=None elapsed=21.01s
 regression/map-scan-ambiguity/B1U: train=False held=False failure=SearchFailure elapsed=157.45s
 regression/scan-BL-TL/B1U: train=True held=True failure=None elapsed=170.51s
 regression/map-translate/B1U: train=False held=False failure=SearchFailure elapsed=180.44s
+regression/scan-reverse/B1U: train=True held=True failure=None elapsed=58.89s
+regression/true-scan-lazy-prev/B1U: train=True held=True failure=None elapsed=72.24s
+regression/scan-BR-TL/B1U: train=True held=True failure=None elapsed=167.90s
+regression/scan-TR-TL/B1U: train=True held=True failure=None elapsed=166.52s
+regression/wrong-early-skeleton/B1U: train=True held=True failure=None elapsed=144.80s
+runner exit=0

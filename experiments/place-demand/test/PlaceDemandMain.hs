@@ -9,7 +9,7 @@ import Synthesis.InducedR2.Observers
 import Synthesis.InducedR2.Witness
 import Synthesis.InducedR2.Learn
 import Synthesis.InducedR2.VersionSpace (nodes)
-import Synthesis.InducedR2.PortfolioCover (coverLazy)
+import Synthesis.InducedR2.PortfolioCover (coverLazy,coverPortfolio)
 import Synthesis.InducedR2.Diversity (signatureOf)
 import ARC.LatentStress (latentStressTasks)
 import ARC.Dataset
@@ -258,8 +258,11 @@ main=do
   -- Lazy cover: on the same DAG, coverLazy produces at least one exact complete
   -- composition within a small budget, with correlation preserved (every
   -- candidate still matches the specification by real Base evaluation).
-  (lazyC,lazyUsed)<-coverLazy 0 True True 96 400 sQ rootQ
-  assert "round 2: lazy cover materializes exact candidates within a small budget" (any (matches qCoord) lazyC && lazyUsed<=400)
+  -- phase 1 charges one attempt per reachable node (about 1250 here), so 2000 is a small budget
+  (lazyC,lazyUsed)<-coverLazy 0 True True 96 2000 sQ rootQ
+  (refineC,_)<-coverPortfolio 0 True True 96 2000 sQ rootQ
+  assert "round 2: lazy cover materializes exact candidates within a small budget" (any (matches qCoord) lazyC && lazyUsed<=2000)
+  assert "round 2: at the same small budget the coordinate-descent cover yields no more exact candidates than the lazy cover" (length (filter (matches qCoord) refineC)<=length (filter (matches qCoord) lazyC))
   assert "round 2: lazy cover never mixes children across decompositions (all candidates exact or absent)" (all (matches qCoord) lazyC)
   -- Pruning ablation switch: unpruned policy yields a superset of decompositions.
   let dsP=witnessAt Bidirectional 1 32 (prim "coordAdd") qAdd leftOnly

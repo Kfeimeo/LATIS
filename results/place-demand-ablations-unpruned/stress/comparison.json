@@ -1,0 +1,1808 @@
+[
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "A-absolute-relative",
+    "mode": "Full",
+    "train_exact": false,
+    "heldout_exact": false,
+    "heldout_available": true,
+    "failure": "SearchFailure",
+    "failure_evidence": "nonempty symbolic root VSA; bounded cost/portfolio extraction did not produce an exact complete program; search/materialization failure, not a missing Base or witness certificate",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": null,
+    "typed_ast": null,
+    "portfolio_count": 0,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 0,
+      "abstraction_rounds": 1,
+      "base_symbols_activated": 33,
+      "base_symbols_rejected": 29,
+      "bidirectional_left_decompositions": 5972,
+      "bottom_up_terms": 0,
+      "branch_points": 339,
+      "cost_bound_reached": 20,
+      "cost_strata": 20,
+      "counterfactual_calls": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 66,
+      "deduction_milliseconds": 193130,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 0,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 0,
+      "demands_registered": 0,
+      "demands_resumed": 0,
+      "demands_still_blocked": 0,
+      "demands_suspended": 0,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 0,
+      "distinct_symbol_count": 0,
+      "effect_pruned": 18,
+      "equivalence_classes": 387,
+      "exact_verifier_calls": 0,
+      "expression_tests": 36738,
+      "extraction_milliseconds": 4229,
+      "extraction_work": 37500,
+      "failed_witness_decompositions": 5713,
+      "first_solution_states": 0,
+      "fv_bindings_eliminated": 4219,
+      "grounded_expressions": 0,
+      "induced_tsl_symbol_count": 33,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 670,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 92830,
+      "materialized_child_asts": 37500,
+      "materialized_complete_asts": 0,
+      "max_representatives_per_class": 121,
+      "memo_hits": 7627,
+      "memo_queries": 11031,
+      "memoized_learning_tasks": 3338,
+      "observer_terms": 15739,
+      "portfolio_cover_work": 12500,
+      "program_ast_length": 0,
+      "propagation_steps": 50028,
+      "pruned_representatives": 17996,
+      "recursive_learning_tasks": 11031,
+      "root_learning_tasks": 1,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 0,
+      "structural_deduplications": 4537,
+      "structural_prior_count": 0,
+      "structural_representatives": 2358,
+      "successful_witness_decompositions": 677,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 238824,
+      "total_expanded_work": 238824,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 346,
+      "version_space_nodes": 2993,
+      "witness_calls": 97738,
+      "witness_unavailable": 4222,
+      "wall_clock_seconds": 197.883368874
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1U",
+      "witness_policy": "BidirectionalUnpruned",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3
+    },
+    "variant": "B1U",
+    "base_expressibility": "Unknown: no impossibility certificate",
+    "bounded": false,
+    "group": "stress",
+    "execution_elapsed_seconds": 202.35814422099998
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "B-repeated-progression",
+    "mode": "Full",
+    "train_exact": true,
+    "heldout_exact": true,
+    "heldout_available": true,
+    "failure": "None",
+    "failure_evidence": "training exact; heldout is assessed only after MDL selection",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))),objects(v0))))",
+    "typed_ast": {
+      "type": "ArrowT SceneT SceneT",
+      "expression": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))),objects(v0))))",
+      "free_variables": [],
+      "binding_accesses": [
+        "v0",
+        "v1"
+      ],
+      "children": [
+        {
+          "type": "SceneT",
+          "expression": "mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))),objects(v0)))",
+          "free_variables": [
+            "v0"
+          ],
+          "binding_accesses": [
+            "v0",
+            "v1"
+          ],
+          "children": [
+            {
+              "type": "SizeT",
+              "expression": "canvasSize(v0)",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0"
+              ],
+              "children": [
+                {
+                  "type": "SceneT",
+                  "expression": "v0",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "ColorT",
+              "expression": "ColorV 0",
+              "free_variables": [],
+              "binding_accesses": [],
+              "children": []
+            },
+            {
+              "type": "ListT PlacedT",
+              "expression": "map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))),objects(v0))",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0",
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "ArrowT PlacedT PlacedT",
+                  "expression": "(lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL)))))",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0",
+                    "v1"
+                  ],
+                  "children": [
+                    {
+                      "type": "PlacedT",
+                      "expression": "place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))",
+                      "free_variables": [
+                        "v0",
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v0",
+                        "v1"
+                      ],
+                      "children": [
+                        {
+                          "type": "ObjectT",
+                          "expression": "objectOf(v1)",
+                          "free_variables": [
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "PlacedT",
+                              "expression": "v1",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CoordT",
+                          "expression": "coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL)))",
+                          "free_variables": [
+                            "v0",
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v0",
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "CoordT",
+                              "expression": "Anchor(v1,TL)",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "PlacedT",
+                                  "expression": "v1",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": []
+                                },
+                                {
+                                  "type": "AnchorT",
+                                  "expression": "TL",
+                                  "free_variables": [],
+                                  "binding_accesses": [],
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VecT",
+                              "expression": "coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))",
+                              "free_variables": [
+                                "v0",
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v0",
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(v1,TL)",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "v1",
+                                      "free_variables": [
+                                        "v1"
+                                      ],
+                                      "binding_accesses": [
+                                        "v1"
+                                      ],
+                                      "children": []
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "TL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(objects(v0)),BL)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(objects(v0))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "objects(v0)",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "SceneT",
+                                              "expression": "v0",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "BL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ListT PlacedT",
+                  "expression": "objects(v0)",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": [
+                    {
+                      "type": "SceneT",
+                      "expression": "v0",
+                      "free_variables": [
+                        "v0"
+                      ],
+                      "binding_accesses": [
+                        "v0"
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "portfolio_count": 1,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 0,
+      "abstraction_rounds": 0,
+      "base_symbols_activated": 33,
+      "base_symbols_rejected": 29,
+      "bidirectional_left_decompositions": 6272,
+      "bottom_up_terms": 0,
+      "branch_points": 362,
+      "cost_bound_reached": 20,
+      "cost_strata": 20,
+      "counterfactual_calls": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 54,
+      "deduction_milliseconds": 212981,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 0,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 0,
+      "demands_registered": 0,
+      "demands_resumed": 0,
+      "demands_still_blocked": 0,
+      "demands_suspended": 0,
+      "depth_cutoffs": 0,
+      "distinct_symbol_count": 12,
+      "effect_pruned": 17,
+      "equivalence_classes": 150,
+      "exact_verifier_calls": 1,
+      "expression_tests": 37112,
+      "extraction_milliseconds": 6628,
+      "extraction_work": 37429,
+      "failed_witness_decompositions": 6579,
+      "first_solution_states": 250000,
+      "fv_bindings_eliminated": 3744,
+      "grounded_expressions": 1,
+      "induced_tsl_symbol_count": 33,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 171,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 107750,
+      "materialized_child_asts": 37429,
+      "materialized_complete_asts": 1,
+      "max_representatives_per_class": 136,
+      "memo_hits": 8750,
+      "memo_queries": 12256,
+      "memoized_learning_tasks": 3452,
+      "observer_terms": 15739,
+      "portfolio_cover_work": 12500,
+      "program_ast_length": 25,
+      "propagation_steps": 52058,
+      "pruned_representatives": 17996,
+      "recursive_learning_tasks": 12256,
+      "root_learning_tasks": 1,
+      "selected_cse_nodes_saved": 0,
+      "selected_let_bindings": 0,
+      "selected_mdl_cost": 26,
+      "selected_ungrounded_literal_cost": 0,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 25,
+      "structural_deduplications": 2025,
+      "structural_prior_count": 0,
+      "structural_representatives": 2384,
+      "successful_witness_decompositions": 180,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 250000,
+      "total_expanded_work": 250000,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 93,
+      "verification_milliseconds": 0,
+      "version_space_nodes": 1780,
+      "witness_calls": 113335,
+      "witness_unavailable": 4848,
+      "wall_clock_seconds": 219.848880751
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1U",
+      "witness_policy": "BidirectionalUnpruned",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3
+    },
+    "variant": "B1U",
+    "base_expressibility": "Constructive Base certificate",
+    "bounded": true,
+    "group": "stress",
+    "execution_elapsed_seconds": 223.61642071899996
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "C-scene-axis",
+    "mode": "Full",
+    "train_exact": false,
+    "heldout_exact": false,
+    "heldout_available": true,
+    "failure": "SearchFailure",
+    "failure_evidence": "finite expanded-work budget reached; no impossibility claim",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": null,
+    "typed_ast": null,
+    "portfolio_count": 0,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 0,
+      "abstraction_rounds": 0,
+      "base_symbols_activated": 32,
+      "base_symbols_rejected": 30,
+      "bidirectional_left_decompositions": 5578,
+      "bottom_up_terms": 0,
+      "branch_points": 264,
+      "cost_bound_reached": 0,
+      "cost_strata": 0,
+      "counterfactual_calls": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 100,
+      "deduction_milliseconds": 277836,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 0,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 0,
+      "demands_registered": 0,
+      "demands_resumed": 0,
+      "demands_still_blocked": 0,
+      "demands_suspended": 0,
+      "depth_cutoffs": 0,
+      "distinct_symbol_count": 0,
+      "effect_pruned": 136,
+      "equivalence_classes": 698,
+      "exact_verifier_calls": 0,
+      "expression_tests": 83963,
+      "extraction_milliseconds": 5,
+      "extraction_work": 0,
+      "failed_witness_decompositions": 5124,
+      "first_solution_states": 0,
+      "fv_bindings_eliminated": 2925,
+      "grounded_expressions": 0,
+      "induced_tsl_symbol_count": 32,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 963,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 79698,
+      "materialized_child_asts": 0,
+      "materialized_complete_asts": 0,
+      "max_representatives_per_class": 135,
+      "memo_hits": 5735,
+      "memo_queries": 9774,
+      "memoized_learning_tasks": 3939,
+      "observer_terms": 77430,
+      "portfolio_cover_work": 0,
+      "program_ast_length": 0,
+      "propagation_steps": 57910,
+      "pruned_representatives": 88176,
+      "recursive_learning_tasks": 9774,
+      "root_learning_tasks": 1,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 0,
+      "structural_deduplications": 8098,
+      "structural_prior_count": 0,
+      "structural_representatives": 2774,
+      "successful_witness_decompositions": 963,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 250024,
+      "total_expanded_work": 250024,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 436,
+      "version_space_nodes": 3706,
+      "witness_calls": 84296,
+      "witness_unavailable": 4014,
+      "wall_clock_seconds": 279.669136151
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1U",
+      "witness_policy": "BidirectionalUnpruned",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3
+    },
+    "variant": "B1U",
+    "base_expressibility": "Unknown: no impossibility certificate",
+    "bounded": true,
+    "group": "stress",
+    "execution_elapsed_seconds": 286.740833377
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "D-object-sufficient",
+    "mode": "Full",
+    "train_exact": true,
+    "heldout_exact": true,
+    "heldout_available": true,
+    "failure": "None",
+    "failure_evidence": "training exact; heldout is assessed only after MDL selection",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": "(lambda v0:SceneT. v0)",
+    "typed_ast": {
+      "type": "ArrowT SceneT SceneT",
+      "expression": "(lambda v0:SceneT. v0)",
+      "free_variables": [],
+      "binding_accesses": [
+        "v0"
+      ],
+      "children": [
+        {
+          "type": "SceneT",
+          "expression": "v0",
+          "free_variables": [
+            "v0"
+          ],
+          "binding_accesses": [
+            "v0"
+          ],
+          "children": []
+        }
+      ]
+    },
+    "portfolio_count": 1,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 3,
+      "abstraction_rounds": 1,
+      "base_symbols_activated": 1,
+      "base_symbols_rejected": 61,
+      "bidirectional_left_decompositions": 0,
+      "bottom_up_terms": 0,
+      "branch_points": 0,
+      "cost_bound_reached": 96,
+      "cost_strata": 96,
+      "counterfactual_calls": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 0,
+      "deduction_milliseconds": 709,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 0,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 0,
+      "demands_registered": 0,
+      "demands_resumed": 0,
+      "demands_still_blocked": 0,
+      "demands_suspended": 0,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 0,
+      "distinct_symbol_count": 1,
+      "effect_pruned": 0,
+      "equivalence_classes": 2,
+      "exact_verifier_calls": 1,
+      "expression_tests": 2,
+      "extraction_milliseconds": 0,
+      "extraction_work": 9,
+      "failed_witness_decompositions": 0,
+      "first_solution_states": 35,
+      "fv_bindings_eliminated": 0,
+      "grounded_expressions": 1,
+      "induced_tsl_symbol_count": 1,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 1,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 0,
+      "materialized_child_asts": 9,
+      "materialized_complete_asts": 1,
+      "max_representatives_per_class": 1,
+      "memo_hits": 0,
+      "memo_queries": 2,
+      "memoized_learning_tasks": 2,
+      "observer_terms": 1944,
+      "portfolio_cover_work": 4,
+      "program_ast_length": 2,
+      "propagation_steps": 22,
+      "pruned_representatives": 2222,
+      "recursive_learning_tasks": 2,
+      "root_learning_tasks": 1,
+      "selected_cse_nodes_saved": 0,
+      "selected_let_bindings": 0,
+      "selected_mdl_cost": 2,
+      "selected_ungrounded_literal_cost": 0,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 2,
+      "structural_deduplications": 0,
+      "structural_prior_count": 0,
+      "structural_representatives": 2,
+      "successful_witness_decompositions": 1,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 35,
+      "total_expanded_work": 38,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 1,
+      "verification_milliseconds": 0,
+      "version_space_nodes": 4,
+      "witness_calls": 10,
+      "witness_unavailable": 9,
+      "wall_clock_seconds": 0.711070471
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1U",
+      "witness_policy": "BidirectionalUnpruned",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3
+    },
+    "variant": "B1U",
+    "base_expressibility": "Constructive Base certificate",
+    "bounded": false,
+    "group": "stress",
+    "execution_elapsed_seconds": 0.8183903820000182
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "E-local-better",
+    "mode": "Full",
+    "train_exact": false,
+    "heldout_exact": false,
+    "heldout_available": true,
+    "failure": "WitnessMissing",
+    "failure_evidence": "no supported complete program under partial witnesses, finite observation domains, depth and frontier bounds; witness-coverage diagnosis within these bounds, not a claim Base cannot express the task",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": null,
+    "typed_ast": null,
+    "portfolio_count": 0,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 0,
+      "abstraction_rounds": 1,
+      "base_symbols_activated": 0,
+      "base_symbols_rejected": 62,
+      "bidirectional_left_decompositions": 1584,
+      "bottom_up_terms": 0,
+      "branch_points": 54,
+      "cost_bound_reached": 96,
+      "cost_strata": 96,
+      "counterfactual_calls": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 36,
+      "deduction_milliseconds": 105603,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 0,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 0,
+      "demands_registered": 0,
+      "demands_resumed": 0,
+      "demands_still_blocked": 0,
+      "demands_suspended": 0,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 0,
+      "distinct_symbol_count": 0,
+      "effect_pruned": 15,
+      "equivalence_classes": 59,
+      "exact_verifier_calls": 0,
+      "expression_tests": 28183,
+      "extraction_milliseconds": 0,
+      "extraction_work": 0,
+      "failed_witness_decompositions": 1655,
+      "first_solution_states": 0,
+      "fv_bindings_eliminated": 5272,
+      "grounded_expressions": 0,
+      "induced_tsl_symbol_count": 0,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 0,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 24857,
+      "materialized_child_asts": 0,
+      "materialized_complete_asts": 0,
+      "max_representatives_per_class": 30,
+      "memo_hits": 1654,
+      "memo_queries": 2857,
+      "memoized_learning_tasks": 1167,
+      "observer_terms": 15739,
+      "portfolio_cover_work": 0,
+      "program_ast_length": 0,
+      "propagation_steps": 16632,
+      "pruned_representatives": 17996,
+      "recursive_learning_tasks": 2857,
+      "root_learning_tasks": 1,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 0,
+      "structural_deduplications": 426,
+      "structural_prior_count": 0,
+      "structural_representatives": 405,
+      "successful_witness_decompositions": 0,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 74463,
+      "total_expanded_work": 74463,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 25,
+      "version_space_nodes": 173,
+      "witness_calls": 25875,
+      "witness_unavailable": 901,
+      "wall_clock_seconds": 105.638816719
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1U",
+      "witness_policy": "BidirectionalUnpruned",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3
+    },
+    "variant": "B1U",
+    "base_expressibility": "Unknown: no impossibility certificate",
+    "bounded": false,
+    "group": "stress",
+    "execution_elapsed_seconds": 106.48273531100006
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "F-global-better",
+    "mode": "Full",
+    "train_exact": false,
+    "heldout_exact": false,
+    "heldout_available": true,
+    "failure": "SearchFailure",
+    "failure_evidence": "finite expanded-work budget reached; no impossibility claim",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": null,
+    "typed_ast": null,
+    "portfolio_count": 0,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 0,
+      "abstraction_rounds": 0,
+      "base_symbols_activated": 32,
+      "base_symbols_rejected": 30,
+      "bidirectional_left_decompositions": 6654,
+      "bottom_up_terms": 0,
+      "branch_points": 347,
+      "cost_bound_reached": 0,
+      "cost_strata": 0,
+      "counterfactual_calls": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 80,
+      "deduction_milliseconds": 240556,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 0,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 0,
+      "demands_registered": 0,
+      "demands_resumed": 0,
+      "demands_still_blocked": 0,
+      "demands_suspended": 0,
+      "depth_cutoffs": 0,
+      "distinct_symbol_count": 0,
+      "effect_pruned": 99,
+      "equivalence_classes": 1006,
+      "exact_verifier_calls": 0,
+      "expression_tests": 61114,
+      "extraction_milliseconds": 8,
+      "extraction_work": 0,
+      "failed_witness_decompositions": 5449,
+      "first_solution_states": 0,
+      "fv_bindings_eliminated": 3090,
+      "grounded_expressions": 0,
+      "induced_tsl_symbol_count": 32,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 1769,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 87418,
+      "materialized_child_asts": 0,
+      "materialized_complete_asts": 0,
+      "max_representatives_per_class": 135,
+      "memo_hits": 6942,
+      "memo_queries": 10815,
+      "memoized_learning_tasks": 3793,
+      "observer_terms": 55496,
+      "portfolio_cover_work": 0,
+      "program_ast_length": 0,
+      "propagation_steps": 56333,
+      "pruned_representatives": 63250,
+      "recursive_learning_tasks": 10815,
+      "root_learning_tasks": 1,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 0,
+      "structural_deduplications": 15915,
+      "structural_prior_count": 0,
+      "structural_representatives": 3193,
+      "successful_witness_decompositions": 1769,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 250009,
+      "total_expanded_work": 250009,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 721,
+      "version_space_nodes": 5193,
+      "witness_calls": 92385,
+      "witness_unavailable": 4228,
+      "wall_clock_seconds": 242.096366003
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1U",
+      "witness_policy": "BidirectionalUnpruned",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3
+    },
+    "variant": "B1U",
+    "base_expressibility": "Unknown: no impossibility certificate",
+    "bounded": true,
+    "group": "stress",
+    "execution_elapsed_seconds": 250.87550349699995
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "G-fusion",
+    "mode": "Full",
+    "train_exact": false,
+    "heldout_exact": false,
+    "heldout_available": true,
+    "failure": "SearchFailure",
+    "failure_evidence": "finite expanded-work budget reached; no impossibility claim",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": null,
+    "typed_ast": null,
+    "portfolio_count": 0,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 0,
+      "abstraction_rounds": 0,
+      "base_symbols_activated": 33,
+      "base_symbols_rejected": 29,
+      "bidirectional_left_decompositions": 7234,
+      "bottom_up_terms": 0,
+      "branch_points": 396,
+      "cost_bound_reached": 0,
+      "cost_strata": 0,
+      "counterfactual_calls": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 80,
+      "deduction_milliseconds": 271462,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 0,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 0,
+      "demands_registered": 0,
+      "demands_resumed": 0,
+      "demands_still_blocked": 0,
+      "demands_suspended": 0,
+      "depth_cutoffs": 0,
+      "distinct_symbol_count": 0,
+      "effect_pruned": 46,
+      "equivalence_classes": 370,
+      "exact_verifier_calls": 0,
+      "expression_tests": 49500,
+      "extraction_milliseconds": 3,
+      "extraction_work": 0,
+      "failed_witness_decompositions": 7249,
+      "first_solution_states": 0,
+      "fv_bindings_eliminated": 4445,
+      "grounded_expressions": 0,
+      "induced_tsl_symbol_count": 33,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 503,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 118462,
+      "materialized_child_asts": 0,
+      "materialized_complete_asts": 0,
+      "max_representatives_per_class": 121,
+      "memo_hits": 9532,
+      "memo_queries": 13594,
+      "memoized_learning_tasks": 3982,
+      "observer_terms": 31609,
+      "portfolio_cover_work": 0,
+      "program_ast_length": 0,
+      "propagation_steps": 59738,
+      "pruned_representatives": 36080,
+      "recursive_learning_tasks": 13594,
+      "root_learning_tasks": 1,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 0,
+      "structural_deduplications": 3376,
+      "structural_prior_count": 0,
+      "structural_representatives": 2494,
+      "successful_witness_decompositions": 524,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 250000,
+      "total_expanded_work": 250000,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 262,
+      "version_space_nodes": 2783,
+      "witness_calls": 124646,
+      "witness_unavailable": 5371,
+      "wall_clock_seconds": 271.852819652
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1U",
+      "witness_policy": "BidirectionalUnpruned",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3
+    },
+    "variant": "B1U",
+    "base_expressibility": "Unknown: no impossibility certificate",
+    "bounded": true,
+    "group": "stress",
+    "execution_elapsed_seconds": 276.47498614100004
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "H-overfitting-trap",
+    "mode": "Full",
+    "train_exact": false,
+    "heldout_exact": false,
+    "heldout_available": true,
+    "failure": "WitnessMissing",
+    "failure_evidence": "no supported complete program under partial witnesses, finite observation domains, depth and frontier bounds; witness-coverage diagnosis within these bounds, not a claim Base cannot express the task",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": null,
+    "typed_ast": null,
+    "portfolio_count": 0,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 0,
+      "abstraction_rounds": 1,
+      "base_symbols_activated": 0,
+      "base_symbols_rejected": 62,
+      "bidirectional_left_decompositions": 2112,
+      "bottom_up_terms": 0,
+      "branch_points": 72,
+      "cost_bound_reached": 96,
+      "cost_strata": 96,
+      "counterfactual_calls": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 47,
+      "deduction_milliseconds": 138127,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 0,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 0,
+      "demands_registered": 0,
+      "demands_resumed": 0,
+      "demands_still_blocked": 0,
+      "demands_suspended": 0,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 0,
+      "distinct_symbol_count": 0,
+      "effect_pruned": 38,
+      "equivalence_classes": 79,
+      "exact_verifier_calls": 0,
+      "expression_tests": 35940,
+      "extraction_milliseconds": 0,
+      "extraction_work": 0,
+      "failed_witness_decompositions": 2220,
+      "first_solution_states": 0,
+      "fv_bindings_eliminated": 5464,
+      "grounded_expressions": 0,
+      "induced_tsl_symbol_count": 0,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 0,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 32500,
+      "materialized_child_asts": 0,
+      "materialized_complete_asts": 0,
+      "max_representatives_per_class": 30,
+      "memo_hits": 2213,
+      "memo_queries": 3823,
+      "memoized_learning_tasks": 1563,
+      "observer_terms": 27662,
+      "portfolio_cover_work": 0,
+      "program_ast_length": 0,
+      "propagation_steps": 22180,
+      "pruned_representatives": 31570,
+      "recursive_learning_tasks": 3823,
+      "root_learning_tasks": 1,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 0,
+      "structural_deduplications": 621,
+      "structural_prior_count": 0,
+      "structural_representatives": 541,
+      "successful_witness_decompositions": 0,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 98232,
+      "total_expanded_work": 98232,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 27,
+      "version_space_nodes": 179,
+      "witness_calls": 33982,
+      "witness_unavailable": 1320,
+      "wall_clock_seconds": 138.165720155
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1U",
+      "witness_policy": "BidirectionalUnpruned",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3
+    },
+    "variant": "B1U",
+    "base_expressibility": "Unknown: no impossibility certificate",
+    "bounded": false,
+    "group": "stress",
+    "execution_elapsed_seconds": 139.21368527999994
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "I-equivalent-representations",
+    "mode": "Full",
+    "train_exact": true,
+    "heldout_exact": true,
+    "heldout_available": true,
+    "failure": "None",
+    "failure_evidence": "training exact; heldout is assessed only after MDL selection",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))),objects(v0))))",
+    "typed_ast": {
+      "type": "ArrowT SceneT SceneT",
+      "expression": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))),objects(v0))))",
+      "free_variables": [],
+      "binding_accesses": [
+        "v0",
+        "v1"
+      ],
+      "children": [
+        {
+          "type": "SceneT",
+          "expression": "mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))),objects(v0)))",
+          "free_variables": [
+            "v0"
+          ],
+          "binding_accesses": [
+            "v0",
+            "v1"
+          ],
+          "children": [
+            {
+              "type": "SizeT",
+              "expression": "canvasSize(v0)",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0"
+              ],
+              "children": [
+                {
+                  "type": "SceneT",
+                  "expression": "v0",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "ColorT",
+              "expression": "ColorV 0",
+              "free_variables": [],
+              "binding_accesses": [],
+              "children": []
+            },
+            {
+              "type": "ListT PlacedT",
+              "expression": "map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))),objects(v0))",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0",
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "ArrowT PlacedT PlacedT",
+                  "expression": "(lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL)))))",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0",
+                    "v1"
+                  ],
+                  "children": [
+                    {
+                      "type": "PlacedT",
+                      "expression": "place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))",
+                      "free_variables": [
+                        "v0",
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v0",
+                        "v1"
+                      ],
+                      "children": [
+                        {
+                          "type": "ObjectT",
+                          "expression": "objectOf(v1)",
+                          "free_variables": [
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "PlacedT",
+                              "expression": "v1",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CoordT",
+                          "expression": "coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL)))",
+                          "free_variables": [
+                            "v0",
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v0",
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "CoordT",
+                              "expression": "Anchor(head(tail(objects(v0))),Center)",
+                              "free_variables": [
+                                "v0"
+                              ],
+                              "binding_accesses": [
+                                "v0"
+                              ],
+                              "children": [
+                                {
+                                  "type": "PlacedT",
+                                  "expression": "head(tail(objects(v0)))",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "ListT PlacedT",
+                                      "expression": "tail(objects(v0))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "objects(v0)",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "SceneT",
+                                              "expression": "v0",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "AnchorT",
+                                  "expression": "Center",
+                                  "free_variables": [],
+                                  "binding_accesses": [],
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VecT",
+                              "expression": "coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))",
+                              "free_variables": [
+                                "v0",
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v0",
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(v1,TL)",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "v1",
+                                      "free_variables": [
+                                        "v1"
+                                      ],
+                                      "binding_accesses": [
+                                        "v1"
+                                      ],
+                                      "children": []
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "TL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(objects(v0)),BL)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(objects(v0))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "objects(v0)",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "SceneT",
+                                              "expression": "v0",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "BL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ListT PlacedT",
+                  "expression": "objects(v0)",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": [
+                    {
+                      "type": "SceneT",
+                      "expression": "v0",
+                      "free_variables": [
+                        "v0"
+                      ],
+                      "binding_accesses": [
+                        "v0"
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "portfolio_count": 1,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 37,
+      "abstraction_rounds": 1,
+      "base_symbols_activated": 33,
+      "base_symbols_rejected": 29,
+      "bidirectional_left_decompositions": 5632,
+      "bottom_up_terms": 0,
+      "branch_points": 337,
+      "cost_bound_reached": 18,
+      "cost_strata": 18,
+      "counterfactual_calls": 0,
+      "cover_lazy_candidates": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 53,
+      "deduction_milliseconds": 190714,
+      "deferred_branches": 0,
+      "deferred_pass_memo_invalidations": 0,
+      "deferred_pass_work": 0,
+      "deferred_released": 0,
+      "deferred_tasks": 0,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 0,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 0,
+      "demands_registered": 0,
+      "demands_resumed": 0,
+      "demands_still_blocked": 0,
+      "demands_suspended": 0,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 0,
+      "distinct_symbol_count": 13,
+      "effect_pruned": 18,
+      "equivalence_classes": 141,
+      "exact_verifier_calls": 1,
+      "expression_tests": 31973,
+      "extraction_milliseconds": 4328,
+      "extraction_work": 37528,
+      "failed_witness_decompositions": 5907,
+      "first_solution_states": 230372,
+      "fv_bindings_eliminated": 4424,
+      "grounded_expressions": 1,
+      "induced_tsl_symbol_count": 33,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 178,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 97348,
+      "materialized_child_asts": 37528,
+      "materialized_complete_asts": 1,
+      "max_representatives_per_class": 136,
+      "memo_hits": 7702,
+      "memo_queries": 11017,
+      "memoized_learning_tasks": 3262,
+      "observer_terms": 15739,
+      "portfolio_cover_work": 12500,
+      "program_ast_length": 28,
+      "propagation_steps": 49098,
+      "pruned_representatives": 17996,
+      "recursive_learning_tasks": 11017,
+      "root_learning_tasks": 1,
+      "selected_cse_nodes_saved": 0,
+      "selected_let_bindings": 0,
+      "selected_mdl_cost": 29,
+      "selected_ungrounded_literal_cost": 0,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 28,
+      "structural_deduplications": 2277,
+      "structural_prior_count": 0,
+      "structural_representatives": 2232,
+      "successful_witness_decompositions": 189,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 230372,
+      "total_expanded_work": 230409,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 93,
+      "verification_milliseconds": 0,
+      "version_space_nodes": 1731,
+      "witness_calls": 102597,
+      "witness_unavailable": 4565,
+      "wall_clock_seconds": 195.287535333
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1U",
+      "witness_policy": "BidirectionalUnpruned",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3,
+      "schedule_policy": "ScheduleAll",
+      "deferred_work_budget": 62500,
+      "cover_policy": "CoverRefine"
+    },
+    "variant": "B1U",
+    "base_expressibility": "Constructive Base certificate",
+    "bounded": false,
+    "group": "stress",
+    "execution_elapsed_seconds": 198.80397173699998
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "J-no-useful-abstraction",
+    "mode": "Full",
+    "train_exact": false,
+    "heldout_exact": false,
+    "heldout_available": true,
+    "failure": "SearchFailure",
+    "failure_evidence": "finite expanded-work budget reached; no impossibility claim",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": null,
+    "typed_ast": null,
+    "portfolio_count": 0,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 0,
+      "abstraction_rounds": 0,
+      "base_symbols_activated": 33,
+      "base_symbols_rejected": 29,
+      "bidirectional_left_decompositions": 7386,
+      "bottom_up_terms": 0,
+      "branch_points": 430,
+      "cost_bound_reached": 0,
+      "cost_strata": 0,
+      "counterfactual_calls": 0,
+      "cover_lazy_candidates": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 55,
+      "deduction_milliseconds": 214321,
+      "deferred_branches": 0,
+      "deferred_pass_memo_invalidations": 0,
+      "deferred_pass_work": 0,
+      "deferred_released": 0,
+      "deferred_tasks": 0,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 0,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 0,
+      "demands_registered": 0,
+      "demands_resumed": 0,
+      "demands_still_blocked": 0,
+      "demands_suspended": 0,
+      "depth_cutoffs": 0,
+      "distinct_symbol_count": 0,
+      "effect_pruned": 19,
+      "equivalence_classes": 693,
+      "exact_verifier_calls": 0,
+      "expression_tests": 41904,
+      "extraction_milliseconds": 487,
+      "extraction_work": 3253,
+      "failed_witness_decompositions": 6663,
+      "first_solution_states": 0,
+      "fv_bindings_eliminated": 4118,
+      "grounded_expressions": 0,
+      "induced_tsl_symbol_count": 33,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 1387,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 110452,
+      "materialized_child_asts": 3253,
+      "materialized_complete_asts": 0,
+      "max_representatives_per_class": 121,
+      "memo_hits": 9265,
+      "memo_queries": 13431,
+      "memoized_learning_tasks": 4111,
+      "observer_terms": 15739,
+      "portfolio_cover_work": 3253,
+      "program_ast_length": 0,
+      "propagation_steps": 62237,
+      "pruned_representatives": 17996,
+      "recursive_learning_tasks": 13431,
+      "root_learning_tasks": 1,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 0,
+      "structural_deduplications": 6987,
+      "structural_prior_count": 0,
+      "structural_representatives": 2565,
+      "successful_witness_decompositions": 1387,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 250000,
+      "total_expanded_work": 250000,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 587,
+      "version_space_nodes": 4460,
+      "witness_calls": 116397,
+      "witness_unavailable": 5065,
+      "wall_clock_seconds": 216.118575635
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1U",
+      "witness_policy": "BidirectionalUnpruned",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3,
+      "schedule_policy": "ScheduleAll",
+      "deferred_work_budget": 62500,
+      "cover_policy": "CoverRefine"
+    },
+    "variant": "B1U",
+    "base_expressibility": "Unknown: no impossibility certificate",
+    "bounded": true,
+    "group": "stress",
+    "execution_elapsed_seconds": 221.63259409500006
+  }
+]
