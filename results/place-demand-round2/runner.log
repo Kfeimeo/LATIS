@@ -76,3 +76,5 @@ regression/scan-BL-TL/B1L: train=False held=False failure=ImplementationBug elap
 regression/scan-BL-TL/B1Q: train=True held=True failure=None elapsed=129.38s
 regression/scan-BL-TL/B1X: train=True held=True failure=None elapsed=125.05s
 regression/scan-BL-TL/B1QX: train=False held=False failure=ImplementationBug elapsed=117.20s
+regression/scan-BR-TL/B0: train=True held=True failure=None elapsed=117.63s
+regression/scan-BR-TL/B1: train=True held=True failure=None elapsed=116.11s
