@@ -178,7 +178,8 @@ def main():
     A('')
     A('## 下一阶段判断')
     A('')
-    A('证据最支持的动作是**先修已定位的瓶颈，而不是继续 demand closure 或局部抽象反馈**：双向 witness 已经使 A/B/I 的链可达（H1 的机制部分成立），真正阻断的是“弱约束子规格中的 residual/join 扇出 × 固定提取预算”。下一步应在不改预算口径的前提下，把 B1L 所揭示的“residual 不得是规格的整体平移”做成有理论依据的通用条件（例如要求 residual 子规格相对父规格有信息增益，或在 cover/saturation 中按子规格约束强度调度），再以同一受控矩阵（含未见 audit 的重新生成）检验；demand closure 应在提取瓶颈解决后、以“候选覆盖相同的工作量”重新评估，因为本轮 B2 的所有新增信息都被提取预算吞没。')
+    regL = [r for r in abl_rows if r['group'] == 'regression' and r['variant'] == 'B1L']
+    A(f"证据最支持的动作是**先修已定位的瓶颈，而不是继续 demand closure 或局部抽象反馈**：双向 witness 已经使 A/B/I 的链可达（H1 的机制部分成立），真正阻断的是“弱约束子规格中的 residual/join 扇出 × 固定提取预算”。开发证据 B1L（仅把左侧 residual 限制在元素局部基点）在相同预算下 stress 留出 {cnt('stress','B1L','heldout')}/{n('stress','B1L')}、regression 留出 {cnt('regression','B1L','heldout')}/{len(regL)}、generated-audit 留出 {cnt('generated-audit','B1L','heldout')}/{n('generated-audit','B1L')}，说明扇出而非 witness 语义是瓶颈。下一步应在不改预算口径的前提下，把“residual 不得是规格的整体平移”做成有理论依据的通用条件（例如要求 residual 子规格相对父规格有信息增益，或在 cover/saturation 中按子规格约束强度调度），**重新生成未见 audit 样例**后以同一受控矩阵检验；demand closure 应在提取瓶颈解决后、以“候选覆盖相同的工作量”重新评估：本轮 B2 的新增信息被提取预算吞没，而 B2L 相对 B1L 在 stress 上" + ('没有增益' if cnt('stress','B2L','heldout') <= cnt('stress','B1L','heldout') else '有增益') + f"（{cnt('stress','B2L','heldout')}/{n('stress','B2L')} vs {cnt('stress','B1L','heldout')}/{n('stress','B1L')}），且改变了部分任务的选择结果。")
     (OUT / 'REPORT.md').write_text('\n'.join(L) + '\n', encoding='utf-8')
     print('wrote REPORT.md', len(L), 'lines')
 if __name__ == '__main__': main()
