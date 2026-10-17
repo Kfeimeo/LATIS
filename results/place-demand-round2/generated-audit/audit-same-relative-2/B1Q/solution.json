@@ -1,0 +1,1 @@
+{"train_exact": false, "heldout_exact": false, "failure": "SearchFailure", "failure_evidence": "external 300s process deadline", "external_timeout": true, "statistics": {}, "variant": "B1Q"}
