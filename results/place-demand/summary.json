@@ -1,0 +1,848 @@
+{
+  "completed": 222,
+  "per_group": {
+    "core/B0": {
+      "n": 1,
+      "train": 1,
+      "heldout": 1,
+      "timeouts": 0
+    },
+    "core/B1": {
+      "n": 1,
+      "train": 1,
+      "heldout": 1,
+      "timeouts": 0
+    },
+    "core/B2": {
+      "n": 1,
+      "train": 1,
+      "heldout": 1,
+      "timeouts": 0
+    },
+    "regression/B0": {
+      "n": 17,
+      "train": 15,
+      "heldout": 15,
+      "timeouts": 0
+    },
+    "regression/B1": {
+      "n": 17,
+      "train": 14,
+      "heldout": 14,
+      "timeouts": 1
+    },
+    "regression/B2": {
+      "n": 17,
+      "train": 14,
+      "heldout": 14,
+      "timeouts": 2
+    },
+    "stress/B0": {
+      "n": 10,
+      "train": 6,
+      "heldout": 3,
+      "timeouts": 0
+    },
+    "stress/B1": {
+      "n": 10,
+      "train": 4,
+      "heldout": 4,
+      "timeouts": 0
+    },
+    "stress/B2": {
+      "n": 10,
+      "train": 4,
+      "heldout": 4,
+      "timeouts": 0
+    },
+    "diagnostic/B0": {
+      "n": 30,
+      "train": 1,
+      "heldout": 0,
+      "timeouts": 2
+    },
+    "diagnostic/B1": {
+      "n": 30,
+      "train": 1,
+      "heldout": 0,
+      "timeouts": 2
+    },
+    "diagnostic/B2": {
+      "n": 30,
+      "train": 1,
+      "heldout": 0,
+      "timeouts": 2
+    },
+    "generated-dev/B0": {
+      "n": 4,
+      "train": 2,
+      "heldout": 0,
+      "timeouts": 0
+    },
+    "generated-dev/B1": {
+      "n": 4,
+      "train": 0,
+      "heldout": 0,
+      "timeouts": 1
+    },
+    "generated-dev/B2": {
+      "n": 4,
+      "train": 0,
+      "heldout": 0,
+      "timeouts": 1
+    },
+    "generated-audit/B0": {
+      "n": 12,
+      "train": 10,
+      "heldout": 1,
+      "timeouts": 0
+    },
+    "generated-audit/B1": {
+      "n": 12,
+      "train": 0,
+      "heldout": 0,
+      "timeouts": 6
+    },
+    "generated-audit/B2": {
+      "n": 12,
+      "train": 0,
+      "heldout": 0,
+      "timeouts": 6
+    }
+  },
+  "outcome_changes_vs_B0": [
+    {
+      "group": "generated-audit",
+      "task": "audit-same-progression-0",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-same-progression-0",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-same-progression-2",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-same-progression-2",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-same-relative-0",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-same-relative-0",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-same-relative-1",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-same-relative-1",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-same-relative-2",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-same-relative-2",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-unseen-double-0",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-unseen-double-0",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-unseen-double-1",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-unseen-double-1",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-unseen-negated-0",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-unseen-negated-0",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-unseen-xalign-0",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-unseen-xalign-0",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-unseen-xalign-1",
+      "variant": "B1",
+      "B0": [
+        true,
+        true,
+        "None"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-audit",
+      "task": "audit-unseen-xalign-1",
+      "variant": "B2",
+      "B0": [
+        true,
+        true,
+        "None"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-dev",
+      "task": "dev-progression-1",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-dev",
+      "task": "dev-progression-1",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-dev",
+      "task": "dev-relative-0",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "generated-dev",
+      "task": "dev-relative-0",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "regression",
+      "task": "map-scan-ambiguity",
+      "variant": "B1",
+      "B0": [
+        true,
+        true,
+        "None"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "regression",
+      "task": "map-scan-ambiguity",
+      "variant": "B2",
+      "B0": [
+        true,
+        true,
+        "None"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "regression",
+      "task": "map-translate",
+      "variant": "B1",
+      "B0": [
+        true,
+        true,
+        "None"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "regression",
+      "task": "map-translate",
+      "variant": "B2",
+      "B0": [
+        true,
+        true,
+        "None"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "regression",
+      "task": "scan-TR-TL",
+      "variant": "B1",
+      "B0": [
+        false,
+        false,
+        "ImplementationBug"
+      ],
+      "B1": [
+        true,
+        true,
+        "None"
+      ]
+    },
+    {
+      "group": "regression",
+      "task": "scan-TR-TL",
+      "variant": "B2",
+      "B0": [
+        false,
+        false,
+        "ImplementationBug"
+      ],
+      "B2": [
+        true,
+        true,
+        "None"
+      ]
+    },
+    {
+      "group": "stress",
+      "task": "B-repeated-progression",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        true,
+        true,
+        "None"
+      ]
+    },
+    {
+      "group": "stress",
+      "task": "B-repeated-progression",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        true,
+        true,
+        "None"
+      ]
+    },
+    {
+      "group": "stress",
+      "task": "C-scene-axis",
+      "variant": "B1",
+      "B0": [
+        true,
+        true,
+        "None"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "stress",
+      "task": "C-scene-axis",
+      "variant": "B2",
+      "B0": [
+        true,
+        true,
+        "None"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "stress",
+      "task": "F-global-better",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "stress",
+      "task": "F-global-better",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "stress",
+      "task": "G-fusion",
+      "variant": "B1",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B1": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "stress",
+      "task": "G-fusion",
+      "variant": "B2",
+      "B0": [
+        true,
+        false,
+        "AbstractionMissing"
+      ],
+      "B2": [
+        false,
+        false,
+        "SearchFailure"
+      ]
+    },
+    {
+      "group": "stress",
+      "task": "I-equivalent-representations",
+      "variant": "B1",
+      "B0": [
+        false,
+        false,
+        "WitnessMissing"
+      ],
+      "B1": [
+        true,
+        true,
+        "None"
+      ]
+    },
+    {
+      "group": "stress",
+      "task": "I-equivalent-representations",
+      "variant": "B2",
+      "B0": [
+        false,
+        false,
+        "WitnessMissing"
+      ],
+      "B2": [
+        true,
+        true,
+        "None"
+      ]
+    }
+  ],
+  "B0_vs_frozen_place_only_outcome_mismatches": [
+    {
+      "group": "regression",
+      "task": "scan-TR-TL",
+      "B0": [
+        false,
+        false,
+        "ImplementationBug"
+      ],
+      "place_only": [
+        true,
+        true,
+        "None"
+      ]
+    }
+  ],
+  "timeouts": [
+    [
+      "diagnostic",
+      "484b58aa",
+      "B0"
+    ],
+    [
+      "diagnostic",
+      "484b58aa",
+      "B1"
+    ],
+    [
+      "diagnostic",
+      "484b58aa",
+      "B2"
+    ],
+    [
+      "diagnostic",
+      "c444b776",
+      "B0"
+    ],
+    [
+      "diagnostic",
+      "c444b776",
+      "B1"
+    ],
+    [
+      "diagnostic",
+      "c444b776",
+      "B2"
+    ],
+    [
+      "generated-audit",
+      "audit-same-progression-1",
+      "B1"
+    ],
+    [
+      "generated-audit",
+      "audit-same-progression-1",
+      "B2"
+    ],
+    [
+      "generated-audit",
+      "audit-same-relative-0",
+      "B1"
+    ],
+    [
+      "generated-audit",
+      "audit-same-relative-0",
+      "B2"
+    ],
+    [
+      "generated-audit",
+      "audit-same-relative-2",
+      "B1"
+    ],
+    [
+      "generated-audit",
+      "audit-same-relative-2",
+      "B2"
+    ],
+    [
+      "generated-audit",
+      "audit-unseen-double-0",
+      "B1"
+    ],
+    [
+      "generated-audit",
+      "audit-unseen-double-0",
+      "B2"
+    ],
+    [
+      "generated-audit",
+      "audit-unseen-negated-1",
+      "B1"
+    ],
+    [
+      "generated-audit",
+      "audit-unseen-negated-1",
+      "B2"
+    ],
+    [
+      "generated-audit",
+      "audit-unseen-xalign-1",
+      "B1"
+    ],
+    [
+      "generated-audit",
+      "audit-unseen-xalign-1",
+      "B2"
+    ],
+    [
+      "generated-dev",
+      "dev-relative-1",
+      "B1"
+    ],
+    [
+      "generated-dev",
+      "dev-relative-1",
+      "B2"
+    ],
+    [
+      "regression",
+      "map-scan-ambiguity",
+      "B1"
+    ],
+    [
+      "regression",
+      "map-scan-ambiguity",
+      "B2"
+    ],
+    [
+      "regression",
+      "map-translate",
+      "B2"
+    ]
+  ]
+}
