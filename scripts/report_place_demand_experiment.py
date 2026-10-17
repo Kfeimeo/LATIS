@@ -89,3 +89,39 @@ def main():
     (OUT / 'summary_tables.md').write_text('\n'.join(table(rows, groups)) + '\n', encoding='utf-8')
     print(json.dumps(summary['per_group'], indent=1)); print('changes vs B0:', len(changes)); print('B0 vs frozen mismatches:', b0_vs_frozen); print('timeouts:', summary['timeouts'])
 if __name__ == '__main__': main()
+
+# ---------------------------------------------------------------------------
+# Per-task tables and traceable chains (appended; invoked by make_place_demand_report)
+def fmt(v):
+    if v is None: return 'n/a'
+    if isinstance(v, bool): return '1' if v else '0'
+    if isinstance(v, float): return f'{v:.1f}'
+    return str(v)
+
+def per_task_table(rows, group, keys):
+    by = collections.defaultdict(dict)
+    for r in rows:
+        if r['group'] == group: by[r['task']][r['variant']] = r
+    head = '| 任务 | 变体 | train | heldout | failure | portfolio | held-correct | first-exact work | total work | solver s | ' + ' | '.join(keys) + ' |'
+    lines = [head, '|' + '---|' * (10 + len(keys))]
+    for task in sorted(by):
+        for v in VARIANTS:
+            r = by[task].get(v)
+            if r is None: continue
+            lines.append(f"| {task} | {v} | {fmt(r['train'])} | {fmt(r['heldout'])} | {r['failure']}{' (timeout)' if r['timeout'] else ''} | {fmt(r['portfolio'])} | {fmt(r['held_correct'])} | {fmt(r['first_solution_states'])} | {fmt(r['total_expanded_work'])} | {fmt(r['wall_clock_seconds'])} | " + ' | '.join(fmt(r[k]) for k in keys) + ' |')
+    return lines
+
+def chain(path, patterns, limit=40):
+    """Extract trace lines matching any pattern, in order, truncated to a width."""
+    p = ROOT / path
+    if not p.exists(): return ['(trace missing)']
+    out = []
+    for line in p.read_text(encoding='utf-8', errors='replace').splitlines():
+        if any(re.search(pt, line) for pt in patterns):
+            out.append(line[:260])
+            if len(out) >= limit: break
+    return out
+
+def aggregate(rows, group, variant, key):
+    vals = [r[key] for r in rows if r['group'] == group and r['variant'] == variant and r[key] is not None]
+    return (sum(vals), len(vals)) if vals else (None, 0)
