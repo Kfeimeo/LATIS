@@ -10,3 +10,5 @@ experiments/place-demand/place-demand-tests
 experiments/*/build-test/
 experiments/*/build/
 experiments/*/build*.log
+experiments/place-demand/latis-place-demand.matrix
+experiments/place-demand/latis-place-demand-*
