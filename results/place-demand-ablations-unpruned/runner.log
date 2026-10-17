@@ -1,0 +1,9 @@
+stress/A-absolute-relative/B1U: train=False held=False failure=SearchFailure elapsed=202.36s
+stress/D-object-sufficient/B1U: train=True held=True failure=None elapsed=0.82s
+stress/B-repeated-progression/B1U: train=True held=True failure=None elapsed=223.62s
+stress/C-scene-axis/B1U: train=False held=False failure=SearchFailure elapsed=286.74s
+stress/E-local-better/B1U: train=False held=False failure=WitnessMissing elapsed=106.48s
+stress/H-overfitting-trap/B1U: train=False held=False failure=WitnessMissing elapsed=139.21s
+stress/F-global-better/B1U: train=False held=False failure=SearchFailure elapsed=250.88s
+stress/G-fusion/B1U: train=False held=False failure=SearchFailure elapsed=276.47s
+regression/constant-transform/B1U: train=True held=True failure=None elapsed=26.51s
