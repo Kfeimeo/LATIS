@@ -263,3 +263,4 @@ generated-audit/audit-unseen-xalign-1/B1: train=False held=False failure=SearchF
 generated-audit/audit-unseen-xalign-1/B1QX: train=True held=True failure=None elapsed=178.30s
 generated-audit/audit-unseen-xalign-1/B1X: train=False held=False failure=SearchFailure elapsed=293.90s
 generated-audit/audit2-same-relative-0/B0: train=True held=False failure=AbstractionMissing elapsed=143.01s
+generated-audit/audit2-same-relative-0/B1L: train=True held=False failure=AbstractionMissing elapsed=168.37s
