@@ -1,0 +1,95 @@
+cabal-version: 3.0
+name: latis
+version: 0.1.0.0
+build-type: Simple
+license: BSD-3-Clause
+
+library
+  hs-source-dirs: src
+  exposed-modules:
+    Latent.Grid Latent.Object Latent.Encode Latent.Render Latent.Correspondence
+    Language.Types Language.ML Language.DSA Language.Effect Language.Schema Language.Witness
+    Synthesis.Residual Synthesis.Dependency Synthesis.Skeleton Synthesis.Hole
+    Synthesis.Search Synthesis.Verify Synthesis.MDL Synthesis.Abstraction
+    ARC.Dataset ARC.Evaluate ARC.JointEvaluate
+    Synthesis.Expression.FreeVars Synthesis.Expression.Domain
+    Synthesis.Constraint.State Synthesis.Constraint.Metrics Synthesis.Constraint.Propagate
+    Synthesis.Search.Memo Synthesis.Joint
+    Latent.Local.Grammar Latent.Local.Encode Latent.Local.Decode Latent.Local.Discover
+    Latent.Global.Grammar Latent.Global.Encode Latent.Global.Decode Latent.Global.Discover
+    Latent.Fusion.Context Latent.Program Latent.Constraint.Propagate Latent.MDL.LatentCost
+    Synthesis.Hierarchical
+    Latent.Serialize
+    ARC.LatentStress ARC.FailureTaxonomy ARC.HierarchicalEvaluate
+    Language.Induced.Base
+    Synthesis.Induced.Specification Synthesis.Induced.Observers Synthesis.Induced.Witness
+    Synthesis.Induced.VersionSpace Synthesis.Induced.Abstraction Synthesis.Induced.Learn
+    ARC.InducedEvaluate
+    Synthesis.InducedR1.Specification Synthesis.InducedR1.Observers Synthesis.InducedR1.Witness
+    Synthesis.InducedR1.Coverage Synthesis.InducedR1.Abstraction Synthesis.InducedR1.Learn
+    ARC.InducedR1Evaluate
+    Synthesis.InducedR2.Diversity Synthesis.InducedR2.Sharing Synthesis.InducedR2.Observers
+    Synthesis.InducedR2.NormalForm
+    Synthesis.InducedR2.PortfolioCover
+    Synthesis.InducedR2.AliasSharing
+    Synthesis.InducedR2.EffectDomain
+    Synthesis.InducedR2.Witness Synthesis.InducedR2.Coverage Synthesis.InducedR2.VersionSpace
+    Synthesis.InducedR2.Learn Synthesis.InducedR2.Counterfactual ARC.InducedR2Evaluate
+  build-depends: base >=4.18 && <5, containers, time, directory, filepath, deepseq
+  default-language: GHC2021
+  ghc-options: -Wall -O2
+
+executable latis
+  hs-source-dirs: app
+  main-is: Main.hs
+  build-depends: base, latis, containers, time, directory, filepath
+  default-language: GHC2021
+  ghc-options: -Wall -O2 -rtsopts
+
+test-suite latis-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: Main.hs
+  build-depends: base, latis, containers, directory
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite joint-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: JointMain.hs
+  build-depends: base, latis, containers
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite latent-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: LatentMain.hs
+  build-depends: base, latis, containers
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite induced-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: InducedMain.hs
+  build-depends: base, latis, containers
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite induced-r1-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: InducedR1Main.hs
+  build-depends: base, latis, containers, directory, filepath
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite induced-r2-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: InducedR2Main.hs
+  build-depends: base, latis, containers, directory
+  default-language: GHC2021
+  ghc-options: -Wall -O1

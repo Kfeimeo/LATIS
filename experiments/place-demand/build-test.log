@@ -1,0 +1,42 @@
+[33 of 34] Compiling Main             ( test/PlaceDemandMain.hs, build-test/Main.o ) [Source file changed]
+test/PlaceDemandMain.hs:30:8: warning: [GHC-63394] [-Wx-partial]
+    In the use of `head'
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use pattern matching, 'Data.List.uncons' or 'Data.Maybe.listToMaybe' instead. Consider refactoring to use "Data.List.NonEmpty"."
+   |
+30 | prim n=head [p | p<-base,primitiveName p==n]
+   |        ^^^^
+
+test/PlaceDemandMain.hs:87:32: warning: [GHC-63394] [-Wx-partial]
+    In the use of `head'
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use pattern matching, 'Data.List.uncons' or 'Data.Maybe.listToMaybe' instead. Consider refactoring to use "Data.List.NonEmpty"."
+   |
+87 |     (any (\d->map snd (points (head (decompositionChildren d)))==[coordAt 4 3,coordAt (-7) 0,coordAt (-3) 7]) dsBiR)
+   |                                ^^^^
+
+test/PlaceDemandMain.hs:144:48: warning: [GHC-63394] [-Wx-partial]
+    In the use of `head'
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use pattern matching, 'Data.List.uncons' or 'Data.Maybe.listToMaybe' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+144 |   putStrLn ("  example candidate: "++exprText (head exactOnes))
+    |                                                ^^^^
+
+test/PlaceDemandMain.hs:171:48: warning: [GHC-63394] [-Wx-partial]
+    In the use of `head'
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use pattern matching, 'Data.List.uncons' or 'Data.Maybe.listToMaybe' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+171 |   putStrLn ("  example candidate: "++exprText (head exactInt))
+    |                                                ^^^^
+
+test/PlaceDemandMain.hs:238:15: warning: [GHC-63394] [-Wx-partial]
+    In the use of `head'
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use pattern matching, 'Data.List.uncons' or 'Data.Maybe.listToMaybe' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+238 |     let taskI=head [t | t<-latentStressTasks,taskId t=="I-equivalent-representations"]
+    |               ^^^^
+
+[34 of 34] Linking place-demand-tests [Objects changed]

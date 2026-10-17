@@ -1,0 +1,445 @@
+{
+  "generator": "scripts/generate_place_demand_samples.py",
+  "seed": 20261017,
+  "object_order": "raster order of 4-connected same-color components of the INPUT grid",
+  "splits": {
+    "dev": "same rules as stress A/B/I; development evidence",
+    "audit-same-rule": "same rules, new instances; scored only after program selection is frozen",
+    "audit-unseen": "compositional rules absent from the original stress suite (negated/double displacement, x-alignment)"
+  },
+  "tasks": [
+    {
+      "name": "dev-relative-0",
+      "rule": "relative",
+      "split": "dev",
+      "canvas_sizes": [
+        [
+          16,
+          14
+        ],
+        [
+          20,
+          18
+        ],
+        [
+          24,
+          22
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/dev-relative-0/task.json",
+      "sha256": "21a0a637fb6d347cecfd2d7718d327ae39ffce769094816cf950dad72e079393"
+    },
+    {
+      "name": "dev-relative-1",
+      "rule": "relative",
+      "split": "dev",
+      "canvas_sizes": [
+        [
+          18,
+          17
+        ],
+        [
+          20,
+          18
+        ],
+        [
+          25,
+          22
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/dev-relative-1/task.json",
+      "sha256": "b709942155f059bb673b8d56e2d8ee444e8a95146897297ed9262cf0771f7c71"
+    },
+    {
+      "name": "dev-progression-0",
+      "rule": "progression",
+      "split": "dev",
+      "canvas_sizes": [
+        [
+          22,
+          20
+        ],
+        [
+          26,
+          24
+        ],
+        [
+          30,
+          30
+        ]
+      ],
+      "object_counts": [
+        3,
+        3,
+        4
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/dev-progression-0/task.json",
+      "sha256": "460e84151a25992714d5c75ff0c1b93608b595dcfe2535cb93269818acd9201d"
+    },
+    {
+      "name": "dev-progression-1",
+      "rule": "progression",
+      "split": "dev",
+      "canvas_sizes": [
+        [
+          23,
+          20
+        ],
+        [
+          26,
+          24
+        ],
+        [
+          30,
+          30
+        ]
+      ],
+      "object_counts": [
+        3,
+        3,
+        4
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/dev-progression-1/task.json",
+      "sha256": "0104fa44581390c44d9d06b4aa8c7ccd3d58fe1d684130121344fc3724a257b5"
+    },
+    {
+      "name": "audit-same-relative-0",
+      "rule": "relative",
+      "split": "audit-same-rule",
+      "canvas_sizes": [
+        [
+          14,
+          12
+        ],
+        [
+          18,
+          17
+        ],
+        [
+          26,
+          21
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        5
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/audit-same-relative-0/task.json",
+      "sha256": "3113b8fa6e2a5b13d2518eb82160d80df9f95b12e256f75e8eba70e41a8fd917"
+    },
+    {
+      "name": "audit-same-relative-1",
+      "rule": "relative",
+      "split": "audit-same-rule",
+      "canvas_sizes": [
+        [
+          15,
+          13
+        ],
+        [
+          18,
+          17
+        ],
+        [
+          26,
+          21
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        5
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/audit-same-relative-1/task.json",
+      "sha256": "cf509531dee1768c88665eae2f2329bebe37f95ed505cb5d675335b1529f079d"
+    },
+    {
+      "name": "audit-same-relative-2",
+      "rule": "relative",
+      "split": "audit-same-rule",
+      "canvas_sizes": [
+        [
+          16,
+          14
+        ],
+        [
+          18,
+          17
+        ],
+        [
+          26,
+          21
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        5
+      ],
+      "confusable_training": true,
+      "path": "data/place-demand-generated/audit-same-relative-2/task.json",
+      "sha256": "101f6e44d30c72b154b5872a71d9b3fe308e0da3df51966660498c19eef2b256"
+    },
+    {
+      "name": "audit-same-progression-0",
+      "rule": "progression",
+      "split": "audit-same-rule",
+      "canvas_sizes": [
+        [
+          24,
+          20
+        ],
+        [
+          28,
+          26
+        ],
+        [
+          30,
+          28
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/audit-same-progression-0/task.json",
+      "sha256": "02314f2921a66e17c4acc0348fd5e9179630fb1096b35b266b48d903df88f75f"
+    },
+    {
+      "name": "audit-same-progression-1",
+      "rule": "progression",
+      "split": "audit-same-rule",
+      "canvas_sizes": [
+        [
+          24,
+          21
+        ],
+        [
+          28,
+          26
+        ],
+        [
+          30,
+          28
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/audit-same-progression-1/task.json",
+      "sha256": "c94056de62ea6fad3548d7bdd6e07bc8faa1db3fe0878fd6c41f5a5a6c1fb529"
+    },
+    {
+      "name": "audit-same-progression-2",
+      "rule": "progression",
+      "split": "audit-same-rule",
+      "canvas_sizes": [
+        [
+          24,
+          22
+        ],
+        [
+          28,
+          26
+        ],
+        [
+          30,
+          28
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/audit-same-progression-2/task.json",
+      "sha256": "f4e383c136d3ed0947a0b933b7c6ddad7a55a46dea34b376f285374f66a635ff"
+    },
+    {
+      "name": "audit-unseen-negated-0",
+      "rule": "negated",
+      "split": "audit-unseen",
+      "canvas_sizes": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          18
+        ],
+        [
+          24,
+          24
+        ]
+      ],
+      "object_counts": [
+        3,
+        3,
+        4
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/audit-unseen-negated-0/task.json",
+      "sha256": "44cfbd1600fca0898504b26c8563f1cca0508a32e753e69748976a12a2f596d3"
+    },
+    {
+      "name": "audit-unseen-negated-1",
+      "rule": "negated",
+      "split": "audit-unseen",
+      "canvas_sizes": [
+        [
+          16,
+          16
+        ],
+        [
+          21,
+          18
+        ],
+        [
+          24,
+          24
+        ]
+      ],
+      "object_counts": [
+        3,
+        3,
+        4
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/audit-unseen-negated-1/task.json",
+      "sha256": "001d4ec11fcd9d6828280c864e9ab39bf1d02b66ecba526c72ca4f36053e13df"
+    },
+    {
+      "name": "audit-unseen-double-0",
+      "rule": "double",
+      "split": "audit-unseen",
+      "canvas_sizes": [
+        [
+          20,
+          20
+        ],
+        [
+          26,
+          22
+        ],
+        [
+          30,
+          30
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/audit-unseen-double-0/task.json",
+      "sha256": "3e8d95c13630786fae179c7b149dbedd9c26cbe49a570700169b7baceb3bd638"
+    },
+    {
+      "name": "audit-unseen-double-1",
+      "rule": "double",
+      "split": "audit-unseen",
+      "canvas_sizes": [
+        [
+          20,
+          20
+        ],
+        [
+          26,
+          23
+        ],
+        [
+          30,
+          30
+        ]
+      ],
+      "object_counts": [
+        3,
+        4,
+        3
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/audit-unseen-double-1/task.json",
+      "sha256": "ebcf2a005cdbd13b3dfa16ad5a505db42a661e7e62c5fe8471d96129bc117573"
+    },
+    {
+      "name": "audit-unseen-xalign-0",
+      "rule": "xalign",
+      "split": "audit-unseen",
+      "canvas_sizes": [
+        [
+          16,
+          18
+        ],
+        [
+          20,
+          24
+        ],
+        [
+          22,
+          28
+        ]
+      ],
+      "object_counts": [
+        3,
+        3,
+        4
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/audit-unseen-xalign-0/task.json",
+      "sha256": "57db2a1ee6116215b0099928c2e17753cf8495b546d7e6b9112170b4a5250cf8"
+    },
+    {
+      "name": "audit-unseen-xalign-1",
+      "rule": "xalign",
+      "split": "audit-unseen",
+      "canvas_sizes": [
+        [
+          16,
+          18
+        ],
+        [
+          20,
+          25
+        ],
+        [
+          22,
+          28
+        ]
+      ],
+      "object_counts": [
+        3,
+        3,
+        4
+      ],
+      "confusable_training": false,
+      "path": "data/place-demand-generated/audit-unseen-xalign-1/task.json",
+      "sha256": "c1138c0fc6e261181a89fe26248a4ecbf79b978eab5dd6686c4f3cc72e5f384f"
+    }
+  ],
+  "manifest_hash": "223b867f9207756f22509e194d9ee40dfc0aab6211588d857157d49b601acade"
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "suite": "InducedMain.hs",
+    "removed_symbols_referenced": [
+      "PoseT",
+      "Translate",
+      "poseOf"
+    ],
+    "classification": "needs-rewrite (references removed Translate/poseOf symbols; not run for place)"
+  },
+  {
+    "suite": "InducedR1Main.hs",
+    "removed_symbols_referenced": [
+      "Translate"
+    ],
+    "classification": "needs-rewrite (references removed Translate/poseOf symbols; not run for place)"
+  },
+  {
+    "suite": "InducedR2Main.hs",
+    "removed_symbols_referenced": [],
+    "classification": "applicable-in-principle (induced Base without Translate references; not part of this round)"
+  },
+  {
+    "suite": "JointMain.hs",
+    "removed_symbols_referenced": [],
+    "classification": "not-applicable (legacy v0.1/v0.2/v0.3 search, not the induced Base language)"
+  },
+  {
+    "suite": "LatentMain.hs",
+    "removed_symbols_referenced": [],
+    "classification": "not-applicable (legacy v0.1/v0.2/v0.3 search, not the induced Base language)"
+  },
+  {
+    "suite": "Main.hs",
+    "removed_symbols_referenced": [
+      "Translate"
+    ],
+    "classification": "not-applicable (legacy v0.1/v0.2/v0.3 search, not the induced Base language)"
+  },
+  {
+    "suite": "experiments/place-only/CheckPlace.hs",
+    "removed_symbols_referenced": [],
+    "classification": "applicable (place registry/semantics check; run and passing for place-demand Base, which is unchanged)"
+  },
+  {
+    "suite": "experiments/place-demand/test/PlaceDemandMain.hs",
+    "removed_symbols_referenced": [],
+    "classification": "new (phase A/B semantic tests; run and passing)"
+  }
+]
