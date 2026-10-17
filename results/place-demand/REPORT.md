@@ -16,11 +16,11 @@
 
 ## 实现（`experiments/place-demand`，与 place-only 的差异可用 `diff -r` 列出）
 
-**阶段 A（B1，`Witness.hs: witnessAt Bidirectional`）**：对 `coordAdd(a,v)=t`、`coordDelta(p,q)=v`、`vecAdd(u,w)=y` 按实际参数顺序补全左侧条件化（已观察 a ⇒ v_i=t_i−a_i；已观察 p ⇒ q_i=p_i−v_i；已观察 u ⇒ w_i=y_i−u_i）。每行保持（样例，操作数）配对；residual 是子规格（pointTask），不是被接受的表达式；原 join 与右侧 residual 完整保留，join 存在时沿用原 `preferGround`。候选左操作数按原 grounded MDL rank 排序、上限 16（与原右侧 residual 相同）。另加 credit-aware 剪枝：residual 子任务若只剩 0 层推导额度且其值既非观察项也非常数，则不生成（这样的子任务本来只能靠 forward 观察闭合，必返回空；无 invention 时结果中性）。未剪枝的首个版本在 stress A 上 11251 个递归子任务耗尽 250000 预算。
+**阶段 A（B1，`Witness.hs: witnessAt Bidirectional`）**：对 `coordAdd(a,v)=t`、`coordDelta(p,q)=v`、`vecAdd(u,w)=y` 按实际参数顺序补全左侧条件化（已观察 a ⇒ v_i=t_i−a_i；已观察 p ⇒ q_i=p_i−v_i；已观察 u ⇒ w_i=y_i−u_i）。每行保持（样例，操作数）配对；residual 是子规格（pointTask），不是被接受的表达式；原 join 与右侧 residual 完整保留，join 存在时沿用原 `preferGround`。候选左操作数按原 grounded MDL rank 排序、上限 16（与原右侧 residual 相同）。另加 credit-aware 剪枝：residual 子任务若只剩 0 层推导额度且其值既非观察项也非常数，则不生成。**更正**：这一剪枝只在无预算截断下可论证为 DAG 等价（credit=0 的子任务不调用 witness、无 invention、pool key 与父任务相同，只能由 forward 观察或 shared 常数闭合，即剪枝条件本身）；在有限总预算下它改变了 MRV lookahead 的域计数与工作消耗序列，截断点随之变化，**有界条件下的结果中性没有证明**，实测见第二轮的 B1U 消融（`results/place-demand-ablations-unpruned`、`REPORT_ROUND2.md`）。未剪枝的首个版本在 stress A 上 11251 个递归子任务耗尽 250000 预算。
 
 **阶段 B（B2，`Learn.hs`）**：witness 调用时若某条件化操作数类型在观察域中完全缺失（`missingOperands`，只看类型签名与观察域；算术 residual 不在有限观察域时报告 IntT），登记需求 `(pool key, Type)` 并记入当前 Learn 调用栈帧。一轮 Learn 后按登记顺序解析：对 CoordT/VecT/IntT，用 Observe 效应、arity≤2、一阶参数的普通 Base 算子按签名一层组合既有观察项（每类型取 rank 最好的 24 个），在该 pool key 的训练环境求值，经原 `selectPool`（结构多样性语义）合并；生成/保留各计 1 单位工作。pool 增长则 epoch+1；memo 条目记录子树登记的需求集合与写入 epoch，仅当其需求在更晚 epoch 被“有增长地”解析时失效并重学（memo hit 时把子树需求集合向上传播）；无增长的解析不唤醒；每个 key/type 只解析一次；轮数与工作有界；调度确定性。`demands.json` 记录每个需求的状态（resumed / still-blocked / suspended）。
 
-**额外开关（B1L/B2L，`BidirectionalLocal`）**：左侧 residual 只条件化至少依赖一个非 SceneT 环境变量的操作数；类型级通用规则，无任务信息。它是在检查 B1 失败 trace（A/C/F 的 join 全部位于 Γ=[v0] 上下文）之后提出的，所以其结果只算开发证据。
+**额外开关（B1L/B2L，`BidirectionalLocal`）**：左侧 residual 只条件化至少依赖一个非 SceneT 环境变量的操作数；类型级通用规则，无任务信息。它是在检查 B1 失败 trace（A/C/F 的 join 全部位于 Γ=[v0] 上下文）之后提出的，所以其结果只算开发证据。**更正**：被它删除的“整体平移 residual”（t_i − a_i = c）是合法的常数位移规则，例如 scan seed 的“首对象平移 c”，不能硬排除；B1L 只能作为扇出诊断参考，第二轮改为可恢复的延后调度并冻结了必须使用非局部基点的 audit 规则。
 
 ## 测试
 
@@ -467,7 +467,7 @@ Learn(CoordT; observations=6; Gamma=[("v0",SceneT),("v1",PlacedT)]); return-comp
 Nonempty VS_coordDelta node=218 children=[11,133]; indexed algebra inverse; child equivalence classes retain all structural representatives
 ```
 
-### stress A（B1 失败：候选提取）
+### stress A（B1 失败：候选提取；事后无预算 cover 组装出 7024 个训练 exact 程序，见 out-of-protocol-diagnostics/assemblability）
 
 同一条链在 A 的 DAG 中存在（`Nonempty VS_coordAdd node=135 children=[11,134]`，child 11 为含 `Anchor(v1,TL)` 的 Union，134 为 coordDelta join），map join 非空；但 cover（12500）与 saturation（25000）物化 0 个完整 AST，C 只到 20（完整程序 cost≈29），join 670（其中 coordAdd[v0] 374、coordDelta[v0] 171）。out-of-protocol 的 4 倍 saturation 复跑仍 0 个完整 AST（C=23）。第一个实际阻断的子任务：**候选提取**（固定 cover/saturation 预算下，场景级两行子规格的 join 级多样性）。 B1L 把 [v0] 上下文的左侧 residual 关掉后：train/held 1/1，join 27，程序 `(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))))),objects(v0))))`。
 
