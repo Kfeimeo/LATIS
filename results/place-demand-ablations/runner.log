@@ -68,3 +68,22 @@ generated-audit/audit-same-relative-0/B2L: train=True held=False failure=Abstrac
 generated-audit/audit-same-relative-1/B2L: train=True held=True failure=None elapsed=77.62s
 generated-audit/audit-same-progression-0/B1L: train=True held=True failure=None elapsed=75.05s
 generated-audit/audit-same-progression-0/B2L: train=False held=False failure=SearchFailure elapsed=135.10s
+generated-audit/audit-same-relative-2/B1L: train=True held=False failure=AbstractionMissing elapsed=289.62s
+generated-audit/audit-same-relative-2/B2L: train=False held=False failure=SearchFailure elapsed=300.10s
+generated-audit/audit-same-progression-2/B1L: train=True held=True failure=None elapsed=62.76s
+generated-audit/audit-same-progression-1/B1L: train=True held=False failure=AbstractionMissing elapsed=170.34s
+generated-audit/audit-same-progression-2/B2L: train=True held=True failure=None elapsed=131.99s
+generated-audit/audit-same-progression-1/B2L: train=False held=False failure=SearchFailure elapsed=226.84s
+generated-audit/audit-unseen-negated-0/B1L: train=True held=False failure=AbstractionMissing elapsed=178.13s
+generated-audit/audit-unseen-negated-0/B2L: train=True held=False failure=AbstractionMissing elapsed=175.90s
+generated-audit/audit-unseen-negated-1/B1L: train=True held=True failure=None elapsed=160.23s
+generated-audit/audit-unseen-negated-1/B2L: train=True held=True failure=None elapsed=173.37s
+generated-audit/audit-unseen-double-0/B1L: train=True held=False failure=AbstractionMissing elapsed=167.26s
+generated-audit/audit-unseen-double-1/B1L: train=True held=False failure=AbstractionMissing elapsed=80.24s
+generated-audit/audit-unseen-double-0/B2L: train=False held=False failure=SearchFailure elapsed=254.21s
+generated-audit/audit-unseen-xalign-0/B1L: train=True held=False failure=AbstractionMissing elapsed=92.84s
+generated-audit/audit-unseen-xalign-1/B1L: train=True held=True failure=None elapsed=113.42s
+generated-audit/audit-unseen-double-1/B2L: train=False held=False failure=SearchFailure elapsed=248.85s
+generated-audit/audit-unseen-xalign-0/B2L: train=True held=False failure=AbstractionMissing elapsed=211.01s
+generated-audit/audit-unseen-xalign-1/B2L: train=True held=True failure=None elapsed=215.74s
+runner exit=0
