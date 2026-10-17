@@ -41,10 +41,10 @@ ok: Phase B: repeated execution is deterministic (metrics, node count, candidate
 ok: Phase B: generated IntT terms are typed, new and bounded by the operand cap
 ok: Phase B: same training values, different dependency structures => both representatives kept
 ok: Phase B: coordAdd without VecT observations registers a VecT demand
-place-demand-tests: Uncaught exception ghc-internal:GHC.Internal.Exception.ErrorCall:
-
-FAIL: Phase B: VecT demand growth produced new VecT observations (coordDelta/vec compositions)
-
-HasCallStack backtrace:
-  error, called at test/PlaceDemandMain.hs:26:22 in main:Main
-
+ok: Phase B: VecT demand growth produced new VecT observations (coordDelta/vec compositions)
+ok: Phase B: CoordT task remains solvable after growth
+  stress I (B1) seconds=85.721855104 failure=None portfolio=1
+ok: end-to-end: every portfolio program type-checks as Scene -> Scene
+ok: end-to-end: selected program passes the original Grid exact verifier on training
+ok: end-to-end: selected program uses place with coordAdd/coordDelta, no Translate
+PASS: place-demand phase A/B semantic tests
