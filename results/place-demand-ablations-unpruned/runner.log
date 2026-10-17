@@ -7,3 +7,6 @@ stress/H-overfitting-trap/B1U: train=False held=False failure=WitnessMissing ela
 stress/F-global-better/B1U: train=False held=False failure=SearchFailure elapsed=250.88s
 stress/G-fusion/B1U: train=False held=False failure=SearchFailure elapsed=276.47s
 regression/constant-transform/B1U: train=True held=True failure=None elapsed=26.51s
+regression/equivalent-expressions/B1U: train=True held=True failure=None elapsed=43.48s
+stress/I-equivalent-representations/B1U: train=True held=True failure=None elapsed=198.80s
+regression/fold-bbox/B1U: train=False held=False failure=BaseExpressibilityUnknown elapsed=0.67s
