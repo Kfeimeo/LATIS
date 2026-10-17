@@ -54,6 +54,7 @@ variantLabel :: InducedConfig -> String
 variantLabel conf=case (witnessPolicy conf,demandPolicy conf) of
   (Unidirectional,DemandOff)->"B0"; (Bidirectional,DemandOff)->"B1"; (Bidirectional,DemandOn)->"B2"
   (Unidirectional,DemandOn)->"B0+demand"
+  (BidirectionalLocal,DemandOff)->"B1L"; (BidirectionalLocal,DemandOn)->"B2L"
 data InducedResult = InducedResult
   { inducedProgram :: Maybe Expr, inducedPortfolio :: [Expr], inducedSpace :: Space
   , inducedRoot :: NodeId, inducedSignature :: M.Map String [Support]

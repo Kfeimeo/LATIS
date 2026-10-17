@@ -9,6 +9,7 @@ import qualified Latent.Object as O
 import Latent.Correspondence
 import Latent.Render (render)
 import qualified Data.Map.Strict as M
+import qualified Data.Set as S
 import Data.List (nubBy,sortOn)
 import Control.Monad (guard)
 
@@ -17,7 +18,13 @@ import Control.Monad (guard)
 -- only. Bidirectional adds the symmetric single-operator inverse that
 -- conditions on an observed LEFT operand and deduces the right component
 -- specification. No multi-operator template is introduced by either policy.
-data WitnessPolicy = Unidirectional | Bidirectional deriving (Eq,Ord,Show,Read,Enum,Bounded)
+data WitnessPolicy = Unidirectional | Bidirectional | BidirectionalLocal deriving (Eq,Ord,Show,Read,Enum,Bounded)
+-- BidirectionalLocal (extra ablation, formulated after inspecting the B1 traces
+-- of stress A/C/F): the left-conditioned residual only conditions on an operand
+-- that depends on at least one NON-Scene environment variable. A base point that
+-- is constant per example turns the residual into an information-preserving
+-- shift of the whole specification, which multiplies chance joins in two-row
+-- scene-level subtasks. This is a generic type-level rule; no task identity.
 
 -- Demand-side diagnosis (place-demand, phase B). For a conditional-algebra
 -- operator this names the operand types for which the pool holds NO
@@ -112,9 +119,10 @@ witnessAt policy remaining corrLimit p q pool=take 64 $ case primitiveName p of
     -- survive and child version spaces keep all structural representatives.
     algebra=case policy of
       Unidirectional->preferGround coordinateJoin
-      Bidirectional->case coordinateJoin of
+      _->case coordinateJoin of
         []->filter childLearnable coordinateResidual++leftResidual
         ds->ds
+    localOperand o=policy/=BidirectionalLocal || any (\v->M.lookup v (environment q)/=Just SceneT) (S.toList (freeVars (observedExpr o)))
     -- A residual child whose values are neither observed nor a shared constant
     -- needs at least one unit of credit to decompose further.
     childLearnable d=remaining>=2 || all learnableChild (decompositionChildren d)
@@ -169,7 +177,7 @@ witnessAt policy remaining corrLimit p q pool=take 64 $ case primitiveName p of
       [decomp [child leftType (observedValues left),child rightType inferred]
          "coordinate/vector inverse: condition on left operand and deduce right component specification"
       | let (leftType,rightType)=case n of "coordDelta"->(CoordT,CoordT); "coordAdd"->(CoordT,VecT); _->(VecT,VecT)
-      ,left<-take 16 (sortOn (rankWith True . observedExpr) (available leftType))
+      ,left<-take 16 (sortOn (rankWith True . observedExpr) (filter localOperand (available leftType)))
       ,Just inferred<-[traverse inverseRight (zip ys (observedValues left))]]
     inverseRight (CoordV (Coord x y),CoordV (Coord a b)) | n=="coordAdd"=Just (VecV (Vec (x-a) (y-b)))
     inverseRight (VecV (Vec x y),CoordV (Coord a b)) | n=="coordDelta"=Just (CoordV (Coord (a-x) (b-y)))

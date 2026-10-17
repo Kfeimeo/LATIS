@@ -87,19 +87,14 @@
     "out": "/home/user/LATIS/results/place-demand",
     "binary": "/home/user/LATIS/experiments/place-demand/latis-place-demand",
     "groups": [
-      "core",
-      "regression",
-      "stress",
-      "diagnostic",
-      "generated-dev",
-      "generated-audit"
+      "regression"
     ],
     "variants": [
-      "B0",
-      "B1",
-      "B2"
+      "B0"
     ],
-    "tasks": null,
+    "tasks": [
+      "scan-TR-TL"
+    ],
     "budget": 250000,
     "diagnostic_budget": 25000,
     "cost": 96,
@@ -108,7 +103,7 @@
     "demand_operands": 24,
     "demand_rounds": 3,
     "timeout": 300,
-    "workers": 3,
+    "workers": 1,
     "generated_manifest": "/home/user/LATIS/data/place-demand-generated/manifest.json",
     "force": false
   },
@@ -133,7 +128,7 @@
     ]
   },
   "concurrency": {
-    "workers": 3,
+    "workers": 1,
     "policy": "fixed thread pool; one independent solver process per job; jobs ordered group,task,variant"
   },
   "host": {
@@ -141,7 +136,6 @@
     "platform": "linux"
   },
   "task_sha256": {
-    "data/03560426.json": "098e548544498a4db5e874fd8c8f87922c1b68ad62e7f2616edc69898c8298e1",
     "results/v03/regression/constant-transform/task.json": "3879ea14f3431b09dcd4d0d7b97c69f39a86656b2bb3c16e00e9c02f6bdae866",
     "results/v03/regression/equivalent-expressions/task.json": "4e4e1698ddf2400aa89033a8f787fcf1d9c9348595a3e42282ad8ded0590fa7f",
     "results/v03/regression/filter-color/task.json": "9a3a8f20ffe28a790fd5c766c44015dadec773886e3749ad987c8f7623a28a9f",
@@ -158,63 +152,7 @@
     "results/v03/regression/scan-TR-TL/task.json": "06b11c99f42bf9293ea566584b25bcaa525aa2037822f15aa7a33c79eff2c66b",
     "results/v03/regression/scan-reverse/task.json": "aced68b38bc2eea4d2313b10754598e3142dfc0106f1f32d8de7fdad10ac0df9",
     "results/v03/regression/true-scan-lazy-prev/task.json": "d1ae2d831047f5420984241d701ac9a82ca4d0b5786823a6b81e5169e739d77f",
-    "results/v03/regression/wrong-early-skeleton/task.json": "b90d378cf25db6084b206eef9227bd0c54c828fafb41c5b6b26700d4aa13b481",
-    "results/v03/stress/A-absolute-relative/task.json": "ff4c5e5b1c65110531e6c99fc3aba1e9bdc6eadaf19d9fcd117915f1b2bcd097",
-    "results/v03/stress/B-repeated-progression/task.json": "ce6ce6661876f58e21a97820affdb2b9dcfc1ba6a440c99a6e3956bec622dcf4",
-    "results/v03/stress/C-scene-axis/task.json": "bfa44ae5fd04809158498e49dbc5047d0ada9725a2ea10fcd1adb8eb55856d24",
-    "results/v03/stress/D-object-sufficient/task.json": "0c45bcedeebbc02359860a9c988ba3ab2b082ed7c91ecf1927a7edb4fb828667",
-    "results/v03/stress/E-local-better/task.json": "722901638779e79c21179331a596e7338666273cb8418776defd4f35bf23ab60",
-    "results/v03/stress/F-global-better/task.json": "244ea3582a1c61f07b908e4abfa51d103f574e5db3c1c98e77407ec6733c9b0d",
-    "results/v03/stress/G-fusion/task.json": "cac98c6b6fc22270b33944079b3f91fed0c0f239dab57906c8a1f1bb7e2b2b86",
-    "results/v03/stress/H-overfitting-trap/task.json": "0b63e3c5226d783c559bf9ea76b4071ccc7bdaf7c7f55a41065f289470b6a681",
-    "results/v03/stress/I-equivalent-representations/task.json": "f973490c09a678d1228e58f186d27188866392057a998acf8e2eb16bff7aa306",
-    "results/v03/stress/J-no-useful-abstraction/task.json": "d37ef2e0ea978ef0ba6ba0ead1c07ce9359f52b7d7e816e27326750772944160",
-    "data/arc1-frozen/1bfc4729.json": "5ec42d931051394f5d30a586a4f245c3daa59b52411852096bfeb86d9b830f9c",
-    "data/arc1-frozen/1fad071e.json": "eda07774c6929f0068393e56e7894deb5c5d59a9faefe70babcc67bed5119e90",
-    "data/arc1-frozen/23b5c85d.json": "7cf5a09aff375325849a5a4509ab168899e28070cc5c4c5f4b5c2663c474bb1e",
-    "data/arc1-frozen/2dc579da.json": "109dfc7222d7692465389d92ce9d7c0352bb9a41c6c3c4882cb5ede53fb89869",
-    "data/arc1-frozen/363442ee.json": "0206d080d4d156239a5f043ba6c474e8c3956c7014705b91bfe568929ad8bd7e",
-    "data/arc1-frozen/36d67576.json": "7931c55bd3ed4e97a28ed9a6099ac4985181adcb2783c946e093914301e76036",
-    "data/arc1-frozen/39e1d7f9.json": "dc5a238cd9ff408ccbf0ef9a0f4b8d831d1e83aafb1a182868fa7ac0463a5f2e",
-    "data/arc1-frozen/3eda0437.json": "6e9a93643443ecc921de448c8dc0180ebe8b382b8c9cca849c7eb60f91a36c62",
-    "data/arc1-frozen/40853293.json": "fc5436bdcbc0e8e85f97b3bc8da562a892700148c7a9d6c2c0ce86e65eda6133",
-    "data/arc1-frozen/4347f46a.json": "1e613cb4bb4b9c0949f871832a5b08a4b4cf69e69355fc2192529671213b6cf8",
-    "data/arc1-frozen/469497ad.json": "97c7824f8e6375e1788c1a9a62587514061c90bc1d61b8d4d2c695d1aa59bf83",
-    "data/arc1-frozen/484b58aa.json": "04718f22dc89e0037f4ab0821b45e92a098ca5ec54e4ca15052ae0ae93249792",
-    "data/arc1-frozen/54d9e175.json": "7e9868e5ca96c14afca4110ce4eec8585bc79e75d2ad05535a55d5eef3d52d99",
-    "data/arc1-frozen/5521c0d9.json": "080a4e14963da3fe4f14aa0a0d6ac5638f3ed04591d0adbdf6c35d649f841e16",
-    "data/arc1-frozen/5ad4f10b.json": "5b381beb4a60179d07c8b4309b7de7f2e2ea393c864623c386b9ea72f596a329",
-    "data/arc1-frozen/5c2c9af4.json": "98505d04a490fef8cbb6fb12295575ffa737696c7004a39cd8aca5d995f43763",
-    "data/arc1-frozen/623ea044.json": "1294df35d12f4df50f8a01069473801c66b63af372dd929a5c6d29068bf51e34",
-    "data/arc1-frozen/694f12f3.json": "b1ed91d6c6978556cbc3b090b141cfc5e13d922e9aa5a24bc779bbfdf606985d",
-    "data/arc1-frozen/7837ac64.json": "29db6c8f83975ee48b673f2979fedd89bfd694dad5b812268c02f80795482801",
-    "data/arc1-frozen/855e0971.json": "ef0c86dde16c52d614d36009a2603f741542f300b46072b078c3cf50eb4f3570",
-    "data/arc1-frozen/868de0fa.json": "82b359c217e8e0fe5d730300df286e43ac292ea06ff38ee9b5173766395a1199",
-    "data/arc1-frozen/8efcae92.json": "80bef8ca224841f2ec3b25faf51f7c5f1fe389947ba58fdd505d02bbcc031da5",
-    "data/arc1-frozen/9f236235.json": "2d22595fc98bc7e0d6db0579ec76fe6f83c6a56e41359d02ba80b7719b121118",
-    "data/arc1-frozen/aba27056.json": "ca887aaa0a592074e87eb7694a76a25a8d6d9cb45dbe04b905283889bc8208a6",
-    "data/arc1-frozen/c444b776.json": "f9b09c3056f1b04782503b88f53b952e5081d7bcfefa54a673f0aebd9535cb6d",
-    "data/arc1-frozen/d23f8c26.json": "4e83b2a30f673ab8310f41f5342a3573078a19b208742a8004c87b6e5a8f36ad",
-    "data/arc1-frozen/d90796e8.json": "5c70091ade33d1e8ceac543dcb0a4d645a2d9e93066133bc208f21c841afeb30",
-    "data/arc1-frozen/e48d4e1a.json": "b3d6f9f14b8080ff35c8207d9ff6625f227d84403226d1225c99c6a80879c966",
-    "data/arc1-frozen/ef135b50.json": "3f3e42e3c835b64cccdd73c2aca985a87a36c50bd1f4a3bee3feec59af5d1dca",
-    "data/arc1-frozen/f35d900a.json": "831d3ec1aa4d06ec1b182f63330d4cd1d49323000257ef8f9bf5345e14a39f55",
-    "data/place-demand-generated/dev-relative-0/task.json": "21a0a637fb6d347cecfd2d7718d327ae39ffce769094816cf950dad72e079393",
-    "data/place-demand-generated/dev-relative-1/task.json": "b709942155f059bb673b8d56e2d8ee444e8a95146897297ed9262cf0771f7c71",
-    "data/place-demand-generated/dev-progression-0/task.json": "63c3fbc2cf0f811550f4cd23aac906c17e649638f5750a8986299e467d6775bc",
-    "data/place-demand-generated/dev-progression-1/task.json": "33dd0ebd778ebb4f018eac5740620b79333924c6b5b7db39ba270e6ff85551f2",
-    "data/place-demand-generated/audit-same-relative-0/task.json": "299f8bf3fbff9a45cb24016bf1d9e3e713c4922880c29ab8effec492674c00a2",
-    "data/place-demand-generated/audit-same-relative-1/task.json": "99c0d515cef03762bd47aabf3b9edbe109f670d0240fb1fe8853d64bb3739f4a",
-    "data/place-demand-generated/audit-same-relative-2/task.json": "811f091dcc83a55c19525aa084979d9a15fab9fc2e9d7fd36423306427f3ae53",
-    "data/place-demand-generated/audit-same-progression-0/task.json": "380ce0385f9fa2bc7ffa5ef35dd1f03a445566fc6112b49744747307a04f5599",
-    "data/place-demand-generated/audit-same-progression-1/task.json": "2797c78cf3c0e9804a0919f458b560572a26f2b2466985ee17e2e448cf4a43bb",
-    "data/place-demand-generated/audit-same-progression-2/task.json": "d4c5ee399001c174fbfbf2be2f02b25b6854cddc79a95b251bcfb28dededb1b4",
-    "data/place-demand-generated/audit-unseen-negated-0/task.json": "67783ade3f25515b71fb3cdc1d82103b200dd39e449c5ff99c0adb3cfda5bc80",
-    "data/place-demand-generated/audit-unseen-negated-1/task.json": "7dcf19869800d70267a521c51bf06ce8deb2836ef29346afbb427f8447227d10",
-    "data/place-demand-generated/audit-unseen-double-0/task.json": "4f7d93a245bb435756b01d658d0c0e76ec36beede84a85106fd6786d0ff5e526",
-    "data/place-demand-generated/audit-unseen-double-1/task.json": "0782dde97930ea462d4e378d3a02ce587eff6ec0f16d19232cabc6075edf3dd3",
-    "data/place-demand-generated/audit-unseen-xalign-0/task.json": "b8c8c9b2519f76a2cd638daa470db2bf0a7738354b8f5bea152d64eef9189022",
-    "data/place-demand-generated/audit-unseen-xalign-1/task.json": "e1e06b212645fd55bb6fdb3562694036ff91c7bd8f62c95f54c6d73852354f6d"
+    "results/v03/regression/wrong-early-skeleton/task.json": "b90d378cf25db6084b206eef9227bd0c54c828fafb41c5b6b26700d4aa13b481"
   },
   "diagnostic_label": "PreviouslyOpenedDiagnosticSet"
 }
