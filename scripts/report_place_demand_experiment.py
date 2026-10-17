@@ -4,7 +4,7 @@ Heldout-correct candidate counts are post-selection audits only."""
 import collections, csv, hashlib, json, pathlib, re, sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / 'results/place-demand'
-VARIANTS = ['B0', 'B1', 'B2']
+VARIANTS = ['B0', 'B1', 'B2', 'B1L', 'B2L']
 STAT_KEYS = ['total_expanded_work', 'first_solution_states', 'witness_calls', 'bidirectional_left_decompositions', 'recursive_learning_tasks',
              'version_space_nodes', 'join_nodes', 'structural_representatives', 'max_representatives_per_class', 'cost_bound_reached',
              'materialized_complete_asts', 'exact_verifier_calls', 'portfolio_cover_work', 'extraction_work', 'deduction_milliseconds', 'extraction_milliseconds',
@@ -14,17 +14,20 @@ STAT_KEYS = ['total_expanded_work', 'first_solution_states', 'witness_calls', 'b
 
 def digest(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 
-def load_rows():
+def load_rows(out=None):
+    out = out or OUT
     rows = []
-    protocol = json.loads((OUT / 'protocol.json').read_text(encoding='utf-8'))
+    protocol = json.loads((out / 'protocol.json').read_text(encoding='utf-8'))
     binary_hash = protocol['fingerprint']['binary_sha256']
-    for p in sorted(OUT.rglob('execution.json')):
+    for p in sorted(out.rglob('execution.json')):
         result = p.parent / 'solution.json'
-        if not result.exists(): continue
+        if not result.exists() or 'out-of-protocol' in str(p): continue
         execution = json.loads(p.read_text(encoding='utf-8')); x = json.loads(result.read_text(encoding='utf-8'))
         variant = p.parent.name; task = p.parent.parent.name; group = p.parent.parent.parent.name
         proto = execution['protocol']
         assert proto['fingerprint']['binary_sha256'] == binary_hash, p
+        if task == 'scan-TR-TL' and variant == 'B0' and proto.get('workers') == 1: row_note = 'solo rerun after cgroup OOM'
+        else: row_note = ''
         assert proto['variant'] == variant
         program = x.get('program') or ''
         assert 'Translate(' not in program and 'poseOf(' not in program, p
@@ -45,7 +48,7 @@ def load_rows():
         row = dict(group=group, task=task, variant=variant, train=bool(x.get('train_exact')), heldout=bool(x.get('heldout_exact')), failure=x.get('failure'),
                    timeout=timeout, elapsed_seconds=round(execution['elapsed_seconds'], 2), portfolio=x.get('portfolio_count'), held_correct=held_correct,
                    place_only_train=None if baseline is None else baseline[0], place_only_heldout=None if baseline is None else baseline[1], place_only_failure=None if baseline is None else baseline[2],
-                   program=program, path=str(result.relative_to(ROOT)), input_sha256=proto['input_sha256'])
+                   program=program, path=str(result.relative_to(ROOT)), input_sha256=proto['input_sha256'], note=row_note)
         for k in STAT_KEYS: row[k] = None if timeout else stats.get(k)
         rows.append(row)
     return rows, protocol
