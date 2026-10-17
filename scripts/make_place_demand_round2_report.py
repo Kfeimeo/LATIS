@@ -114,7 +114,7 @@ def main():
         A(f"- **Q（延后调度）**：五组合计留出 {q}（B1 {b1}，B1L {l}，B0 {b0}）。延后而非删除非局部 residual，在 regression 上" + ('保住了 B0 的全部 16 项' if held('regression', 'B1Q') >= held('regression', 'B0') else f"丢失 {sorted(held('regression','B0')-held('regression','B1Q'))}") + f"，在 stress 上得到 {sorted(t[:1] for t in held('stress','B1Q'))}。与 B1L 的差集见表：差异来自延后份额（62500）本身的工作消耗与它加入 DAG 的非局部备选对提取/选择的影响。")
         A(f"- **X（惰性提取）单独**：合计留出 {x}。它修复的是提取层（A/C/G 等“DAG 中有可组装正确程序但 cover 预算不足”的情形），但不减少推导工作，所以在推导阶段就耗尽预算的任务（regression map-translate/map-scan-ambiguity、多数 generated）上仍失败。")
         A(f"- **Q+X**：合计留出 {qx}。" + ('两者互补（优于各自单独）。' if qx > max(q, x) else ('不优于单独的 Q：惰性 cover 的候选集与 refine cover 不同，改变了部分任务的 portfolio 与选择（见逐题表中 B1Q 对 B1QX 的差异），说明两个机制在本预算下不是简单叠加。' if qx <= q else '与单独 X 相当。')))
-        nlb = {v: (len(train('generated-round2', v) & {t for t in train('generated-round2','B0') if 'nonlocal' in t} if False else {t for t in train('generated-round2', v) if 'nonlocal' in t}), {t for t in held('generated-round2', v) if 'nonlocal' in t}) for v in VARS}
+        nlb = {v: ({t for t in train('generated-round2', v) if 'nonlocal' in t}, {t for t in held('generated-round2', v) if 'nonlocal' in t}) for v in VARS}
         A('- **非局部基点代价（audit2-nonlocal，3 题）**：' + '; '.join(f"{v} train {len(nlb[v][0])}/3, held {len(nlb[v][1])}/3" for v in VARS) + '。该家族没有按设计区分局部硬限制与延后调度：连 B0 也能在训练上求解其中的 seed（经 `coord`/算术分量路径而非 coordAdd），所以它测到的不是“非局部 residual 的必要性”，而是另一条已有路径；要测量局部偏好的真实代价，需要构造 `coord`/算术路径也不可达的非局部规则。这是本轮 audit 设计的一个失误，如实记录。')
         A('- **B1L 仍是有用的参考而非方案**：它在 audit2-same-negated-0 等任务上优于 B1Q（延后份额的成本），但它删除了合法规则；Q 用可恢复的方式得到接近的覆盖。')
         A('')
