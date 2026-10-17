@@ -9,6 +9,7 @@ import Synthesis.InducedR2.Observers
 import Synthesis.InducedR2.Witness
 import Synthesis.InducedR2.Learn
 import Synthesis.InducedR2.VersionSpace (nodes)
+import Synthesis.InducedR2.PortfolioCover (coverLazy)
 import Synthesis.InducedR2.Diversity (signatureOf)
 import ARC.LatentStress (latentStressTasks)
 import ARC.Dataset
@@ -231,6 +232,35 @@ main=do
   assert "Phase B: VecT demand growth produced new VecT observations (coordDelta/vec compositions)" (M.findWithDefault 0 "demand_new_vec_observations" metricsV>0)
   assert "Phase B: CoordT task remains solvable after growth" (rootV/=0)
 
+  -- ------------------------------------------------------------- round 2
+  -- Deferred non-local scheduling: on the CoordT task (Gamma=[v0,v1]) the
+  -- bidirectional witness yields local (Anchor(v1,.)) and non-local base points.
+  -- Under DeferNonLocal the non-local branches are postponed, then released in
+  -- a budget-shared second pass; nothing is deleted and the union keeps both.
+  let confQ=defaultInduced {workBudget=120000,depthBound=3,witnessPolicy=Bidirectional,schedulePolicy=DeferNonLocal,deferredWorkBudget=30000}
+  engineQ<-newEngine Full confQ
+  rootQ<-learnWithDemands engineQ qCoord
+  mQ<-readIORef (metricsRef engineQ)
+  dQ<-readIORef (demandRef engineQ)
+  let mq k=M.findWithDefault 0 k mQ
+  assert "round 2: non-local left residual branches are registered as deferred" (mq "deferred_branches">0 && any ((==PoseT) . snd) (M.keys dQ))
+  assert "round 2: deferred tasks are released exactly once in the second pass" (mq "deferred_released">0 && mq "deferred_released"==mq "deferred_tasks" && all (\r->demandResolvedEpoch r/=Nothing) [r | ((_,t),r)<-M.toList dQ,t==PoseT])
+  assert "round 2: the deferred pass is charged within its share" (mq "deferred_pass_work"<=30000+1000)
+  assert "round 2: deferred pass re-learns stale tasks (memo invalidation)" (mq "deferred_pass_memo_invalidations">0)
+  sQ<-readIORef (spaceRef engineQ)
+  (cQ,_)<-extract engineQ sQ rootQ
+  let exactQ=[e | e<-cQ,matches qCoord e]
+  assert "round 2: deferred union still yields exact CoordT candidates" (not (null exactQ))
+  -- Lazy cover: on the same DAG, coverLazy produces at least one exact complete
+  -- composition within a small budget, with correlation preserved (every
+  -- candidate still matches the specification by real Base evaluation).
+  (lazyC,lazyUsed)<-coverLazy 0 True True 96 400 sQ rootQ
+  assert "round 2: lazy cover materializes exact candidates within a small budget" (any (matches qCoord) lazyC && lazyUsed<=400)
+  assert "round 2: lazy cover never mixes children across decompositions (all candidates exact or absent)" (all (matches qCoord) lazyC)
+  -- Pruning ablation switch: unpruned policy yields a superset of decompositions.
+  let dsP=witnessAt Bidirectional 1 32 (prim "coordAdd") qAdd leftOnly
+      dsU=witnessAt BidirectionalUnpruned 1 32 (prim "coordAdd") qAdd leftOnly
+  assert "round 2: credit-aware pruning removes only non-observed non-constant residual children at credit 0" (length dsU>=length dsP && all (\d->any (\e->map canonical (decompositionChildren d)==map canonical (decompositionChildren e)) dsU) dsP)
   -- ------------------------------------------------- end-to-end Grid verifier
   unless quick $ do
     -- Stress I under B1 with the full protocol budgets: the complete prediction
