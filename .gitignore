@@ -12,3 +12,8 @@ experiments/*/build/
 experiments/*/build*.log
 experiments/place-demand/latis-place-demand.matrix
 experiments/place-demand/latis-place-demand-*
+# bulky per-run DAG dumps of results/place-demand* are regenerable from execution.json commands; kept locally only
+results/place-demand*/**/version_space.json
+results/place-demand*/**/equivalence_classes.json
+results/place-demand*/**/contexts.json
+results/place-demand*/**/portfolio_diagnostics.json
