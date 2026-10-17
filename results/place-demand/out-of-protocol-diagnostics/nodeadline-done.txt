@@ -1,0 +1,2 @@
+map-translate B2 exit=0 seconds=293
+map-scan-ambiguity B1 exit=0 seconds=299
