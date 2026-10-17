@@ -115,8 +115,8 @@
     "input_sha256": "31a8c5f2600b2180c437a0d3ba35dba768e82fa363cb6afaed17f5658489cd5e",
     "timeout_seconds": 300,
     "variant": "B1Q",
-    "workers": 3
+    "workers": 1
   },
-  "elapsed_seconds": 129.3812460170002,
-  "finished_at": "2026-10-17T19:56:50.572053+00:00"
+  "elapsed_seconds": 121.37888300000122,
+  "finished_at": "2026-10-17T23:52:43.536936+00:00"
 }

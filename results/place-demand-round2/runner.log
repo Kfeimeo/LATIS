@@ -46,3 +46,16 @@ generated-audit/audit2-nonlocal-seedshift-y-0/B1L: train=True held=False failure
 generated-audit/audit2-nonlocal-seedshift-y-0/B1X: train=False held=False failure=SearchFailure elapsed=300.09s
 generated-audit/audit2-nonlocal-seedshift-y-0/B1Q: train=True held=False failure=AbstractionMissing elapsed=230.78s
 generated-audit/audit2-newstruct-mirror-0/B0: train=False held=False failure=WitnessMissing elapsed=78.88s
+generated-audit/audit2-newstruct-mirror-0/B1L: train=False held=False failure=SearchFailure elapsed=133.49s
+generated-audit/audit2-newstruct-mirror-0/B1: train=False held=False failure=SearchFailure elapsed=261.76s
+generated-audit/audit2-nonlocal-seedshift-y-0/B1QX: train=False held=False failure=SearchFailure elapsed=300.12s
+generated-audit/audit2-newstruct-mirror-0/B1Q: train=False held=False failure=SearchFailure elapsed=179.10s
+generated-audit/audit2-newstruct-mirror-1/B0: train=True held=False failure=AbstractionMissing elapsed=168.03s
+generated-audit/audit2-newstruct-mirror-0/B1QX: train=False held=False failure=SearchFailure elapsed=185.23s
+generated-audit/audit2-newstruct-mirror-0/B1X: train=False held=False failure=SearchFailure elapsed=259.15s
+generated-audit/audit2-newstruct-mirror-1/B1L: train=True held=False failure=AbstractionMissing elapsed=187.65s
+generated-audit/audit2-newstruct-mirror-1/B1: train=False held=False failure=SearchFailure elapsed=273.50s
+generated-audit/audit2-newstruct-mirror-1/B1Q: train=True held=False failure=AbstractionMissing elapsed=240.80s
+generated-audit/audit2-newstruct-mirror-1/B1X: train=False held=False failure=SearchFailure elapsed=274.53s
+generated-audit/audit2-newstruct-mirror-1/B1QX: train=False held=False failure=SearchFailure elapsed=300.08s
+runner exit=0

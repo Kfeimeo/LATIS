@@ -87,17 +87,18 @@
     "out": "/home/user/LATIS/results/place-demand-round2",
     "binary": "/home/user/LATIS/experiments/place-demand/latis-place-demand-r2",
     "groups": [
-      "generated-audit"
+      "regression"
     ],
     "variants": [
-      "B0",
-      "B1",
       "B1L",
-      "B1Q",
-      "B1X",
-      "B1QX"
+      "B1QX",
+      "B1Q"
     ],
-    "tasks": null,
+    "tasks": [
+      "scan-BL-TL",
+      "scan-BR-TL",
+      "wrong-early-skeleton"
+    ],
     "budget": 250000,
     "diagnostic_budget": 25000,
     "cost": 96,
@@ -106,8 +107,8 @@
     "demand_operands": 24,
     "demand_rounds": 3,
     "timeout": 300,
-    "workers": 3,
-    "generated_manifest": "data/place-demand-generated-round2/manifest.json",
+    "workers": 1,
+    "generated_manifest": "/home/user/LATIS/data/place-demand-generated/manifest.json",
     "force": false
   },
   "variants": {
@@ -161,7 +162,7 @@
     ]
   },
   "concurrency": {
-    "workers": 3,
+    "workers": 1,
     "policy": "fixed thread pool; one independent solver process per job; jobs ordered group,task,variant"
   },
   "host": {
@@ -169,16 +170,23 @@
     "platform": "linux"
   },
   "task_sha256": {
-    "data/place-demand-generated-round2/audit2-same-relative-0/task.json": "adaa29cb2ba83545044ce8baac19753ba312fdaa9537feab1ed29e19230ce1db",
-    "data/place-demand-generated-round2/audit2-same-progression-0/task.json": "00d96768b0c9cf31f78db72ce09ec51f4cb4f884a7a5086d829d7ff2e26e5d31",
-    "data/place-demand-generated-round2/audit2-same-negated-0/task.json": "54ab4ed4012bd5c9eacb8e55458b594fc18a41e3ee51d363dbe7c059b89358e9",
-    "data/place-demand-generated-round2/audit2-same-double-0/task.json": "ad53e75bacb53ca39e57328e19c0dbfa7244090cc2829005b5b54a0e2cb3da51",
-    "data/place-demand-generated-round2/audit2-same-xalign-0/task.json": "4c9f75969889b4b0c520de0a28774589fc3913fc06ff3425f8fe7aba12489768",
-    "data/place-demand-generated-round2/audit2-nonlocal-seedshift-x-0/task.json": "9073ebe9131445341195b8eebfc7616fc797ef9025f6dd67918cb1f304b7b506",
-    "data/place-demand-generated-round2/audit2-nonlocal-seedshift-x-1/task.json": "0da5e07216606ac23957ef35234a7ff3aeef00bf0795e274bc328dd7c45d5935",
-    "data/place-demand-generated-round2/audit2-nonlocal-seedshift-y-0/task.json": "63b18fa07ecde4982c58f5a188237548cf32ac54e360e5232fe8aafd444dfd7a",
-    "data/place-demand-generated-round2/audit2-newstruct-mirror-0/task.json": "04124f745d555c98c4cd9828b8c0ccf6b4dfaa4d95d8b286c99b7945891627b9",
-    "data/place-demand-generated-round2/audit2-newstruct-mirror-1/task.json": "12b7531939bcfbf85d252538476ef8819f62489663a5411e4936e19fa9fdf9cb"
+    "results/v03/regression/constant-transform/task.json": "3879ea14f3431b09dcd4d0d7b97c69f39a86656b2bb3c16e00e9c02f6bdae866",
+    "results/v03/regression/equivalent-expressions/task.json": "4e4e1698ddf2400aa89033a8f787fcf1d9c9348595a3e42282ad8ded0590fa7f",
+    "results/v03/regression/filter-color/task.json": "9a3a8f20ffe28a790fd5c766c44015dadec773886e3749ad987c8f7623a28a9f",
+    "results/v03/regression/fold-bbox/task.json": "3b1f9e1afc4f450a7c9b1e0664e93ab0bb54cd449a2d0393b1fcd28f17e1c299",
+    "results/v03/regression/grid-without-prev/task.json": "3f4d7d43a699c25f84da342a26e76371b66f5a8dc45d1d46cc733bf8b7d99f3e",
+    "results/v03/regression/iterate-chain/task.json": "2cdee11b7bb873d5fb3705ce38c437f08276f1f147186ccc375293814e8bb86c",
+    "results/v03/regression/map-recolor/task.json": "91fdbd5c2fbd37df474a10daab8a5eb148b0bb2f6e997afeb1900c888e62f967",
+    "results/v03/regression/map-reflectH/task.json": "aac1e3ee9110a1f04b9587f3ee2214c895b48970d6960095928e57fa8db8e09f",
+    "results/v03/regression/map-rotate90/task.json": "8ed2309a4318bc30d084a437fef8035fdd9a1c17a2a71113cb89e3d16c0bc448",
+    "results/v03/regression/map-scan-ambiguity/task.json": "aa76e534898316faebd402519df8a9b07b8a78c87aee405c406b4351f5c13a82",
+    "results/v03/regression/map-translate/task.json": "5d833651c47bbd9d14467352d33790aba464cece0ee72c91a721fd0cb11d27fe",
+    "results/v03/regression/scan-BL-TL/task.json": "31a8c5f2600b2180c437a0d3ba35dba768e82fa363cb6afaed17f5658489cd5e",
+    "results/v03/regression/scan-BR-TL/task.json": "647e04846b6484226b021f6f0d64d8958919f57b92f902423dcd2882261dff87",
+    "results/v03/regression/scan-TR-TL/task.json": "06b11c99f42bf9293ea566584b25bcaa525aa2037822f15aa7a33c79eff2c66b",
+    "results/v03/regression/scan-reverse/task.json": "aced68b38bc2eea4d2313b10754598e3142dfc0106f1f32d8de7fdad10ac0df9",
+    "results/v03/regression/true-scan-lazy-prev/task.json": "d1ae2d831047f5420984241d701ac9a82ca4d0b5786823a6b81e5169e739d77f",
+    "results/v03/regression/wrong-early-skeleton/task.json": "b90d378cf25db6084b206eef9227bd0c54c828fafb41c5b6b26700d4aa13b481"
   },
   "diagnostic_label": "PreviouslyOpenedDiagnosticSet"
 }
