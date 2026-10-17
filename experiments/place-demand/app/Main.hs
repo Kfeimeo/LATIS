@@ -76,6 +76,7 @@ main = do
         "unidirectional" -> pure R2W.Unidirectional
         "bidirectional" -> pure R2W.Bidirectional
         "bidirectional-local" -> pure R2W.BidirectionalLocal
+        "bidirectional-unpruned" -> pure R2W.BidirectionalUnpruned
         _ -> die "--witness requires unidirectional|bidirectional"
       demandPolicy' <- case option "--demand" "off" rest of
         "off" -> pure R2.DemandOff

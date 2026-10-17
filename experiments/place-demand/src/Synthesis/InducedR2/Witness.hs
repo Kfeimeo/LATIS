@@ -18,7 +18,11 @@ import Control.Monad (guard)
 -- only. Bidirectional adds the symmetric single-operator inverse that
 -- conditions on an observed LEFT operand and deduces the right component
 -- specification. No multi-operator template is introduced by either policy.
-data WitnessPolicy = Unidirectional | Bidirectional | BidirectionalLocal deriving (Eq,Ord,Show,Read,Enum,Bounded)
+data WitnessPolicy = Unidirectional | Bidirectional | BidirectionalLocal | BidirectionalUnpruned deriving (Eq,Ord,Show,Read,Enum,Bounded)
+-- BidirectionalUnpruned: ablation of the credit-aware residual pruning. Same
+-- decompositions as Bidirectional, but residual children are emitted even when
+-- they have no deductive credit left (they can then only close by forward
+-- observation or a shared constant inside Learn).
 -- BidirectionalLocal (extra ablation, formulated after inspecting the B1 traces
 -- of stress A/C/F): the left-conditioned residual only conditions on an operand
 -- that depends on at least one NON-Scene environment variable. A base point that
@@ -125,7 +129,7 @@ witnessAt policy remaining corrLimit p q pool=take 64 $ case primitiveName p of
     localOperand o=policy/=BidirectionalLocal || any (\v->M.lookup v (environment q)/=Just SceneT) (S.toList (freeVars (observedExpr o)))
     -- A residual child whose values are neither observed nor a shared constant
     -- needs at least one unit of credit to decompose further.
-    childLearnable d=remaining>=2 || all learnableChild (decompositionChildren d)
+    childLearnable d=policy==BidirectionalUnpruned || remaining>=2 || all learnableChild (decompositionChildren d)
     learnableChild c=let vs=map snd (points c) in
       any (\o->exprType (observedExpr o)==targetType c && and (zipWith equivalent (observedValues o) vs) && length (observedValues o)==length vs) pool
       || case vs of v:rest->all (equivalent v) rest; _->False

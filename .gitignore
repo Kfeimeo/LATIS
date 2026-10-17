@@ -17,3 +17,5 @@ results/place-demand*/**/version_space.json
 results/place-demand*/**/equivalence_classes.json
 results/place-demand*/**/contexts.json
 results/place-demand*/**/portfolio_diagnostics.json
+experiments/place-demand/assemble-diag
+experiments/*/build-diag/
