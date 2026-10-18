@@ -4,3 +4,7 @@ regression/scan-BL-TL/B1Q: train=True held=True failure=None elapsed=121.38s
 regression/scan-BR-TL/B1L: train=True held=True failure=None elapsed=110.41s
 regression/scan-BR-TL/B1QX: train=True held=True failure=None elapsed=116.66s
 regression/scan-BR-TL/B1Q: train=True held=True failure=None elapsed=118.78s
+regression/wrong-early-skeleton/B1L: train=True held=True failure=None elapsed=99.40s
+regression/wrong-early-skeleton/B1QX: train=True held=True failure=None elapsed=105.77s
+regression/wrong-early-skeleton/B1Q: train=True held=True failure=None elapsed=105.79s
+rerun exit=0

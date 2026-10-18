@@ -43,3 +43,18 @@ python scripts/classify_old_tests_for_place.py
 
 Old test suites that reference the removed `Translate`/`poseOf` are classified in
 `results/place-demand/old_test_classification.json`; they are not claimed to pass.
+
+## Round 2 (deferred scheduling, lazy cover)
+
+| variant | flags |
+|---|---|
+| B1U | `--witness bidirectional-unpruned` (ablation of the credit-aware residual pruning) |
+| B1Q | `--witness bidirectional --schedule defer-nonlocal --deferred-budget 62500` (non-local left residuals postponed to a budget-shared second pass, never deleted) |
+| B1X | `--witness bidirectional --cover lazy` (one complete composition per node first, then breadth-first single-hole alternatives) |
+| B1QX | both |
+
+`AssembleDiag.hs` is the post-hoc assemblability diagnostic (unbounded cover on the B1 DAG; never part of solving).
+Round-2 audit: `python scripts/generate_place_demand_samples.py --round2` (frozen manifest in `data/place-demand-generated-round2`),
+certificates via `runghc -isrc GeneratedAudit.hs results/place-demand/generated_certificates_round2.json --round2`.
+Matrix: `python scripts/run_place_demand_round2.py` (round-1 sets) then with `--groups generated-audit --generated-manifest data/place-demand-generated-round2/manifest.json`;
+report: `python scripts/make_place_demand_round2_report.py` → `results/place-demand-round2/REPORT_ROUND2.md`.

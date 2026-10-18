@@ -39,7 +39,7 @@ B1U 与 B1 使用同一分解集合（剪枝只去掉 credit=0 且既非观察�
 
 binary `73d3c1c7a47466ea…`，预算与第一轮相同（250000 / cost 96 / saturation 25000 / 300 s），B1Q/B1QX 的延后份额 62500（含在总预算内），固定 3 worker。generated-round2 是冻结于任何第二轮求解之前的新 audit（manifest hash `474087d241041af1…`）：audit2-same（同规则新实例）、audit2-nonlocal（seedshift_x/y，seed 需要非局部基点+常数位移）、audit2-newstruct（mirror_relative）。
 
-执行失败：矩阵中被主机 cgroup OOM 杀死的行（3 并发时单个 scan-* 任务 RSS 约 5.8 GB）已用 `--workers 1` 单独重跑并替换（重跑 protocol 另存为 `protocol-rerun-*.json`）；当前仍标 ImplementationBug 的行：[('regression', 'wrong-early-skeleton', 'B1Q')]。
+执行失败：矩阵中被主机 cgroup OOM 杀死的行（3 并发时单个 scan-* 任务 RSS 约 5.8 GB）已用 `--workers 1` 单独重跑并替换（重跑 protocol 另存为 `protocol-rerun-*.json`）；当前仍标 ImplementationBug 的行：无。
 
 | 组 | 变体 | 完成 | 训练正确 | 留出正确 | 超时 |
 |---|---|---:|---:|---:|---:|
@@ -51,8 +51,8 @@ binary `73d3c1c7a47466ea…`，预算与第一轮相同（250000 / cost 96 / sat
 | core | B1QX | 1 | 1 | 1 | 0 |
 | regression | B0 | 17 | 16 | 16 | 0 |
 | regression | B1 | 17 | 14 | 14 | 0 |
-| regression | B1L | 16 | 15 | 15 | 0 |
-| regression | B1Q | 17 | 15 | 15 | 0 |
+| regression | B1L | 17 | 16 | 16 | 0 |
+| regression | B1Q | 17 | 16 | 16 | 0 |
 | regression | B1X | 17 | 14 | 14 | 0 |
 | regression | B1QX | 17 | 16 | 16 | 0 |
 | stress | B0 | 10 | 6 | 3 | 0 |
@@ -218,9 +218,10 @@ binary `73d3c1c7a47466ea…`，预算与第一轮相同（250000 / cost 96 / sat
 | true-scan-lazy-prev | B1QX | 1 | 1 | None | 144 | 132 | 6981 | 29020 | 24.7 | 9 | 96 | 144 | 11 | 1 | 2538 | 48 |
 | wrong-early-skeleton | B0 | 1 | 1 | None | 2940 | 2940 | 29260 | 103256 | 68.9 | 13 | 56 | 2940 | 0 | 0 | 0 | 0 |
 | wrong-early-skeleton | B1 | 1 | 1 | None | 2940 | 2940 | 32432 | 106428 | 80.6 | 13 | 56 | 2940 | 0 | 0 | 0 | 0 |
-| wrong-early-skeleton | B1Q | 0 | 0 | ImplementationBug | n/a | 2940 | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a |
+| wrong-early-skeleton | B1L | 1 | 1 | None | 2940 | 2940 | 30530 | 104526 | 63.4 | 13 | 56 | 2940 | 0 | 0 | 0 | 0 |
+| wrong-early-skeleton | B1Q | 1 | 1 | None | 2940 | 2940 | 33067 | 107063 | 70.5 | 13 | 56 | 2940 | 11 | 1 | 2537 | 0 |
 | wrong-early-skeleton | B1X | 1 | 1 | None | 2940 | 2940 | 32366 | 106216 | 76.9 | 13 | 56 | 2940 | 0 | 0 | 0 | 132 |
-| wrong-early-skeleton | B1QX | 1 | 1 | None | 2940 | 2940 | 33001 | 106851 | 80.0 | 13 | 56 | 2940 | 11 | 1 | 2537 | 132 |
+| wrong-early-skeleton | B1QX | 1 | 1 | None | 2940 | 2940 | 33001 | 106851 | 72.0 | 13 | 56 | 2940 | 11 | 1 | 2537 | 132 |
 
 #### stress
 
@@ -460,7 +461,7 @@ binary `73d3c1c7a47466ea…`，预算与第一轮相同（250000 / cost 96 / sat
 
 ### 验收重点
 
-- 恢复已有 regression：B0 留出 16/17；B1 14；B1L 15；B1Q 15；B1X 14；B1QX 16。相对 B0 丢失：B1: ['map-scan-ambiguity', 'map-translate']; B1L: ['wrong-early-skeleton']; B1Q: ['wrong-early-skeleton']; B1X: ['map-scan-ambiguity', 'map-translate']; B1QX: 无。
+- 恢复已有 regression：B0 留出 16/17；B1 14；B1L 16；B1Q 16；B1X 14；B1QX 16。相对 B0 丢失：B1: ['map-scan-ambiguity', 'map-translate']; B1L: 无; B1Q: 无; B1X: ['map-scan-ambiguity', 'map-translate']; B1QX: 无。
 - A 产生可验证完整候选：B0: train 0 / held 0, portfolio 0; B1: train 0 / held 0, portfolio 0; B1L: train 1 / held 1, portfolio 2408; B1Q: train 1 / held 1, portfolio 2409; B1X: train 1 / held 1, portfolio 4711; B1QX: train 1 / held 1, portfolio 2165。
 - 保留 B/I 收益：B0: ['C', 'D', 'J']; B1: ['B', 'D', 'I', 'J']; B1L: ['A', 'B', 'C', 'D', 'G', 'I', 'J']; B1Q: ['A', 'B', 'D', 'G', 'I', 'J']; B1X: ['A', 'B', 'C', 'D', 'G', 'I', 'J']; B1QX: ['A', 'B', 'C', 'D', 'G', 'I', 'J']。
 - 必须使用非局部基点的任务（audit2-nonlocal，3 题）：B0: train 3 / held 1; B1: train 1 / held 1; B1L: train 3 / held 1; B1Q: train 3 / held 1; B1X: train 2 / held 1; B1QX: train 2 / held 1。局部硬限制 B1L 若在此为 0 而 B1Q/B1QX 不为 0，说明延后而非删除保住了非局部规则的求解能力；若所有变体都为 0，则该能力在协议预算内对任何变体都未达成，不能据此偏好任一方案。
@@ -471,16 +472,16 @@ binary `73d3c1c7a47466ea…`，预算与第一轮相同（250000 / cost 96 / sat
 
 | 变体 | 五组合计 train | 五组合计 heldout | 相对 B1L 留出差集（B1L 有而它没有） | 它有而 B1L 没有 |
 |---|---:|---:|---|---|
-| B0 | 41/53 | 21/53 | stress/A-absolute-relative, stress/B-repeated-progression, stress/G-fusion, stress/I-equivalent-representations, generated-dev/dev-progression-0, generated-dev/dev-progression-1, generated-dev/dev-relative-1, generated-audit/audit-same-progression-0, generated-audit/audit-same-progression-2, generated-audit/audit-same-relative-1, generated-audit/audit-unseen-negated-1, generated-round2/audit2-same-negated-0, generated-round2/audit2-same-progression-0 | regression/wrong-early-skeleton |
-| B1 | 19/53 | 19/53 | regression/map-scan-ambiguity, regression/map-translate, stress/A-absolute-relative, stress/C-scene-axis, stress/G-fusion, generated-dev/dev-progression-0, generated-dev/dev-progression-1, generated-dev/dev-relative-1, generated-audit/audit-same-progression-0, generated-audit/audit-same-progression-2, generated-audit/audit-same-relative-1, generated-audit/audit-unseen-negated-1, generated-audit/audit-unseen-xalign-1, generated-round2/audit2-same-negated-0, generated-round2/audit2-same-progression-0 | regression/wrong-early-skeleton |
-| B1L | 47/53 | 33/53 | 无 | 无 |
-| B1Q | 45/53 | 31/53 | stress/C-scene-axis, generated-round2/audit2-same-negated-0 | 无 |
-| B1X | 29/53 | 26/53 | regression/map-scan-ambiguity, regression/map-translate, generated-dev/dev-progression-0, generated-dev/dev-relative-1, generated-audit/audit-same-relative-1, generated-audit/audit-unseen-negated-1, generated-audit/audit-unseen-xalign-1, generated-round2/audit2-same-negated-0 | regression/wrong-early-skeleton |
-| B1QX | 43/53 | 32/53 | generated-dev/dev-relative-1, generated-round2/audit2-same-negated-0 | regression/wrong-early-skeleton |
+| B0 | 41/53 | 21/53 | stress/A-absolute-relative, stress/B-repeated-progression, stress/G-fusion, stress/I-equivalent-representations, generated-dev/dev-progression-0, generated-dev/dev-progression-1, generated-dev/dev-relative-1, generated-audit/audit-same-progression-0, generated-audit/audit-same-progression-2, generated-audit/audit-same-relative-1, generated-audit/audit-unseen-negated-1, generated-round2/audit2-same-negated-0, generated-round2/audit2-same-progression-0 | 无 |
+| B1 | 19/53 | 19/53 | regression/map-scan-ambiguity, regression/map-translate, stress/A-absolute-relative, stress/C-scene-axis, stress/G-fusion, generated-dev/dev-progression-0, generated-dev/dev-progression-1, generated-dev/dev-relative-1, generated-audit/audit-same-progression-0, generated-audit/audit-same-progression-2, generated-audit/audit-same-relative-1, generated-audit/audit-unseen-negated-1, generated-audit/audit-unseen-xalign-1, generated-round2/audit2-same-negated-0, generated-round2/audit2-same-progression-0 | 无 |
+| B1L | 48/53 | 34/53 | 无 | 无 |
+| B1Q | 46/53 | 32/53 | stress/C-scene-axis, generated-round2/audit2-same-negated-0 | 无 |
+| B1X | 29/53 | 26/53 | regression/map-scan-ambiguity, regression/map-translate, generated-dev/dev-progression-0, generated-dev/dev-relative-1, generated-audit/audit-same-relative-1, generated-audit/audit-unseen-negated-1, generated-audit/audit-unseen-xalign-1, generated-round2/audit2-same-negated-0 | 无 |
+| B1QX | 43/53 | 32/53 | generated-dev/dev-relative-1, generated-round2/audit2-same-negated-0 | 无 |
 
-- **Q（延后调度）**：五组合计留出 31（B1 19，B1L 33，B0 21）。延后而非删除非局部 residual，在 regression 上丢失 ['wrong-early-skeleton']，在 stress 上得到 ['A', 'B', 'D', 'G', 'I', 'J']。与 B1L 的差集见表：差异来自延后份额（62500）本身的工作消耗与它加入 DAG 的非局部备选对提取/选择的影响。
+- **Q（延后调度）**：五组合计留出 32（B1 19，B1L 34，B0 21）。延后而非删除非局部 residual，在 regression 上保住了 B0 的全部 16 项，在 stress 上得到 ['A', 'B', 'D', 'G', 'I', 'J']。与 B1L 的差集见表：差异来自延后份额（62500）本身的工作消耗与它加入 DAG 的非局部备选对提取/选择的影响。
 - **X（惰性提取）单独**：合计留出 26。它修复的是提取层（A/C/G 等“DAG 中有可组装正确程序但 cover 预算不足”的情形），但不减少推导工作，所以在推导阶段就耗尽预算的任务（regression map-translate/map-scan-ambiguity、多数 generated）上仍失败。
-- **Q+X**：合计留出 32。两者互补（优于各自单独）。
+- **Q+X**：合计留出 32。不优于单独的 Q：惰性 cover 的候选集与 refine cover 不同，改变了部分任务的 portfolio 与选择（见逐题表中 B1Q 对 B1QX 的差异），说明两个机制在本预算下不是简单叠加。
 - **非局部基点代价（audit2-nonlocal，3 题）**：B0 train 3/3, held 1/3; B1 train 1/3, held 1/3; B1L train 3/3, held 1/3; B1Q train 3/3, held 1/3; B1X train 2/3, held 1/3; B1QX train 2/3, held 1/3。该家族没有按设计区分局部硬限制与延后调度：连 B0 也能在训练上求解其中的 seed（经 `coord`/算术分量路径而非 coordAdd），所以它测到的不是“非局部 residual 的必要性”，而是另一条已有路径；要测量局部偏好的真实代价，需要构造 `coord`/算术路径也不可达的非局部规则。这是本轮 audit 设计的一个失误，如实记录。
 - **B1L 仍是有用的参考而非方案**：它在 audit2-same-negated-0 等任务上优于 B1Q（延后份额的成本），但它删除了合法规则；Q 用可恢复的方式得到接近的覆盖。
 
