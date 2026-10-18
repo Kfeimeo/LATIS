@@ -42,3 +42,22 @@ Or run the whole matrix with the runner (fixed concurrency recorded in protocol.
 - `results/place-demand-round2/<group>/<task>/<variant>/solution.json` and `execution.json` (train/heldout exact, failure, statistics, elapsed) and the peak RSS per job.
 - The runner log (lines `group/task/variant: train=… held=… failure=… elapsed=…`).
 - If a job is still killed on the other host: the kernel OOM line, so that the failure rate under the concurrent protocol can be reported for that host too.
+
+## B1QX rows that hit the external 300 s deadline under 3-way concurrency (B1Q finished at 220–277 s on the same tasks)
+
+Run with NO external deadline (or a 900 s cap) and record wall-clock; the question is whether the larger lazy-cover candidate set (≈1500 verifications) only costs time or changes the outcome.
+
+- `generated-dev/dev-relative-1/B1QX`
+  ```
+  experiments/place-demand/latis-place-demand-r2 solve-v03r2 --task data/place-demand-generated/dev-relative-1/task.json --out results/place-demand-round2/out-of-protocol/dev-relative-1-B1QX-nodeadline --mode Full --budget 250000 --cost 96 --saturation-budget 25000 --witness bidirectional --demand off --schedule defer-nonlocal --deferred-budget 62500 --cover lazy --demand-budget 25000 --demand-operands 24 --demand-rounds 3
+  ```
+- `generated-audit/audit2-newstruct-mirror-1/B1QX`
+  ```
+  experiments/place-demand/latis-place-demand-r2 solve-v03r2 --task data/place-demand-generated-round2/audit2-newstruct-mirror-1/task.json --out results/place-demand-round2/out-of-protocol/audit2-newstruct-mirror-1-B1QX-nodeadline --mode Full --budget 250000 --cost 96 --saturation-budget 25000 --witness bidirectional --demand off --schedule defer-nonlocal --deferred-budget 62500 --cover lazy --demand-budget 25000 --demand-operands 24 --demand-rounds 3
+  ```
+- `generated-audit/audit2-nonlocal-seedshift-y-0/B1QX`
+  ```
+  experiments/place-demand/latis-place-demand-r2 solve-v03r2 --task data/place-demand-generated-round2/audit2-nonlocal-seedshift-y-0/task.json --out results/place-demand-round2/out-of-protocol/audit2-nonlocal-seedshift-y-0-B1QX-nodeadline --mode Full --budget 250000 --cost 96 --saturation-budget 25000 --witness bidirectional --demand off --schedule defer-nonlocal --deferred-budget 62500 --cover lazy --demand-budget 25000 --demand-operands 24 --demand-rounds 3
+  ```
+
+Send back `solution.json` (train/heldout, statistics.wall_clock_seconds, exact_verifier_calls, cover_lazy_candidates) for each.

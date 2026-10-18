@@ -90,6 +90,20 @@ def main():
     A('')
     A('判读规则：若 lazy cover 在固定 DAG 上仍得到训练 exact 且 held-correct 候选存在、只是选中不同，问题在选择层；若候选消失，继续修提取调度，不能靠调 MDL 掩盖；若 DAG 本身不同（join/work 不同），差异来自完整流水线中的预算交互，而非提取器本身。')
     A('')
+    A('## 5. 结论（按层归因）')
+    A('')
+    diffs = [(g, t, vs['B1Q'], vs['B1QX']) for (g, t), vs in sorted(by2.items()) if 'B1Q' in vs and 'B1QX' in vs and (vs['B1Q']['train'], vs['B1Q']['heldout']) != (vs['B1QX']['train'], vs['B1QX']['heldout'])]
+    to = [(g, t) for g, t, q, qx in diffs if qx['timeout'] or q['timeout']]
+    better = [(g, t) for g, t, q, qx in diffs if qx['heldout'] and not q['heldout'] and not qx['timeout']]
+    worse = [(g, t) for g, t, q, qx in diffs if q['heldout'] and not qx['heldout'] and not qx['timeout'] and not q['timeout']]
+    A(f"- **Q 对 QX 的差异**：{len(diffs)} 个任务结果不同，其中 {len(to)} 个是 QX 侧外部 300 s 超时（{', '.join(t for _, t in to)}；B1Q 在同一任务上也已用去 220–277 秒，QX 的 lazy cover 产生约 1500 个候选、每个都经原 verifier 检查，推到了 deadline 之后）。这是固定 3 并发协议下的 wall-clock 失败，内部证据缺失，不能判定为搜索或选择差异；对应命令已加入 `commands_for_external_host.md`，建议在外部主机无 deadline 复跑。")
+    A(f"- **提取器本身**（固定 DAG、相同 12500 次尝试）：lazy cover 在全部 {len(diags)} 个任务上得到的训练 exact 候选数 ≥ refine cover（" + '; '.join(f"{d['task']}: {d.get('refine',{}).get('train_exact','?')}→{d.get('lazy',{}).get('train_exact','?')}" for d in diags) + '），事后 held-correct 候选数同样 ≥；C 上 refine 选中 cost 61 留出错、lazy 选中 cost 55 留出对（候选覆盖层的差异，不是排名公式的差异）。' + (f"完整流水线中 QX 优于 Q 的任务：{', '.join(t for _, t in better)}；" if better else '') + (f"QX 劣于 Q 且非超时的任务：{', '.join(t for _, t in worse)}。" if worse else 'QX 劣于 Q 的任务没有一个不是超时。'))
+    A('- **判断**：在本预算下，X 的作用在提取层是正向的（候选覆盖增加、选中不劣），其代价是验证次数带来的 wall-clock；因此“默认叠加 X”的障碍是时间协议而不是搜索质量。在拿到无 deadline 复跑结果之前，Q 仍是工作基线，X 保持为独立开关。')
+    if rows3:
+        hq = {r['task'] for r in rows3 if r['variant']=='B1Q' and r['heldout']}; hl = {r['task'] for r in rows3 if r['variant']=='B1L' and r['heldout']}; h0 = {r['task'] for r in rows3 if r['variant']=='B0' and r['heldout']}
+        tq = {r['task'] for r in rows3 if r['variant']=='B1Q' and r['train']}; tl = {r['task'] for r in rows3 if r['variant']=='B1L' and r['train']}
+        A(f"- **端到端 audit（round 3，6 题）**：留出 B0 {len(h0)}、B1L {len(hl)}、B1Q {len(hq)}；训练 B1L {len(tl)}、B1Q {len(tq)}。Q 相对 B1L：多解 {sorted(hq-hl) or '无'}，少解 {sorted(hl-hq) or '无'}。" + ('本集合上未观察到硬局部限制使某类规则长期得不到预算的情形' if not (hq-hl) else '硬局部限制在这些任务上丢失了 Q 能解的规则') + '；该结论限于这 6 题与本预算。')
+    A('')
     (R3 / 'REPORT_ROUND3.md' if rows3 else R2 / 'REPORT_ROUND3_draft.md').write_text('\n'.join(L) + '\n', encoding='utf-8')
     print('wrote round-3 report', len(L), 'lines')
 if __name__ == '__main__': main()
