@@ -97,8 +97,23 @@ def rule_seedshift_y(objs):   # same with sort by TL y and seed shift (1,3)
     return _chain(sorted(objs, key=lambda o: (o[0][1], o[0][0])), (1, 3))
 def rule_mirror_relative(objs):  # round-2 new structure: moved by (-dx, dy) where (dx,dy)=TL(second)-TL(first)
     d = vec(tl(objs[1]), tl(objs[0])); return [move(o, (-d[0], d[1])) for o in objs]
+def _size(o): return len(o[1])
+def rule_extremes_delta(objs):  # round-3 cross-object: every object moved by TL(largest object) - TL(smallest object) (sizes distinct)
+    big = max(objs, key=_size); small = min(objs, key=_size); d = vec(tl(big), tl(small)); return [move(o, d) for o in objs]
+def rule_to_left_border(objs):  # round-3 scene context: shift all objects left so the leftmost touches x=0
+    mx = min(o[0][0] for o in objs); return [move(o, (-mx, 0)) for o in objs]
+def rule_chain_right(objs):     # round-3 sequence context: sort by TL x; first stays; each next placed at previous BR + (1,0) (same y as previous TL)
+    order = sorted(objs, key=lambda o: (o[0][0], o[0][1])); out = []; prev = None
+    for o in order:
+        if prev is None: pos = o[0]
+        else:
+            (px, py), pshape, _ = prev; w = max(dx for dx, _ in pshape)+1
+            pos = (px+w-1+1, py)
+        prev = (pos, o[1], o[2]); out.append(prev)
+    return out
 RULES = {'relative': rule_relative, 'progression': rule_progression, 'negated': rule_negated, 'double': rule_double, 'xalign': rule_xalign,
-         'seedshift_x': rule_seedshift_x, 'seedshift_y': rule_seedshift_y, 'mirror_relative': rule_mirror_relative}
+         'seedshift_x': rule_seedshift_x, 'seedshift_y': rule_seedshift_y, 'mirror_relative': rule_mirror_relative,
+         'extremes_delta': rule_extremes_delta, 'to_left_border': rule_to_left_border, 'chain_right': rule_chain_right}
 
 def sample_scene(rng, rule, w, h, n, confusable=False):
     """Random input scene satisfying the rule's preconditions; returns (input objects, output objects)."""
@@ -132,6 +147,14 @@ def sample_scene(rng, rule, w, h, n, confusable=False):
         if gout is None: continue
         if gin == gout: continue                   # identity examples carry no information
         if rule in ('relative', 'mirror_relative') and (vec(tl(inp[1]), tl(inp[0])) == (0, 0) or (rule == 'mirror_relative' and vec(tl(inp[1]), tl(inp[0]))[0] == 0)): continue
+        if rule == 'extremes_delta':
+            sizes = [_size(o) for o in inp]
+            if len(set(sizes)) != len(sizes): continue                     # unique largest/smallest
+            if vec(tl(max(inp, key=_size)), tl(min(inp, key=_size))) == (0, 0): continue
+        if rule == 'to_left_border' and min(o[0][0] for o in inp) == 0: continue
+        if rule == 'chain_right':
+            ks = [o[0][0] for o in inp]
+            if len(set(ks)) != len(ks): continue
         if rule in ('seedshift_x', 'seedshift_y'):
             key = (lambda o: (o[0][0], o[0][1])) if rule == 'seedshift_x' else (lambda o: (o[0][1], o[0][0]))
             ks = [key(o) for o in inp]
@@ -157,6 +180,7 @@ def make_task(rng, rule, sizes, counts, confusable_train=False):
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     if '--round2' in sys.argv: return main_round2()
+    if '--round3' in sys.argv: return main_round3()
     rng = random.Random(20261017)
     specs = []  # (name, rule, sizes, counts, confusable)
     specs += [(f'dev-relative-{i}', 'relative', [(16+2*i, 14+3*i), (20, 18), (24+i, 22)], [3, 4, 3], False) for i in range(2)]
@@ -207,5 +231,31 @@ def main_round2():
     manifest['manifest_hash'] = hashlib.sha256(body).hexdigest()
     (out / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
     print(f'wrote {len(specs)} round-2 tasks; manifest hash {manifest["manifest_hash"]}')
+
+
+# ------------------------------------------------------------------ round 3
+# End-to-end audit for the local-preference question (frozen before any run):
+# rules that need cross-object, scene or sequence context. No claim that any
+# of them REQUIRES a non-local residual; the path audit records which
+# dependency structure the selected program actually used.
+def main_round3():
+    out = ROOT / 'data/place-demand-generated-round3'; out.mkdir(parents=True, exist_ok=True)
+    rng = random.Random(20261019)
+    specs = [(f'audit3-crossobj-extremes-{i}', 'extremes_delta', [(20+i, 18), (24, 22), (28, 26)], [3, 4, 3], False) for i in range(2)]
+    specs += [(f'audit3-scene-leftborder-{i}', 'to_left_border', [(18, 16+i), (22, 20), (26, 24)], [3, 4, 3], False) for i in range(2)]
+    specs += [(f'audit3-sequence-chain-{i}', 'chain_right', [(22+i, 18), (26, 20), (30, 24)], [3, 3, 4], False) for i in range(2)]
+    manifest = {'generator': 'scripts/generate_place_demand_samples.py --round3', 'seed': 20261019, 'object_order': 'raster order of 4-connected same-color components of the INPUT grid',
+                'splits': {'audit3-crossobj': 'displacement = TL(largest) - TL(smallest)', 'audit3-scene': 'shift so that the leftmost object touches x=0', 'audit3-sequence': 'sort by x; chain each object to the previous BR + (1,0)'}, 'tasks': []}
+    for name, rule, sizes, counts, conf in specs:
+        task = make_task(rng, rule, sizes, counts, confusable_train=conf)
+        d = out / name; d.mkdir(exist_ok=True)
+        p = d / 'task.json'; p.write_text(json.dumps(task, separators=(',', ':')) + '\n', encoding='utf-8')
+        split = name.rsplit('-', 2)[0]
+        manifest['tasks'].append({'name': name, 'rule': rule, 'split': split, 'canvas_sizes': sizes, 'object_counts': counts, 'confusable_training': conf,
+                                  'path': str(p.relative_to(ROOT)), 'sha256': hashlib.sha256(p.read_bytes()).hexdigest()})
+    body = json.dumps(manifest, sort_keys=True, separators=(',', ':')).encode()
+    manifest['manifest_hash'] = hashlib.sha256(body).hexdigest()
+    (out / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
+    print(f'wrote {len(specs)} round-3 tasks; manifest hash {manifest["manifest_hash"]}')
 
 if __name__ == '__main__': main()
