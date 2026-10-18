@@ -21,3 +21,4 @@ experiments/place-demand/assemble-diag
 experiments/*/build-diag/
 experiments/place-demand/latis-place-demand-r2
 experiments/*/build-r2.log
+experiments/place-demand/extractor-diag

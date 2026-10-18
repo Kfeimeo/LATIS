@@ -255,6 +255,37 @@ main=do
   (cQ,_)<-extract engineQ sQ rootQ
   let exactQ=[e | e<-cQ,matches qCoord e]
   assert "round 2: deferred union still yields exact CoordT candidates" (not (null exactQ))
+  -- Mechanism test for non-local deferral with a CONTROLLED environment: the
+  -- target is a scene-level coordinate, Gamma=[v0] only, so every candidate base
+  -- point is non-local; the rule is t = Anchor(head(objects(v0)),TL) + (2,1) over
+  -- three scenes. This checks that such branches are registered, deferred,
+  -- released and yield a valid candidate; it is NOT an end-to-end score and it
+  -- does not claim the rule is otherwise inexpressible.
+  let sceneOnly k=M.fromList [("v0",SceneV (O.Scene (Dimensions 20 20) 0 (scene k)))]
+      seedRows=[(sceneOnly k,CoordV (add (O.position (head (scene k))) (Vec 2 1))) | k<-[0,1,2]]
+      qSeed=pointTask CoordT seedRows
+      hasNonLocalAdd e=case exprNode e of
+        Prim "coordAdd" (a:_)->S.null (S.delete "v0" (freeVars a)) && S.member "v0" (freeVars a)
+        _->any hasNonLocalAdd (children e)
+      confSeed=defaultInduced {workBudget=150000,depthBound=3,witnessPolicy=Bidirectional}
+  engineSL<-newEngine Full confSeed {witnessPolicy=BidirectionalLocal}
+  rootSL<-learnWithDemands engineSL qSeed
+  sSL<-readIORef (spaceRef engineSL)
+  (cSL,_)<-if rootSL==0 then pure ([],0) else extract engineSL sSL rootSL
+  assert "mechanism: hard-local policy yields no candidate with a non-local coordAdd base in a scene-only context" (not (any hasNonLocalAdd cSL))
+  engineS0<-newEngine Full confSeed {schedulePolicy=DeferNonLocal,deferredWorkBudget=0}
+  rootS0<-learnWithDemands engineS0 qSeed
+  mS0<-readIORef (metricsRef engineS0)
+  sS0<-readIORef (spaceRef engineS0)
+  (cS0,_)<-if rootS0==0 then pure ([],0) else extract engineS0 sS0 rootS0
+  assert "mechanism: with a zero deferred share the non-local branches are registered and released but never explored" (M.findWithDefault 0 "deferred_branches" mS0>0 && M.findWithDefault 0 "deferred_released" mS0>0 && not (any hasNonLocalAdd cS0))
+  engineS1<-newEngine Full confSeed {schedulePolicy=DeferNonLocal,deferredWorkBudget=40000}
+  rootS1<-learnWithDemands engineS1 qSeed
+  mS1<-readIORef (metricsRef engineS1)
+  sS1<-readIORef (spaceRef engineS1)
+  (cS1,_)<-extract engineS1 sS1 rootS1
+  assert "mechanism: after release with a positive share, a valid non-local coordAdd candidate exists and matches the specification by real Base evaluation" (M.findWithDefault 0 "deferred_pass_work" mS1>0 && any (\e->hasNonLocalAdd e && matches qSeed e) cS1)
+  putStrLn ("  mechanism candidate: "++exprText (head [e | e<-cS1,hasNonLocalAdd e,matches qSeed e]))
   -- Lazy cover: on the same DAG, coverLazy produces at least one exact complete
   -- composition within a small budget, with correlation preserved (every
   -- candidate still matches the specification by real Base evaluation).
