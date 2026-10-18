@@ -90,6 +90,17 @@ def main():
     A('')
     A('判读规则：若 lazy cover 在固定 DAG 上仍得到训练 exact 且 held-correct 候选存在、只是选中不同，问题在选择层；若候选消失，继续修提取调度，不能靠调 MDL 掩盖；若 DAG 本身不同（join/work 不同），差异来自完整流水线中的预算交互，而非提取器本身。')
     A('')
+    nd = ROOT / 'results/place-demand-round2/out-of-protocol'
+    if nd.exists() and any(nd.glob('*-B1QX-nodeadline/solution.json')):
+        A('## 4b. QX 超时行的无 deadline 复跑（out-of-protocol，本机，上限 900 s）')
+        A('')
+        A('| 任务 | train/heldout | failure | lazy 候选 | verifier 调用 | solver 秒 |'); A('|---|---|---|---:|---:|---:|')
+        for sol in sorted(nd.glob('*-B1QX-nodeadline/solution.json')):
+            x = json.loads(sol.read_text()); st = x.get('statistics', {})
+            A(f"| {sol.parent.name.replace('-B1QX-nodeadline','')} | {int(bool(x['train_exact']))}/{int(bool(x['heldout_exact']))} | {x['failure']} | {st.get('cover_lazy_candidates','n/a')} | {st.get('exact_verifier_calls','n/a')} | {R.fmt(st.get('wall_clock_seconds'))} |")
+        A('')
+        A('这些是单进程、无 deadline 的证据，只用于判断 QX 在这三题上的失败是否纯属时钟；不计入 3 并发协议的矩阵。')
+        A('')
     A('## 5. 结论（按层归因）')
     A('')
     diffs = [(g, t, vs['B1Q'], vs['B1QX']) for (g, t), vs in sorted(by2.items()) if 'B1Q' in vs and 'B1QX' in vs and (vs['B1Q']['train'], vs['B1Q']['heldout']) != (vs['B1QX']['train'], vs['B1QX']['heldout'])]
@@ -102,7 +113,9 @@ def main():
     if rows3:
         hq = {r['task'] for r in rows3 if r['variant']=='B1Q' and r['heldout']}; hl = {r['task'] for r in rows3 if r['variant']=='B1L' and r['heldout']}; h0 = {r['task'] for r in rows3 if r['variant']=='B0' and r['heldout']}
         tq = {r['task'] for r in rows3 if r['variant']=='B1Q' and r['train']}; tl = {r['task'] for r in rows3 if r['variant']=='B1L' and r['train']}
-        A(f"- **端到端 audit（round 3，6 题）**：留出 B0 {len(h0)}、B1L {len(hl)}、B1Q {len(hq)}；训练 B1L {len(tl)}、B1Q {len(tq)}。Q 相对 B1L：多解 {sorted(hq-hl) or '无'}，少解 {sorted(hl-hq) or '无'}。" + ('本集合上未观察到硬局部限制使某类规则长期得不到预算的情形' if not (hq-hl) else '硬局部限制在这些任务上丢失了 Q 能解的规则') + '；该结论限于这 6 题与本预算。')
+        t0 = {r['task'] for r in rows3 if r['variant']=='B0' and r['train']}
+        held0 = {r['task']: r['held_correct'] for r in rows3 if r['variant']=='B0'}; heldq = {r['task']: r['held_correct'] for r in rows3 if r['variant']=='B1Q'}
+        A(f"- **端到端 audit（round 3，6 题）**：训练 B0 {len(t0)}、B1L {len(tl)}、B1Q {len(tq)}；留出 B0 {len(h0)}、B1L {len(hl)}、B1Q {len(hq)}。Q 相对 B1L：多解 {sorted(hq-hl) or '无'}，少解 {sorted(hl-hq) or '无'}。" + ('本集合上未观察到硬局部限制使某类规则长期得不到预算的情形' if not (hq-hl) else '硬局部限制在这些任务上丢失了 Q 能解的规则') + f"；该结论限于这 6 题与本预算。Q 相对 B0：训练多解 {sorted(tq-t0) or '无'}，留出少解 {sorted(h0-hq) or '无'}" + (f"（其中 held-correct 候选：B0 {[held0.get(t) for t in sorted(h0-hq)]}，B1Q {[heldq.get(t) for t in sorted(h0-hq)]}；若 B1Q 的 held-correct 候选 >0 则是选择层在更大 portfolio 中选错，否则是覆盖层）" if h0-hq else '') + '。')
     A('')
     (R3 / 'REPORT_ROUND3.md' if rows3 else R2 / 'REPORT_ROUND3_draft.md').write_text('\n'.join(L) + '\n', encoding='utf-8')
     print('wrote round-3 report', len(L), 'lines')

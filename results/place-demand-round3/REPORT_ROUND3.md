@@ -19,17 +19,19 @@ ok: mechanism: after release with a positive share, a valid non-local coordAdd c
 |---|---|---|---|---|---|---|
 | audit3-crossobj-extremes-0 | 0/0 | 0/0(to) | 1/0 | 1/0 | 0/0(to) | 0/0(to) |
 | audit3-crossobj-extremes-1 | 0/0 | 0/0(to) | 1/0 | 1/0 | 0/0(to) | 1/0 |
-| audit3-scene-leftborder-0 | 1/1 | 0/0 | 1/1 | 1/1 | 0/0 | n/a |
-| audit3-scene-leftborder-1 | 1/0 | n/a | n/a | n/a | n/a | n/a |
+| audit3-scene-leftborder-0 | 1/1 | 0/0 | 1/1 | 1/1 | 0/0 | 1/1 |
+| audit3-scene-leftborder-1 | 1/0 | 0/0 | 1/0 | 1/0 | 0/0 | 1/0 |
+| audit3-sequence-chain-0 | 1/1 | 1/0 | 1/0 | 1/0 | 1/0 | 1/0 |
+| audit3-sequence-chain-1 | 1/0 | 1/0 | 1/0 | 1/0 | 1/0 | 1/0 |
 
 | 变体 | train | heldout |
 |---|---:|---:|
-| B0 | 2/4 | 1/4 |
-| B1 | 0/3 | 0/3 |
-| B1L | 3/3 | 1/3 |
-| B1Q | 3/3 | 1/3 |
-| B1X | 0/3 | 0/3 |
-| B1QX | 1/2 | 0/2 |
+| B0 | 4/6 | 2/6 |
+| B1 | 2/6 | 0/6 |
+| B1L | 6/6 | 1/6 |
+| B1Q | 6/6 | 1/6 |
+| B1X | 2/6 | 0/6 |
+| B1QX | 5/6 | 1/6 |
 
 ## 3. 路径审计（第二轮矩阵的选中程序）
 
@@ -88,5 +90,5 @@ ok: mechanism: after release with a positive share, a valid non-local coordAdd c
 - **Q 对 QX 的差异**：4 个任务结果不同，其中 3 个是 QX 侧外部 300 s 超时（dev-relative-1, audit2-newstruct-mirror-1, audit2-nonlocal-seedshift-y-0；B1Q 在同一任务上也已用去 220–277 秒，QX 的 lazy cover 产生约 1500 个候选、每个都经原 verifier 检查，推到了 deadline 之后）。这是固定 3 并发协议下的 wall-clock 失败，内部证据缺失，不能判定为搜索或选择差异；对应命令已加入 `commands_for_external_host.md`，建议在外部主机无 deadline 复跑。
 - **提取器本身**（固定 DAG、相同 12500 次尝试）：lazy cover 在全部 7 个任务上得到的训练 exact 候选数 ≥ refine cover（A-absolute-relative: 441→1529; B-repeated-progression: 1→1580; C-scene-axis: 1→819; audit2-newstruct-mirror-1: 2→936; audit2-nonlocal-seedshift-y-0: 1→1455; audit2-same-negated-0: 2→2261; dev-relative-1: 1→1579），事后 held-correct 候选数同样 ≥；C 上 refine 选中 cost 61 留出错、lazy 选中 cost 55 留出对（候选覆盖层的差异，不是排名公式的差异）。完整流水线中 QX 优于 Q 的任务：C-scene-axis；QX 劣于 Q 的任务没有一个不是超时。
 - **判断**：在本预算下，X 的作用在提取层是正向的（候选覆盖增加、选中不劣），其代价是验证次数带来的 wall-clock；因此“默认叠加 X”的障碍是时间协议而不是搜索质量。在拿到无 deadline 复跑结果之前，Q 仍是工作基线，X 保持为独立开关。
-- **端到端 audit（round 3，6 题）**：留出 B0 1、B1L 1、B1Q 1；训练 B1L 3、B1Q 3。Q 相对 B1L：多解 无，少解 无。本集合上未观察到硬局部限制使某类规则长期得不到预算的情形；该结论限于这 6 题与本预算。
+- **端到端 audit（round 3，6 题）**：训练 B0 4、B1L 6、B1Q 6；留出 B0 2、B1L 1、B1Q 1。Q 相对 B1L：多解 无，少解 无。本集合上未观察到硬局部限制使某类规则长期得不到预算的情形；该结论限于这 6 题与本预算。Q 相对 B0：训练多解 ['audit3-crossobj-extremes-0', 'audit3-crossobj-extremes-1']，留出少解 ['audit3-sequence-chain-0']（其中 held-correct 候选：B0 [249]，B1Q [321]；若 B1Q 的 held-correct 候选 >0 则是选择层在更大 portfolio 中选错，否则是覆盖层）。
 

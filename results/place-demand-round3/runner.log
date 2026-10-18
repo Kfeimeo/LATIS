@@ -28,3 +28,10 @@ generated-audit/audit3-sequence-chain-0/B1L: train=True held=False failure=Abstr
 generated-audit/audit3-sequence-chain-0/B1Q: train=True held=False failure=AbstractionMissing elapsed=137.82s
 generated-audit/audit3-sequence-chain-1/B0: train=True held=False failure=AbstractionMissing elapsed=47.44s
 generated-audit/audit3-sequence-chain-0/B1X: train=True held=False failure=AbstractionMissing elapsed=127.62s
+generated-audit/audit3-sequence-chain-0/B1QX: train=True held=False failure=AbstractionMissing elapsed=137.32s
+generated-audit/audit3-sequence-chain-1/B1: train=True held=False failure=AbstractionMissing elapsed=62.94s
+generated-audit/audit3-sequence-chain-1/B1L: train=True held=False failure=AbstractionMissing elapsed=53.30s
+generated-audit/audit3-sequence-chain-1/B1X: train=True held=False failure=AbstractionMissing elapsed=61.25s
+generated-audit/audit3-sequence-chain-1/B1Q: train=True held=False failure=AbstractionMissing elapsed=70.23s
+generated-audit/audit3-sequence-chain-1/B1QX: train=True held=False failure=AbstractionMissing elapsed=68.57s
+runner exit=0
