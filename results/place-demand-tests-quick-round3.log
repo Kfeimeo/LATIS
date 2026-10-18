@@ -1,0 +1,59 @@
+ok: coordAdd: unidirectional witness cannot condition on a left operand (frozen behaviour)
+ok: coordAdd: bidirectional witness conditions on the left operand
+ok: coordAdd left residual: back-substitution exact in every row (negative, zero, non-constant)
+ok: coordAdd left residual: residual child is a VecT specification, not an accepted expression
+ok: coordAdd left residual on a: v_i = t_i - a_i row by row (no cross-example mixing)
+ok: coordAdd: right-conditioned residual exists in both policies
+ok: coordAdd: bidirectional keeps every original right-conditioned decomposition
+ok: coordAdd right residual: back-substitution exact
+ok: coordAdd right residual on w: a_i = t_i - w_i row by row
+ok: coordAdd: no operand of either type -> no decomposition (safe failure)
+ok: coordDelta: left-conditioned residual q_i = p_i - v_i back-substitutes (p observed)
+ok: coordDelta: unidirectional only conditions on the right operand (p_i = v_i + q_i)
+ok: coordDelta: non-commutative argument order respected (left residual child is right operand q=p-v)
+ok: coordDelta: both policies agree on right-conditioned children; bidirectional adds left
+ok: vecAdd: left-conditioned residual w_i = y_i - u_i back-substitutes
+ok: vecAdd: residual is constant (2,-3) across rows, a shared-literal child specification
+ok: a row-permuted operand yields residuals that are exact only w.r.t. its own rows (witness pairs row i with operand row i)
+ok: missingOperands: coordAdd with no VecT observation reports VecT
+ok: missingOperands: coordAdd with both operand types present reports nothing
+ok: missingOperands: coordDelta with no CoordT reports CoordT twice (both operands)
+ok: Vec subspec: unidirectional policy yields no coordAdd-based candidate (no VecT operand is observable)
+ok: Vec subspec: bidirectional witness yields a nonempty CoordT version space
+ok: Vec subspec: extracted CoordT candidates are exact on every training row by real Base evaluation
+ok: Vec subspec: a candidate composes coordAdd with a coordDelta of two observed anchors
+ok: Phase A metric: left-conditioned decompositions were counted
+  example candidate: coordAdd(Anchor(v1,BL),coordDelta(Anchor(head(tail(objects(v0))),BR),Anchor(head(objects(v0)),BL)))
+ok: Phase B: without demand expansion the IntT residual task is empty
+ok: Phase B: demands were registered for IntT
+ok: Phase B: the pool grew with new IntT observations
+ok: Phase B: growth invalidated the stale memo entry and resumed the task
+ok: Phase B: resumed task is nonempty after growth
+ok: Phase B: extracted IntT candidate is exact on all rows
+ok: Phase B: demand work was charged to the global budget
+  example candidate: add(add(x(p),x(q)),y(q))
+ok: Phase B: re-entry without new information performs no further demand round and no invalidation
+ok: Phase B: with a tiny operand cap the demand ends still-blocked or resumed, never pending forever
+ok: Phase B: demand rounds are bounded by configuration
+ok: Phase B: demand budget cutoff leaves demands suspended and the task unsolved, without looping
+ok: Phase B: a demand budget of one unit generates at most one term in total
+ok: Phase B: repeated execution is deterministic (metrics, node count, candidates)
+ok: Phase B: generated IntT terms are typed, new and bounded by the operand cap
+ok: Phase B: same training values, different dependency structures => both representatives kept
+ok: Phase B: coordAdd without VecT observations registers a VecT demand
+ok: Phase B: VecT demand growth produced new VecT observations (coordDelta/vec compositions)
+ok: Phase B: CoordT task remains solvable after growth
+ok: round 2: non-local left residual branches are registered as deferred
+ok: round 2: deferred tasks pending after pass 1 are released exactly once in the second pass
+ok: round 2: the deferred pass is charged within its share
+ok: round 2: deferred pass re-learns stale tasks (memo invalidation)
+ok: round 2: deferred union still yields exact CoordT candidates
+ok: mechanism: hard-local policy yields no candidate with a non-local coordAdd base in a scene-only context
+ok: mechanism: with a zero deferred share the non-local branches are registered and released but never explored
+ok: mechanism: after release with a positive share, a valid non-local coordAdd candidate exists and matches the specification by real Base evaluation
+  mechanism candidate: coordAdd(Anchor(head(objects(v0)),BR),VecV (Vec 1 1))
+ok: round 2: lazy cover materializes exact candidates within a small budget
+ok: round 2: at the same small budget the coordinate-descent cover yields no more exact candidates than the lazy cover
+ok: round 2: lazy cover never mixes children across decompositions (all candidates exact or absent)
+ok: round 2: credit-aware pruning removes only non-observed non-constant residual children at credit 0
+PASS: place-demand phase A/B semantic tests
