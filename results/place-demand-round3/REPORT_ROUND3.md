@@ -85,6 +85,16 @@ ok: mechanism: after release with a positive share, a valid non-local coordAdd c
 
 判读规则：若 lazy cover 在固定 DAG 上仍得到训练 exact 且 held-correct 候选存在、只是选中不同，问题在选择层；若候选消失，继续修提取调度，不能靠调 MDL 掩盖；若 DAG 本身不同（join/work 不同），差异来自完整流水线中的预算交互，而非提取器本身。
 
+## 4b. QX 超时行的无 deadline 复跑（out-of-protocol，本机，上限 900 s）
+
+| 任务 | train/heldout | failure | lazy 候选 | verifier 调用 | solver 秒 |
+|---|---|---|---:|---:|---:|
+| audit2-newstruct-mirror-1 | 1/0 | AbstractionMissing | 1872 | 1074 | 284.5 |
+| audit2-nonlocal-seedshift-y-0 | 1/0 | AbstractionMissing | 3967 | 3359 | 272.4 |
+| dev-relative-1 | 1/1 | None | 3158 | 2011 | 318.0 |
+
+这些是单进程、无 deadline 的证据，只用于判断 QX 在这三题上的失败是否纯属时钟；不计入 3 并发协议的矩阵。
+
 ## 5. 结论（按层归因）
 
 - **Q 对 QX 的差异**：4 个任务结果不同，其中 3 个是 QX 侧外部 300 s 超时（dev-relative-1, audit2-newstruct-mirror-1, audit2-nonlocal-seedshift-y-0；B1Q 在同一任务上也已用去 220–277 秒，QX 的 lazy cover 产生约 1500 个候选、每个都经原 verifier 检查，推到了 deadline 之后）。这是固定 3 并发协议下的 wall-clock 失败，内部证据缺失，不能判定为搜索或选择差异；对应命令已加入 `commands_for_external_host.md`，建议在外部主机无 deadline 复跑。
