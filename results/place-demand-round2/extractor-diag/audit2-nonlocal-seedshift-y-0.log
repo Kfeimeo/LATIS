@@ -1,0 +1,5 @@
+deduction(B1Q): root=1313 nodes=2199 joins=418 work=116961 deferred_released=13
+refine: budget=12500 attempts=12500 candidates=1 train_exact=1 heldout_correct(post-hoc)=0
+  selected cost=41 heldout=False :: (lambda v0:SceneT. let __cse0=head(objects(v0)) in mkScene(canvasSize(v0),ColorV 0,scan((lambda v1:PairT PlacedT PlacedT. place(objectOf(snd(v1)),coordAdd(Anchor(fst(v1),BR),VecV (Vec 1 1)))),place(objectOf(__cse0),coord(x(Anchor(__cse0,Center)),add(IntV 1,add(y(Anchor(__cse0,BR)),IntV 1)))),tail(objects(v0)))))
+lazy: budget=12500 attempts=12500 candidates=1455 train_exact=1455 heldout_correct(post-hoc)=5
+  selected cost=41 heldout=False :: (lambda v0:SceneT. let __cse0=head(objects(v0)) in mkScene(canvasSize(v0),ColorV 0,scan((lambda v1:PairT PlacedT PlacedT. place(objectOf(snd(v1)),coordAdd(Anchor(fst(v1),BR),VecV (Vec 1 1)))),place(objectOf(__cse0),coord(x(Anchor(__cse0,Center)),add(IntV 1,add(y(Anchor(__cse0,BR)),IntV 1)))),tail(objects(v0)))))

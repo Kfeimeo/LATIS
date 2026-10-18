@@ -1,0 +1,5 @@
+deduction(B1Q): root=2343 nodes=2343 joins=716 work=140994 deferred_released=12
+refine: budget=12500 attempts=12500 candidates=2 train_exact=2 heldout_correct(post-hoc)=0
+  selected cost=51 heldout=False :: (lambda v0:SceneT. let __cse0=sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)) in mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coord(add(cardinality(ObjectCells(objectOf(head(tail(tail(__cse0)))))),x(Anchor(v1,TL))),add(add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(__cse0))))))),IntV 1),add(y(Anchor(v1,Center)),IntV 1))))),__cse0)))
+lazy: budget=12500 attempts=12500 candidates=936 train_exact=936 heldout_correct(post-hoc)=0
+  selected cost=51 heldout=False :: (lambda v0:SceneT. let __cse0=sortBy((lambda key:PlacedT. x(Anchor(key,Center))),objects(v0)) in mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coord(add(cardinality(ObjectCells(objectOf(head(tail(tail(__cse0)))))),x(Anchor(v1,TL))),add(add(colorToInt(head(setToList(ObjectColors(objectOf(head(tail(__cse0))))))),IntV 1),add(y(Anchor(v1,Center)),IntV 1))))),__cse0)))

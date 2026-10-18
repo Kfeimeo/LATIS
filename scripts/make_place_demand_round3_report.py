@@ -83,8 +83,8 @@ def main():
     for (g, t), vs in sorted(by2.items()):
         q, qx = vs.get('B1Q'), vs.get('B1QX')
         if not q or not qx or (q['train'], q['heldout']) == (qx['train'], qx['heldout']): continue
-        A(f"| {g}/{t} | 推导（join / 总 work / 延后 work） | {q['join_nodes']} / {q['total_expanded_work']} / {q['deferred_pass_work']} | {qx['join_nodes']} / {qx['total_expanded_work']} / {qx['deferred_pass_work']} | {'DAG 相同' if q['join_nodes']==qx['join_nodes'] else 'DAG 不同（预算交互）'} |")
-        A(f"| | 提取（train exact / portfolio / lazy 候选） | {int(q['train'])} / {q['portfolio']} / — | {int(qx['train'])} / {qx['portfolio']} / {qx['cover_lazy_candidates']} | {'提取层差异' if q['train']!=qx['train'] else '两者都得到训练 exact'} |")
+        A(f"| {g}/{t} | 推导（join / 总 work / 延后 work / 超时） | {q['join_nodes']} / {q['total_expanded_work']} / {q['deferred_pass_work']} / {int(q['timeout'])} | {qx['join_nodes']} / {qx['total_expanded_work']} / {qx['deferred_pass_work']} / {int(qx['timeout'])} | {'外部 300 s 超时（内部证据缺失）' if qx['timeout'] or q['timeout'] else ('DAG 相同' if q['join_nodes']==qx['join_nodes'] else 'DAG 不同（预算交互）')} |")
+        A(f"| | 提取（train exact / portfolio / lazy 候选 / verifier 调用 / solver 秒） | {int(q['train'])} / {q['portfolio']} / — / {q['exact_verifier_calls']} / {R.fmt(q['wall_clock_seconds'])} | {int(qx['train'])} / {qx['portfolio']} / {qx['cover_lazy_candidates']} / {qx['exact_verifier_calls']} / {R.fmt(qx['wall_clock_seconds'])} | {'提取层差异' if q['train']!=qx['train'] else '两者都得到训练 exact'} |")
         A(f"| | 泛化候选覆盖（held-correct 候选，事后） | {q['held_correct']} | {qx['held_correct']} | {'覆盖消失' if (qx['held_correct'] or 0)==0 and (q['held_correct'] or 0)>0 else ('覆盖仍在' if (qx['held_correct'] or 0)>0 else '两者均无')} |")
         A(f"| | 选择（heldout） | {int(q['heldout'])} | {int(qx['heldout'])} | {'正确候选存在但排名未选中' if (qx['held_correct'] or 0)>0 and not qx['heldout'] else ('选择层无差异' if q['heldout']==qx['heldout'] else '见上层')} |")
     A('')
