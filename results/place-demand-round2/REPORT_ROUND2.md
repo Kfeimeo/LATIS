@@ -39,7 +39,7 @@ B1U 与 B1 使用同一分解集合（剪枝只去掉 credit=0 且既非观察�
 
 binary `73d3c1c7a47466ea…`，预算与第一轮相同（250000 / cost 96 / saturation 25000 / 300 s），B1Q/B1QX 的延后份额 62500（含在总预算内），固定 3 worker。generated-round2 是冻结于任何第二轮求解之前的新 audit（manifest hash `474087d241041af1…`）：audit2-same（同规则新实例）、audit2-nonlocal（seedshift_x/y，seed 需要非局部基点+常数位移）、audit2-newstruct（mirror_relative）。
 
-执行失败：矩阵中被主机 cgroup OOM 杀死的行（3 并发时单个 scan-* 任务 RSS 约 5.8 GB）已用 `--workers 1` 单独重跑并替换（重跑 protocol 另存为 `protocol-rerun-*.json`）；当前仍标 ImplementationBug 的行：无。
+**执行失败（分开报告）**：固定 3 并发协议下，4/324 个执行被主机 cgroup OOM 杀死（regression/scan-BL-TL/B1L, regression/scan-BL-TL/B1QX, regression/scan-BR-TL/B1QX, regression/wrong-early-skeleton/B1Q；单个 scan-* 任务 RSS 约 5.8 GB，内核记录见 `oom_records.json`）。这些行随后以 `--workers 1` 单独重跑，4/4 train/heldout exact；矩阵表中的行使用补跑结果，原 OOM 标记与补跑 protocol 保留在 `oom_records.json` / `protocol-rerun-solo.json`。补跑正确率不能用于 3 并发协议的时间或资源结论；可在其他主机复跑的命令见 `commands_for_external_host.md`。
 
 | 组 | 变体 | 完成 | 训练正确 | 留出正确 | 超时 |
 |---|---|---:|---:|---:|---:|
