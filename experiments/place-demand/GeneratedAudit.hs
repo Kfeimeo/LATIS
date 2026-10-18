@@ -38,8 +38,19 @@ seedshift coordinate c=finish (binding "s" (sortedBy coordinate)
                             ,move (p "head" PlacedT [s]) (literal (VecV c)),p "tail" (ListT PlacedT) [s]]))
   where pair=variable "pair" (PairT PlacedT PlacedT); s=variable "s" (ListT PlacedT)
 mirror=mapAll (move obj (p "vec" VecT [p "subtract" IntT [literal (IntV 0),p "dx" IntT [delta (anchor 0 second) (anchor 0 first)]],p "dy" IntT [delta (anchor 0 second) (anchor 0 first)]]))
+-- round 3: cross-object / scene / sequence context
+sizeKey=lambda "key" PlacedT (p "cardinality" IntT [p "ObjectCells" (SetT CellT) [p "objectOf" ObjectT [variable "key" PlacedT]]])
+largest=p "argmaxBy" PlacedT [sizeKey,xs]; smallest=p "argminBy" PlacedT [sizeKey,xs]
+extremes=mapAll (move obj (delta (anchor 0 largest) (anchor 0 smallest)))
+leftmost=p "argminBy" PlacedT [lambda "key" PlacedT (p "x" IntT [anchor 0 (variable "key" PlacedT)]),xs]
+leftBorder=mapAll (p "place" PlacedT [p "objectOf" ObjectT [obj],p "coord" CoordT [p "subtract" IntT [p "x" IntT [anchor 0 obj],p "x" IntT [anchor 0 leftmost]],p "y" IntT [anchor 0 obj]]])
+chainRight=finish (binding "s" (sortedBy "x")
+  (p "scan" (ListT PlacedT) [lambda "pair" (PairT PlacedT PlacedT) (p "place" PlacedT [p "objectOf" ObjectT [p "snd" PlacedT [pair]],p "coord" CoordT [p "add" IntT [p "x" IntT [anchor 3 (p "fst" PlacedT [pair])],literal (IntV 2)],p "y" IntT [anchor 0 (p "fst" PlacedT [pair])]]])
+                            ,p "head" PlacedT [s],p "tail" (ListT PlacedT) [s]]))
+  where pair=variable "pair" (PairT PlacedT PlacedT); s=variable "s" (ListT PlacedT)
 rules=[("relative",relative),("progression",progression),("negated",negated),("double",double),("xalign",xalign)
-      ,("seedshift_x",seedshift "x" (Vec 2 1)),("seedshift_y",seedshift "y" (Vec 1 3)),("mirror_relative",mirror)]
+      ,("seedshift_x",seedshift "x" (Vec 2 1)),("seedshift_y",seedshift "y" (Vec 1 3)),("mirror_relative",mirror)
+      ,("extremes_delta",extremes),("to_left_border",leftBorder),("chain_right",chainRight)]
 predict program input=do
   value<-runFunction program (SceneV (encode defaultEncoder input))
   case value of SceneV result->render result;_->Left "non-scene"
@@ -48,8 +59,10 @@ main=do
   args<-getArgs
   let out=case args of (x:_)->x;_->"results/place-demand/generated_certificates.json"
       round2=case args of [_,"--round2"]->True;_->False
-      dataDir=if round2 then "data/place-demand-generated-round2" else "data/place-demand-generated"
-      names=if round2 then [("audit2-same-relative-0","relative"),("audit2-same-progression-0","progression"),("audit2-same-negated-0","negated"),("audit2-same-double-0","double"),("audit2-same-xalign-0","xalign")
+      round3=case args of [_,"--round3"]->True;_->False
+      dataDir=if round3 then "data/place-demand-generated-round3" else if round2 then "data/place-demand-generated-round2" else "data/place-demand-generated"
+      names=if round3 then [("audit3-crossobj-extremes-0","extremes_delta"),("audit3-crossobj-extremes-1","extremes_delta"),("audit3-scene-leftborder-0","to_left_border"),("audit3-scene-leftborder-1","to_left_border")
+                          ,("audit3-sequence-chain-0","chain_right"),("audit3-sequence-chain-1","chain_right")] else if round2 then [("audit2-same-relative-0","relative"),("audit2-same-progression-0","progression"),("audit2-same-negated-0","negated"),("audit2-same-double-0","double"),("audit2-same-xalign-0","xalign")
                           ,("audit2-nonlocal-seedshift-x-0","seedshift_x"),("audit2-nonlocal-seedshift-x-1","seedshift_x"),("audit2-nonlocal-seedshift-y-0","seedshift_y")
                           ,("audit2-newstruct-mirror-0","mirror_relative"),("audit2-newstruct-mirror-1","mirror_relative")] else [(n,r) | (n,r)<-[("dev-relative-0","relative"),("dev-relative-1","relative"),("dev-progression-0","progression"),("dev-progression-1","progression")
                             ,("audit-same-relative-0","relative"),("audit-same-relative-1","relative"),("audit-same-relative-2","relative")

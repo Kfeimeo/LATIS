@@ -102,13 +102,13 @@ def rule_extremes_delta(objs):  # round-3 cross-object: every object moved by TL
     big = max(objs, key=_size); small = min(objs, key=_size); d = vec(tl(big), tl(small)); return [move(o, d) for o in objs]
 def rule_to_left_border(objs):  # round-3 scene context: shift all objects left so the leftmost touches x=0
     mx = min(o[0][0] for o in objs); return [move(o, (-mx, 0)) for o in objs]
-def rule_chain_right(objs):     # round-3 sequence context: sort by TL x; first stays; each next placed at previous BR + (1,0) (same y as previous TL)
+def rule_chain_right(objs):     # round-3 sequence context: sort by TL x; first stays; each next placed at x = previous BR x + 2 (one empty column), y = previous TL y
     order = sorted(objs, key=lambda o: (o[0][0], o[0][1])); out = []; prev = None
     for o in order:
         if prev is None: pos = o[0]
         else:
             (px, py), pshape, _ = prev; w = max(dx for dx, _ in pshape)+1
-            pos = (px+w-1+1, py)
+            pos = (px+w-1+2, py)
         prev = (pos, o[1], o[2]); out.append(prev)
     return out
 RULES = {'relative': rule_relative, 'progression': rule_progression, 'negated': rule_negated, 'double': rule_double, 'xalign': rule_xalign,
@@ -243,9 +243,9 @@ def main_round3():
     rng = random.Random(20261019)
     specs = [(f'audit3-crossobj-extremes-{i}', 'extremes_delta', [(20+i, 18), (24, 22), (28, 26)], [3, 4, 3], False) for i in range(2)]
     specs += [(f'audit3-scene-leftborder-{i}', 'to_left_border', [(18, 16+i), (22, 20), (26, 24)], [3, 4, 3], False) for i in range(2)]
-    specs += [(f'audit3-sequence-chain-{i}', 'chain_right', [(22+i, 18), (26, 20), (30, 24)], [3, 3, 4], False) for i in range(2)]
+    specs += [(f'audit3-sequence-chain-{i}', 'chain_right', [(26+i, 18), (28, 20), (30, 24)], [3, 3, 3], False) for i in range(2)]
     manifest = {'generator': 'scripts/generate_place_demand_samples.py --round3', 'seed': 20261019, 'object_order': 'raster order of 4-connected same-color components of the INPUT grid',
-                'splits': {'audit3-crossobj': 'displacement = TL(largest) - TL(smallest)', 'audit3-scene': 'shift so that the leftmost object touches x=0', 'audit3-sequence': 'sort by x; chain each object to the previous BR + (1,0)'}, 'tasks': []}
+                'splits': {'audit3-crossobj': 'displacement = TL(largest) - TL(smallest)', 'audit3-scene': 'shift so that the leftmost object touches x=0', 'audit3-sequence': 'sort by x; chain each object to x = previous BR x + 2, y = previous TL y'}, 'tasks': []}
     for name, rule, sizes, counts, conf in specs:
         task = make_task(rng, rule, sizes, counts, confusable_train=conf)
         d = out / name; d.mkdir(exist_ok=True)
