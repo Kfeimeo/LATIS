@@ -1,0 +1,44 @@
+{
+  "B0": {
+    "train_exact": 42,
+    "with_coordAdd": 0,
+    "nonlocal_base": 0,
+    "deferred_join_in_trace": 0,
+    "heldout_with_nonlocal_base": 0
+  },
+  "B1": {
+    "train_exact": 20,
+    "with_coordAdd": 6,
+    "nonlocal_base": 1,
+    "deferred_join_in_trace": 7,
+    "heldout_with_nonlocal_base": 1
+  },
+  "B1L": {
+    "train_exact": 49,
+    "with_coordAdd": 27,
+    "nonlocal_base": 0,
+    "deferred_join_in_trace": 0,
+    "heldout_with_nonlocal_base": 0
+  },
+  "B1Q": {
+    "train_exact": 47,
+    "with_coordAdd": 25,
+    "nonlocal_base": 3,
+    "deferred_join_in_trace": 24,
+    "heldout_with_nonlocal_base": 2
+  },
+  "B1QX": {
+    "train_exact": 44,
+    "with_coordAdd": 24,
+    "nonlocal_base": 5,
+    "deferred_join_in_trace": 24,
+    "heldout_with_nonlocal_base": 4
+  },
+  "B1X": {
+    "train_exact": 30,
+    "with_coordAdd": 14,
+    "nonlocal_base": 3,
+    "deferred_join_in_trace": 17,
+    "heldout_with_nonlocal_base": 3
+  }
+}
