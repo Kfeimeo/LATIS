@@ -1,0 +1,5221 @@
+[
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "dev-relative-0",
+    "mode": "Full",
+    "train_exact": true,
+    "heldout_exact": false,
+    "heldout_available": true,
+    "failure": "AbstractionMissing",
+    "failure_evidence": "training exact; heldout is assessed only after MDL selection",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center))))),objects(v0))))",
+    "typed_ast": {
+      "type": "ArrowT SceneT SceneT",
+      "expression": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center))))),objects(v0))))",
+      "free_variables": [],
+      "binding_accesses": [
+        "v0",
+        "v1"
+      ],
+      "children": [
+        {
+          "type": "SceneT",
+          "expression": "mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center))))),objects(v0)))",
+          "free_variables": [
+            "v0"
+          ],
+          "binding_accesses": [
+            "v0",
+            "v1"
+          ],
+          "children": [
+            {
+              "type": "SizeT",
+              "expression": "canvasSize(v0)",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0"
+              ],
+              "children": [
+                {
+                  "type": "SceneT",
+                  "expression": "v0",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "ColorT",
+              "expression": "ColorV 0",
+              "free_variables": [],
+              "binding_accesses": [],
+              "children": []
+            },
+            {
+              "type": "ListT PlacedT",
+              "expression": "map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center))))),objects(v0))",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0",
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "ArrowT PlacedT PlacedT",
+                  "expression": "(lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center)))))",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0",
+                    "v1"
+                  ],
+                  "children": [
+                    {
+                      "type": "PlacedT",
+                      "expression": "place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center))))",
+                      "free_variables": [
+                        "v0",
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v0",
+                        "v1"
+                      ],
+                      "children": [
+                        {
+                          "type": "ObjectT",
+                          "expression": "objectOf(v1)",
+                          "free_variables": [
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "PlacedT",
+                              "expression": "v1",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CoordT",
+                          "expression": "coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center)))",
+                          "free_variables": [
+                            "v0",
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v0",
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "CoordT",
+                              "expression": "Anchor(v1,TL)",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "PlacedT",
+                                  "expression": "v1",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": []
+                                },
+                                {
+                                  "type": "AnchorT",
+                                  "expression": "TL",
+                                  "free_variables": [],
+                                  "binding_accesses": [],
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VecT",
+                              "expression": "coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center))",
+                              "free_variables": [
+                                "v0"
+                              ],
+                              "binding_accesses": [
+                                "v0"
+                              ],
+                              "children": [
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(tail(objects(v0))),TL)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(tail(objects(v0)))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "tail(objects(v0))",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "ListT PlacedT",
+                                              "expression": "objects(v0)",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "SceneT",
+                                                  "expression": "v0",
+                                                  "free_variables": [
+                                                    "v0"
+                                                  ],
+                                                  "binding_accesses": [
+                                                    "v0"
+                                                  ],
+                                                  "children": []
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "TL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(objects(v0)),Center)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(objects(v0))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "objects(v0)",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "SceneT",
+                                              "expression": "v0",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "Center",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ListT PlacedT",
+                  "expression": "objects(v0)",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": [
+                    {
+                      "type": "SceneT",
+                      "expression": "v0",
+                      "free_variables": [
+                        "v0"
+                      ],
+                      "binding_accesses": [
+                        "v0"
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "portfolio_count": 1,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 37,
+      "abstraction_rounds": 1,
+      "base_symbols_activated": 32,
+      "base_symbols_rejected": 30,
+      "bidirectional_left_decompositions": 736,
+      "bottom_up_terms": 0,
+      "branch_order_scored": 0,
+      "branch_points": 91,
+      "cost_bound_reached": 21,
+      "cost_strata": 21,
+      "counterfactual_calls": 0,
+      "cover_lazy_candidates": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 5,
+      "deduction_milliseconds": 140609,
+      "deferred_branches": 363,
+      "deferred_pass_memo_invalidations": 49,
+      "deferred_pass_work": 62574,
+      "deferred_released": 15,
+      "deferred_tasks": 15,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 8,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 28,
+      "demands_registered": 0,
+      "demands_resumed": 15,
+      "demands_still_blocked": 0,
+      "demands_suspended": 13,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 0,
+      "distinct_symbol_count": 13,
+      "effect_pruned": 311,
+      "equivalence_classes": 372,
+      "exact_verifier_calls": 1,
+      "expression_tests": 68520,
+      "extraction_milliseconds": 5973,
+      "extraction_work": 37528,
+      "failed_witness_decompositions": 819,
+      "first_solution_states": 167961,
+      "fv_bindings_eliminated": 7927,
+      "grounded_expressions": 1,
+      "induced_tsl_symbol_count": 32,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 710,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 20634,
+      "materialized_child_asts": 37528,
+      "materialized_complete_asts": 1,
+      "max_representatives_per_class": 84,
+      "memo_hits": 1432,
+      "memo_queries": 2640,
+      "memoized_learning_tasks": 1186,
+      "observer_terms": 147097,
+      "portfolio_cover_work": 12500,
+      "program_ast_length": 28,
+      "propagation_steps": 20925,
+      "pruned_representatives": 167420,
+      "recursive_learning_tasks": 2640,
+      "root_learning_tasks": 1,
+      "selected_cse_nodes_saved": 0,
+      "selected_let_bindings": 0,
+      "selected_mdl_cost": 29,
+      "selected_ungrounded_literal_cost": 0,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 28,
+      "structural_deduplications": 1768,
+      "structural_prior_count": 0,
+      "structural_representatives": 2058,
+      "successful_witness_decompositions": 839,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 167961,
+      "total_expanded_work": 167998,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 190,
+      "verification_milliseconds": 0,
+      "version_space_nodes": 2392,
+      "witness_calls": 28693,
+      "witness_unavailable": 7479,
+      "wall_clock_seconds": 146.802520425
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1Q",
+      "witness_policy": "Bidirectional",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3,
+      "schedule_policy": "DeferNonLocal",
+      "deferred_work_budget": 62500,
+      "cover_policy": "CoverRefine",
+      "branch_order": "CostOrder"
+    },
+    "variant": "B1Q",
+    "base_expressibility": "Constructive Base certificate",
+    "bounded": false,
+    "group": "generated-dev",
+    "execution_elapsed_seconds": 152.94398117799938
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "dev-relative-0",
+    "mode": "Full",
+    "train_exact": true,
+    "heldout_exact": false,
+    "heldout_available": true,
+    "failure": "AbstractionMissing",
+    "failure_evidence": "training exact; heldout is assessed only after MDL selection",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center))))),objects(v0))))",
+    "typed_ast": {
+      "type": "ArrowT SceneT SceneT",
+      "expression": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center))))),objects(v0))))",
+      "free_variables": [],
+      "binding_accesses": [
+        "v0",
+        "v1"
+      ],
+      "children": [
+        {
+          "type": "SceneT",
+          "expression": "mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center))))),objects(v0)))",
+          "free_variables": [
+            "v0"
+          ],
+          "binding_accesses": [
+            "v0",
+            "v1"
+          ],
+          "children": [
+            {
+              "type": "SizeT",
+              "expression": "canvasSize(v0)",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0"
+              ],
+              "children": [
+                {
+                  "type": "SceneT",
+                  "expression": "v0",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "ColorT",
+              "expression": "ColorV 0",
+              "free_variables": [],
+              "binding_accesses": [],
+              "children": []
+            },
+            {
+              "type": "ListT PlacedT",
+              "expression": "map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center))))),objects(v0))",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0",
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "ArrowT PlacedT PlacedT",
+                  "expression": "(lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center)))))",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0",
+                    "v1"
+                  ],
+                  "children": [
+                    {
+                      "type": "PlacedT",
+                      "expression": "place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center))))",
+                      "free_variables": [
+                        "v0",
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v0",
+                        "v1"
+                      ],
+                      "children": [
+                        {
+                          "type": "ObjectT",
+                          "expression": "objectOf(v1)",
+                          "free_variables": [
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "PlacedT",
+                              "expression": "v1",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CoordT",
+                          "expression": "coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center)))",
+                          "free_variables": [
+                            "v0",
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v0",
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "CoordT",
+                              "expression": "Anchor(v1,TL)",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "PlacedT",
+                                  "expression": "v1",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": []
+                                },
+                                {
+                                  "type": "AnchorT",
+                                  "expression": "TL",
+                                  "free_variables": [],
+                                  "binding_accesses": [],
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VecT",
+                              "expression": "coordDelta(Anchor(head(tail(objects(v0))),TL),Anchor(head(objects(v0)),Center))",
+                              "free_variables": [
+                                "v0"
+                              ],
+                              "binding_accesses": [
+                                "v0"
+                              ],
+                              "children": [
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(tail(objects(v0))),TL)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(tail(objects(v0)))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "tail(objects(v0))",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "ListT PlacedT",
+                                              "expression": "objects(v0)",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "SceneT",
+                                                  "expression": "v0",
+                                                  "free_variables": [
+                                                    "v0"
+                                                  ],
+                                                  "binding_accesses": [
+                                                    "v0"
+                                                  ],
+                                                  "children": []
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "TL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(objects(v0)),Center)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(objects(v0))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "objects(v0)",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "SceneT",
+                                              "expression": "v0",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "Center",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ListT PlacedT",
+                  "expression": "objects(v0)",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": [
+                    {
+                      "type": "SceneT",
+                      "expression": "v0",
+                      "free_variables": [
+                        "v0"
+                      ],
+                      "binding_accesses": [
+                        "v0"
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "portfolio_count": 1,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 37,
+      "abstraction_rounds": 1,
+      "base_symbols_activated": 32,
+      "base_symbols_rejected": 30,
+      "bidirectional_left_decompositions": 688,
+      "bottom_up_terms": 0,
+      "branch_order_scored": 1661,
+      "branch_points": 89,
+      "cost_bound_reached": 21,
+      "cost_strata": 21,
+      "counterfactual_calls": 0,
+      "cover_lazy_candidates": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 4,
+      "deduction_milliseconds": 138743,
+      "deferred_branches": 347,
+      "deferred_pass_memo_invalidations": 49,
+      "deferred_pass_work": 62544,
+      "deferred_released": 15,
+      "deferred_tasks": 15,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 8,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 27,
+      "demands_registered": 0,
+      "demands_resumed": 15,
+      "demands_still_blocked": 0,
+      "demands_suspended": 12,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 0,
+      "distinct_symbol_count": 13,
+      "effect_pruned": 309,
+      "equivalence_classes": 371,
+      "exact_verifier_calls": 1,
+      "expression_tests": 68186,
+      "extraction_milliseconds": 6151,
+      "extraction_work": 37528,
+      "failed_witness_decompositions": 800,
+      "first_solution_states": 168587,
+      "fv_bindings_eliminated": 7927,
+      "grounded_expressions": 1,
+      "induced_tsl_symbol_count": 32,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 708,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 20247,
+      "materialized_child_asts": 37528,
+      "materialized_complete_asts": 1,
+      "max_representatives_per_class": 84,
+      "memo_hits": 1417,
+      "memo_queries": 2614,
+      "memoized_learning_tasks": 1178,
+      "observer_terms": 147097,
+      "portfolio_cover_work": 12500,
+      "program_ast_length": 28,
+      "propagation_steps": 20763,
+      "pruned_representatives": 167420,
+      "recursive_learning_tasks": 2614,
+      "root_learning_tasks": 1,
+      "selected_cse_nodes_saved": 0,
+      "selected_let_bindings": 0,
+      "selected_mdl_cost": 29,
+      "selected_ungrounded_literal_cost": 0,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 28,
+      "structural_deduplications": 1767,
+      "structural_prior_count": 0,
+      "structural_representatives": 2057,
+      "successful_witness_decompositions": 837,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 168587,
+      "total_expanded_work": 168624,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 189,
+      "verification_milliseconds": 0,
+      "version_space_nodes": 2389,
+      "witness_calls": 28206,
+      "witness_unavailable": 7388,
+      "wall_clock_seconds": 145.300581237
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1QS",
+      "witness_policy": "Bidirectional",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3,
+      "schedule_policy": "DeferNonLocal",
+      "deferred_work_budget": 62500,
+      "cover_policy": "CoverRefine",
+      "branch_order": "UnsolvedFirst"
+    },
+    "variant": "B1QS",
+    "base_expressibility": "Constructive Base certificate",
+    "bounded": false,
+    "group": "generated-dev",
+    "execution_elapsed_seconds": 151.4187636359993
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "dev-relative-1",
+    "mode": "Full",
+    "train_exact": true,
+    "heldout_exact": true,
+    "heldout_available": true,
+    "failure": "None",
+    "failure_evidence": "training exact; heldout is assessed only after MDL selection",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))))),objects(v0))))",
+    "typed_ast": {
+      "type": "ArrowT SceneT SceneT",
+      "expression": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))))),objects(v0))))",
+      "free_variables": [],
+      "binding_accesses": [
+        "v0",
+        "v1"
+      ],
+      "children": [
+        {
+          "type": "SceneT",
+          "expression": "mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))))),objects(v0)))",
+          "free_variables": [
+            "v0"
+          ],
+          "binding_accesses": [
+            "v0",
+            "v1"
+          ],
+          "children": [
+            {
+              "type": "SizeT",
+              "expression": "canvasSize(v0)",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0"
+              ],
+              "children": [
+                {
+                  "type": "SceneT",
+                  "expression": "v0",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "ColorT",
+              "expression": "ColorV 0",
+              "free_variables": [],
+              "binding_accesses": [],
+              "children": []
+            },
+            {
+              "type": "ListT PlacedT",
+              "expression": "map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))))),objects(v0))",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0",
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "ArrowT PlacedT PlacedT",
+                  "expression": "(lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL)))))",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0",
+                    "v1"
+                  ],
+                  "children": [
+                    {
+                      "type": "PlacedT",
+                      "expression": "place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))))",
+                      "free_variables": [
+                        "v0",
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v0",
+                        "v1"
+                      ],
+                      "children": [
+                        {
+                          "type": "ObjectT",
+                          "expression": "objectOf(v1)",
+                          "free_variables": [
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "PlacedT",
+                              "expression": "v1",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CoordT",
+                          "expression": "coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL)))",
+                          "free_variables": [
+                            "v0",
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v0",
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "CoordT",
+                              "expression": "Anchor(v1,TL)",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "PlacedT",
+                                  "expression": "v1",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": []
+                                },
+                                {
+                                  "type": "AnchorT",
+                                  "expression": "TL",
+                                  "free_variables": [],
+                                  "binding_accesses": [],
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VecT",
+                              "expression": "coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))",
+                              "free_variables": [
+                                "v0"
+                              ],
+                              "binding_accesses": [
+                                "v0"
+                              ],
+                              "children": [
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(tail(objects(v0))),Center)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(tail(objects(v0)))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "tail(objects(v0))",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "ListT PlacedT",
+                                              "expression": "objects(v0)",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "SceneT",
+                                                  "expression": "v0",
+                                                  "free_variables": [
+                                                    "v0"
+                                                  ],
+                                                  "binding_accesses": [
+                                                    "v0"
+                                                  ],
+                                                  "children": []
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "Center",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(objects(v0)),BL)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(objects(v0))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "objects(v0)",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "SceneT",
+                                              "expression": "v0",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "BL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ListT PlacedT",
+                  "expression": "objects(v0)",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": [
+                    {
+                      "type": "SceneT",
+                      "expression": "v0",
+                      "free_variables": [
+                        "v0"
+                      ],
+                      "binding_accesses": [
+                        "v0"
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "portfolio_count": 1,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 37,
+      "abstraction_rounds": 1,
+      "base_symbols_activated": 32,
+      "base_symbols_rejected": 30,
+      "bidirectional_left_decompositions": 710,
+      "bottom_up_terms": 0,
+      "branch_order_scored": 0,
+      "branch_points": 91,
+      "cost_bound_reached": 21,
+      "cost_strata": 21,
+      "counterfactual_calls": 0,
+      "cover_lazy_candidates": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 5,
+      "deduction_milliseconds": 256876,
+      "deferred_branches": 341,
+      "deferred_pass_memo_invalidations": 47,
+      "deferred_pass_work": 62510,
+      "deferred_released": 14,
+      "deferred_tasks": 14,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 8,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 30,
+      "demands_registered": 0,
+      "demands_resumed": 14,
+      "demands_still_blocked": 0,
+      "demands_suspended": 16,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 0,
+      "distinct_symbol_count": 13,
+      "effect_pruned": 998,
+      "equivalence_classes": 334,
+      "exact_verifier_calls": 1,
+      "expression_tests": 53829,
+      "extraction_milliseconds": 6039,
+      "extraction_work": 37528,
+      "failed_witness_decompositions": 1387,
+      "first_solution_states": 170144,
+      "fv_bindings_eliminated": 5731,
+      "grounded_expressions": 1,
+      "induced_tsl_symbol_count": 32,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 718,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 28884,
+      "materialized_child_asts": 37528,
+      "materialized_complete_asts": 1,
+      "max_representatives_per_class": 62,
+      "memo_hits": 1483,
+      "memo_queries": 3134,
+      "memoized_learning_tasks": 1625,
+      "observer_terms": 466137,
+      "portfolio_cover_work": 12500,
+      "program_ast_length": 28,
+      "propagation_steps": 25687,
+      "pruned_representatives": 529980,
+      "recursive_learning_tasks": 3134,
+      "root_learning_tasks": 1,
+      "selected_cse_nodes_saved": 0,
+      "selected_let_bindings": 0,
+      "selected_mdl_cost": 29,
+      "selected_ungrounded_literal_cost": 0,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 28,
+      "structural_deduplications": 2080,
+      "structural_prior_count": 0,
+      "structural_representatives": 2025,
+      "successful_witness_decompositions": 764,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 170144,
+      "total_expanded_work": 170181,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 183,
+      "verification_milliseconds": 0,
+      "version_space_nodes": 2443,
+      "witness_calls": 41721,
+      "witness_unavailable": 12014,
+      "wall_clock_seconds": 263.208408049
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1Q",
+      "witness_policy": "Bidirectional",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3,
+      "schedule_policy": "DeferNonLocal",
+      "deferred_work_budget": 62500,
+      "cover_policy": "CoverRefine",
+      "branch_order": "CostOrder"
+    },
+    "variant": "B1Q",
+    "base_expressibility": "Constructive Base certificate",
+    "bounded": false,
+    "group": "generated-dev",
+    "execution_elapsed_seconds": 274.0098868470004
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "dev-relative-1",
+    "mode": "Full",
+    "train_exact": true,
+    "heldout_exact": true,
+    "heldout_available": true,
+    "failure": "None",
+    "failure_evidence": "training exact; heldout is assessed only after MDL selection",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))))),objects(v0))))",
+    "typed_ast": {
+      "type": "ArrowT SceneT SceneT",
+      "expression": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))))),objects(v0))))",
+      "free_variables": [],
+      "binding_accesses": [
+        "v0",
+        "v1"
+      ],
+      "children": [
+        {
+          "type": "SceneT",
+          "expression": "mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))))),objects(v0)))",
+          "free_variables": [
+            "v0"
+          ],
+          "binding_accesses": [
+            "v0",
+            "v1"
+          ],
+          "children": [
+            {
+              "type": "SizeT",
+              "expression": "canvasSize(v0)",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0"
+              ],
+              "children": [
+                {
+                  "type": "SceneT",
+                  "expression": "v0",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "ColorT",
+              "expression": "ColorV 0",
+              "free_variables": [],
+              "binding_accesses": [],
+              "children": []
+            },
+            {
+              "type": "ListT PlacedT",
+              "expression": "map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))))),objects(v0))",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0",
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "ArrowT PlacedT PlacedT",
+                  "expression": "(lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL)))))",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0",
+                    "v1"
+                  ],
+                  "children": [
+                    {
+                      "type": "PlacedT",
+                      "expression": "place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))))",
+                      "free_variables": [
+                        "v0",
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v0",
+                        "v1"
+                      ],
+                      "children": [
+                        {
+                          "type": "ObjectT",
+                          "expression": "objectOf(v1)",
+                          "free_variables": [
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "PlacedT",
+                              "expression": "v1",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CoordT",
+                          "expression": "coordAdd(Anchor(v1,TL),coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL)))",
+                          "free_variables": [
+                            "v0",
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v0",
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "CoordT",
+                              "expression": "Anchor(v1,TL)",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "PlacedT",
+                                  "expression": "v1",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": []
+                                },
+                                {
+                                  "type": "AnchorT",
+                                  "expression": "TL",
+                                  "free_variables": [],
+                                  "binding_accesses": [],
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VecT",
+                              "expression": "coordDelta(Anchor(head(tail(objects(v0))),Center),Anchor(head(objects(v0)),BL))",
+                              "free_variables": [
+                                "v0"
+                              ],
+                              "binding_accesses": [
+                                "v0"
+                              ],
+                              "children": [
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(tail(objects(v0))),Center)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(tail(objects(v0)))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "tail(objects(v0))",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "ListT PlacedT",
+                                              "expression": "objects(v0)",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "SceneT",
+                                                  "expression": "v0",
+                                                  "free_variables": [
+                                                    "v0"
+                                                  ],
+                                                  "binding_accesses": [
+                                                    "v0"
+                                                  ],
+                                                  "children": []
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "Center",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(objects(v0)),BL)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(objects(v0))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "objects(v0)",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "SceneT",
+                                              "expression": "v0",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "BL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ListT PlacedT",
+                  "expression": "objects(v0)",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": [
+                    {
+                      "type": "SceneT",
+                      "expression": "v0",
+                      "free_variables": [
+                        "v0"
+                      ],
+                      "binding_accesses": [
+                        "v0"
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "portfolio_count": 1,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 37,
+      "abstraction_rounds": 1,
+      "base_symbols_activated": 32,
+      "base_symbols_rejected": 30,
+      "bidirectional_left_decompositions": 674,
+      "bottom_up_terms": 0,
+      "branch_order_scored": 2187,
+      "branch_points": 90,
+      "cost_bound_reached": 21,
+      "cost_strata": 21,
+      "counterfactual_calls": 0,
+      "cover_lazy_candidates": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 5,
+      "deduction_milliseconds": 256897,
+      "deferred_branches": 321,
+      "deferred_pass_memo_invalidations": 47,
+      "deferred_pass_work": 62510,
+      "deferred_released": 14,
+      "deferred_tasks": 14,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 8,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 27,
+      "demands_registered": 0,
+      "demands_resumed": 14,
+      "demands_still_blocked": 0,
+      "demands_suspended": 13,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 0,
+      "distinct_symbol_count": 13,
+      "effect_pruned": 998,
+      "equivalence_classes": 334,
+      "exact_verifier_calls": 1,
+      "expression_tests": 53387,
+      "extraction_milliseconds": 6641,
+      "extraction_work": 37528,
+      "failed_witness_decompositions": 1367,
+      "first_solution_states": 171351,
+      "fv_bindings_eliminated": 5731,
+      "grounded_expressions": 1,
+      "induced_tsl_symbol_count": 32,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 716,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 28494,
+      "materialized_child_asts": 37528,
+      "materialized_complete_asts": 1,
+      "max_representatives_per_class": 62,
+      "memo_hits": 1459,
+      "memo_queries": 3103,
+      "memoized_learning_tasks": 1618,
+      "observer_terms": 466137,
+      "portfolio_cover_work": 12500,
+      "program_ast_length": 28,
+      "propagation_steps": 25570,
+      "pruned_representatives": 529980,
+      "recursive_learning_tasks": 3103,
+      "root_learning_tasks": 1,
+      "selected_cse_nodes_saved": 0,
+      "selected_let_bindings": 0,
+      "selected_mdl_cost": 29,
+      "selected_ungrounded_literal_cost": 0,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 28,
+      "structural_deduplications": 2081,
+      "structural_prior_count": 0,
+      "structural_representatives": 2025,
+      "successful_witness_decompositions": 763,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 171351,
+      "total_expanded_work": 171388,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 184,
+      "verification_milliseconds": 0,
+      "version_space_nodes": 2442,
+      "witness_calls": 41260,
+      "witness_unavailable": 11951,
+      "wall_clock_seconds": 263.834015637
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1QS",
+      "witness_policy": "Bidirectional",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3,
+      "schedule_policy": "DeferNonLocal",
+      "deferred_work_budget": 62500,
+      "cover_policy": "CoverRefine",
+      "branch_order": "UnsolvedFirst"
+    },
+    "variant": "B1QS",
+    "base_expressibility": "Constructive Base certificate",
+    "bounded": false,
+    "group": "generated-dev",
+    "execution_elapsed_seconds": 274.39346028
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "dev-progression-0",
+    "mode": "Full",
+    "train_exact": true,
+    "heldout_exact": true,
+    "heldout_available": true,
+    "failure": "None",
+    "failure_evidence": "training exact; heldout is assessed only after MDL selection",
+    "ambiguity": {
+      "status": "ObservationallyUnderdetermined",
+      "selection_feedback": false,
+      "hypothesis_a": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))))",
+      "hypothesis_b": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0)))))",
+      "distinguishing_input": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          3,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          9,
+          9,
+          9,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          9,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "hypothetical_prediction_a": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          9,
+          9,
+          9,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          9,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "hypothetical_prediction_b": [
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      ],
+      "minimality": "first by object count, canvas cells, text within finite input perturbation domain; not global minimality",
+      "domain_size": 128,
+      "calls": 48
+    },
+    "program": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))))",
+    "typed_ast": {
+      "type": "ArrowT SceneT SceneT",
+      "expression": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))))",
+      "free_variables": [],
+      "binding_accesses": [
+        "v0",
+        "v1"
+      ],
+      "children": [
+        {
+          "type": "SceneT",
+          "expression": "mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0)))",
+          "free_variables": [
+            "v0"
+          ],
+          "binding_accesses": [
+            "v0",
+            "v1"
+          ],
+          "children": [
+            {
+              "type": "SizeT",
+              "expression": "canvasSize(v0)",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0"
+              ],
+              "children": [
+                {
+                  "type": "SceneT",
+                  "expression": "v0",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "ColorT",
+              "expression": "ColorV 0",
+              "free_variables": [],
+              "binding_accesses": [],
+              "children": []
+            },
+            {
+              "type": "ListT PlacedT",
+              "expression": "map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0",
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "ArrowT PlacedT PlacedT",
+                  "expression": "(lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL)))))",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0",
+                    "v1"
+                  ],
+                  "children": [
+                    {
+                      "type": "PlacedT",
+                      "expression": "place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))",
+                      "free_variables": [
+                        "v0",
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v0",
+                        "v1"
+                      ],
+                      "children": [
+                        {
+                          "type": "ObjectT",
+                          "expression": "objectOf(v1)",
+                          "free_variables": [
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "PlacedT",
+                              "expression": "v1",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CoordT",
+                          "expression": "coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL)))",
+                          "free_variables": [
+                            "v0",
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v0",
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "CoordT",
+                              "expression": "Anchor(v1,TL)",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "PlacedT",
+                                  "expression": "v1",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": []
+                                },
+                                {
+                                  "type": "AnchorT",
+                                  "expression": "TL",
+                                  "free_variables": [],
+                                  "binding_accesses": [],
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VecT",
+                              "expression": "coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))",
+                              "free_variables": [
+                                "v0",
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v0",
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(v1,TL)",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "v1",
+                                      "free_variables": [
+                                        "v1"
+                                      ],
+                                      "binding_accesses": [
+                                        "v1"
+                                      ],
+                                      "children": []
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "TL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(objects(v0)),TL)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(objects(v0))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "objects(v0)",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "SceneT",
+                                              "expression": "v0",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "TL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ListT PlacedT",
+                  "expression": "objects(v0)",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": [
+                    {
+                      "type": "SceneT",
+                      "expression": "v0",
+                      "free_variables": [
+                        "v0"
+                      ],
+                      "binding_accesses": [
+                        "v0"
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "portfolio_count": 2,
+    "task_invented": [
+      {
+        "name": "I0",
+        "source": "TaskInvented",
+        "originating_ast": {
+          "type": "ArrowT SceneT (ArrowT PlacedT CoordT)",
+          "expression": "(lambda v0:SceneT. (lambda v1:PlacedT. coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL)))))",
+          "free_variables": [],
+          "binding_accesses": [
+            "v0",
+            "v1"
+          ],
+          "children": [
+            {
+              "type": "ArrowT PlacedT CoordT",
+              "expression": "(lambda v1:PlacedT. coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0",
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "CoordT",
+                  "expression": "coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL)))",
+                  "free_variables": [
+                    "v0",
+                    "v1"
+                  ],
+                  "binding_accesses": [
+                    "v0",
+                    "v1"
+                  ],
+                  "children": [
+                    {
+                      "type": "CoordT",
+                      "expression": "Anchor(v1,TL)",
+                      "free_variables": [
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v1"
+                      ],
+                      "children": [
+                        {
+                          "type": "PlacedT",
+                          "expression": "v1",
+                          "free_variables": [
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v1"
+                          ],
+                          "children": []
+                        },
+                        {
+                          "type": "AnchorT",
+                          "expression": "TL",
+                          "free_variables": [],
+                          "binding_accesses": [],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VecT",
+                      "expression": "coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))",
+                      "free_variables": [
+                        "v0",
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v0",
+                        "v1"
+                      ],
+                      "children": [
+                        {
+                          "type": "CoordT",
+                          "expression": "Anchor(v1,TL)",
+                          "free_variables": [
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "PlacedT",
+                              "expression": "v1",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": []
+                            },
+                            {
+                              "type": "AnchorT",
+                              "expression": "TL",
+                              "free_variables": [],
+                              "binding_accesses": [],
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CoordT",
+                          "expression": "Anchor(head(objects(v0)),TL)",
+                          "free_variables": [
+                            "v0"
+                          ],
+                          "binding_accesses": [
+                            "v0"
+                          ],
+                          "children": [
+                            {
+                              "type": "PlacedT",
+                              "expression": "head(objects(v0))",
+                              "free_variables": [
+                                "v0"
+                              ],
+                              "binding_accesses": [
+                                "v0"
+                              ],
+                              "children": [
+                                {
+                                  "type": "ListT PlacedT",
+                                  "expression": "objects(v0)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "SceneT",
+                                      "expression": "v0",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "AnchorT",
+                              "expression": "TL",
+                              "free_variables": [],
+                              "binding_accesses": [],
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "repeated_occurrences": 2,
+        "mdl_saving": 1,
+        "saving_scope": "exact-valid program portfolio",
+        "template": {
+          "type": "CoordT",
+          "expression": "coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL)))",
+          "free_variables": [
+            "v0",
+            "v1"
+          ],
+          "binding_accesses": [
+            "v0",
+            "v1"
+          ],
+          "children": [
+            {
+              "type": "CoordT",
+              "expression": "Anchor(v1,TL)",
+              "free_variables": [
+                "v1"
+              ],
+              "binding_accesses": [
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "PlacedT",
+                  "expression": "v1",
+                  "free_variables": [
+                    "v1"
+                  ],
+                  "binding_accesses": [
+                    "v1"
+                  ],
+                  "children": []
+                },
+                {
+                  "type": "AnchorT",
+                  "expression": "TL",
+                  "free_variables": [],
+                  "binding_accesses": [],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "VecT",
+              "expression": "coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))",
+              "free_variables": [
+                "v0",
+                "v1"
+              ],
+              "binding_accesses": [
+                "v0",
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "CoordT",
+                  "expression": "Anchor(v1,TL)",
+                  "free_variables": [
+                    "v1"
+                  ],
+                  "binding_accesses": [
+                    "v1"
+                  ],
+                  "children": [
+                    {
+                      "type": "PlacedT",
+                      "expression": "v1",
+                      "free_variables": [
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v1"
+                      ],
+                      "children": []
+                    },
+                    {
+                      "type": "AnchorT",
+                      "expression": "TL",
+                      "free_variables": [],
+                      "binding_accesses": [],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "type": "CoordT",
+                  "expression": "Anchor(head(objects(v0)),TL)",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": [
+                    {
+                      "type": "PlacedT",
+                      "expression": "head(objects(v0))",
+                      "free_variables": [
+                        "v0"
+                      ],
+                      "binding_accesses": [
+                        "v0"
+                      ],
+                      "children": [
+                        {
+                          "type": "ListT PlacedT",
+                          "expression": "objects(v0)",
+                          "free_variables": [
+                            "v0"
+                          ],
+                          "binding_accesses": [
+                            "v0"
+                          ],
+                          "children": [
+                            {
+                              "type": "SceneT",
+                              "expression": "v0",
+                              "free_variables": [
+                                "v0"
+                              ],
+                              "binding_accesses": [
+                                "v0"
+                              ],
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "AnchorT",
+                      "expression": "TL",
+                      "free_variables": [],
+                      "binding_accesses": [],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "parameters": [
+          {
+            "name": "v0",
+            "type": "SceneT"
+          },
+          {
+            "name": "v1",
+            "type": "PlacedT"
+          }
+        ],
+        "expansion": "ordinary checked Base lambda/application; no invention-specific primitive or witness",
+        "evidence": "typed anti-unification/exact pattern; explicit lambda lifting; disjoint portfolio MDL; Base definition expansion"
+      }
+    ],
+    "statistics": {
+      "abstraction_discovery_work": 180,
+      "abstraction_rounds": 2,
+      "base_symbols_activated": 32,
+      "base_symbols_rejected": 30,
+      "bidirectional_left_decompositions": 688,
+      "bottom_up_terms": 0,
+      "branch_order_scored": 0,
+      "branch_points": 61,
+      "cost_bound_reached": 22,
+      "cost_strata": 44,
+      "counterfactual_calls": 48,
+      "cover_lazy_candidates": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 5,
+      "deduction_milliseconds": 107136,
+      "deferred_branches": 345,
+      "deferred_pass_memo_invalidations": 33,
+      "deferred_pass_work": 62502,
+      "deferred_released": 10,
+      "deferred_tasks": 10,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 4,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 25,
+      "demands_registered": 0,
+      "demands_resumed": 10,
+      "demands_still_blocked": 0,
+      "demands_suspended": 15,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 5,
+      "distinct_symbol_count": 12,
+      "effect_pruned": 128,
+      "equivalence_classes": 228,
+      "exact_verifier_calls": 2,
+      "expression_tests": 51113,
+      "extraction_milliseconds": 15992,
+      "extraction_work": 75112,
+      "failed_witness_decompositions": 682,
+      "first_solution_states": 139486,
+      "fv_bindings_eliminated": 2541,
+      "grounded_expressions": 2,
+      "induced_tsl_symbol_count": 33,
+      "invented_abstractions": 1,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 615,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 20243,
+      "materialized_child_asts": 75112,
+      "materialized_complete_asts": 2,
+      "max_representatives_per_class": 54,
+      "memo_hits": 1247,
+      "memo_queries": 2160,
+      "memoized_learning_tasks": 897,
+      "observer_terms": 63472,
+      "portfolio_cover_work": 25000,
+      "program_ast_length": 25,
+      "propagation_steps": 16123,
+      "pruned_representatives": 72314,
+      "recursive_learning_tasks": 2164,
+      "root_learning_tasks": 1,
+      "selected_cse_nodes_saved": 0,
+      "selected_let_bindings": 0,
+      "selected_mdl_cost": 26,
+      "selected_ungrounded_literal_cost": 0,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 112,
+      "structural_deduplications": 1411,
+      "structural_prior_count": 0,
+      "structural_representatives": 1609,
+      "successful_witness_decompositions": 700,
+      "synthesis_work_after_discovery": 4,
+      "synthesis_work_before_discovery": 139486,
+      "total_expanded_work": 177226,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 133,
+      "verification_milliseconds": 0,
+      "version_space_nodes": 2220,
+      "witness_calls": 26449,
+      "witness_unavailable": 5737,
+      "wall_clock_seconds": 123.504371037
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1Q",
+      "witness_policy": "Bidirectional",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3,
+      "schedule_policy": "DeferNonLocal",
+      "deferred_work_budget": 62500,
+      "cover_policy": "CoverRefine",
+      "branch_order": "CostOrder"
+    },
+    "variant": "B1Q",
+    "base_expressibility": "Constructive Base certificate",
+    "bounded": false,
+    "group": "generated-dev",
+    "execution_elapsed_seconds": 127.1350302689998
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "dev-progression-0",
+    "mode": "Full",
+    "train_exact": true,
+    "heldout_exact": true,
+    "heldout_available": true,
+    "failure": "None",
+    "failure_evidence": "training exact; heldout is assessed only after MDL selection",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))))",
+    "typed_ast": {
+      "type": "ArrowT SceneT SceneT",
+      "expression": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))))",
+      "free_variables": [],
+      "binding_accesses": [
+        "v0",
+        "v1"
+      ],
+      "children": [
+        {
+          "type": "SceneT",
+          "expression": "mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0)))",
+          "free_variables": [
+            "v0"
+          ],
+          "binding_accesses": [
+            "v0",
+            "v1"
+          ],
+          "children": [
+            {
+              "type": "SizeT",
+              "expression": "canvasSize(v0)",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0"
+              ],
+              "children": [
+                {
+                  "type": "SceneT",
+                  "expression": "v0",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "ColorT",
+              "expression": "ColorV 0",
+              "free_variables": [],
+              "binding_accesses": [],
+              "children": []
+            },
+            {
+              "type": "ListT PlacedT",
+              "expression": "map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0",
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "ArrowT PlacedT PlacedT",
+                  "expression": "(lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL)))))",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0",
+                    "v1"
+                  ],
+                  "children": [
+                    {
+                      "type": "PlacedT",
+                      "expression": "place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))",
+                      "free_variables": [
+                        "v0",
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v0",
+                        "v1"
+                      ],
+                      "children": [
+                        {
+                          "type": "ObjectT",
+                          "expression": "objectOf(v1)",
+                          "free_variables": [
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "PlacedT",
+                              "expression": "v1",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CoordT",
+                          "expression": "coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL)))",
+                          "free_variables": [
+                            "v0",
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v0",
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "CoordT",
+                              "expression": "Anchor(v1,TL)",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "PlacedT",
+                                  "expression": "v1",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": []
+                                },
+                                {
+                                  "type": "AnchorT",
+                                  "expression": "TL",
+                                  "free_variables": [],
+                                  "binding_accesses": [],
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VecT",
+                              "expression": "coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))",
+                              "free_variables": [
+                                "v0",
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v0",
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(v1,TL)",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "v1",
+                                      "free_variables": [
+                                        "v1"
+                                      ],
+                                      "binding_accesses": [
+                                        "v1"
+                                      ],
+                                      "children": []
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "TL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(objects(v0)),TL)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(objects(v0))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "objects(v0)",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "SceneT",
+                                              "expression": "v0",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "TL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ListT PlacedT",
+                  "expression": "objects(v0)",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": [
+                    {
+                      "type": "SceneT",
+                      "expression": "v0",
+                      "free_variables": [
+                        "v0"
+                      ],
+                      "binding_accesses": [
+                        "v0"
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "portfolio_count": 1,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 32,
+      "abstraction_rounds": 1,
+      "base_symbols_activated": 32,
+      "base_symbols_rejected": 30,
+      "bidirectional_left_decompositions": 704,
+      "bottom_up_terms": 0,
+      "branch_order_scored": 1388,
+      "branch_points": 61,
+      "cost_bound_reached": 22,
+      "cost_strata": 22,
+      "counterfactual_calls": 0,
+      "cover_lazy_candidates": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 5,
+      "deduction_milliseconds": 104293,
+      "deferred_branches": 361,
+      "deferred_pass_memo_invalidations": 33,
+      "deferred_pass_work": 62524,
+      "deferred_released": 10,
+      "deferred_tasks": 10,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 4,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 26,
+      "demands_registered": 0,
+      "demands_resumed": 10,
+      "demands_still_blocked": 0,
+      "demands_suspended": 16,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 0,
+      "distinct_symbol_count": 12,
+      "effect_pruned": 126,
+      "equivalence_classes": 227,
+      "exact_verifier_calls": 1,
+      "expression_tests": 51065,
+      "extraction_milliseconds": 8191,
+      "extraction_work": 37525,
+      "failed_witness_decompositions": 669,
+      "first_solution_states": 139991,
+      "fv_bindings_eliminated": 2061,
+      "grounded_expressions": 1,
+      "induced_tsl_symbol_count": 32,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 613,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 19848,
+      "materialized_child_asts": 37525,
+      "materialized_complete_asts": 1,
+      "max_representatives_per_class": 54,
+      "memo_hits": 1230,
+      "memo_queries": 2133,
+      "memoized_learning_tasks": 890,
+      "observer_terms": 63472,
+      "portfolio_cover_work": 12500,
+      "program_ast_length": 25,
+      "propagation_steps": 15941,
+      "pruned_representatives": 72314,
+      "recursive_learning_tasks": 2133,
+      "root_learning_tasks": 1,
+      "selected_cse_nodes_saved": 0,
+      "selected_let_bindings": 0,
+      "selected_mdl_cost": 26,
+      "selected_ungrounded_literal_cost": 0,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 25,
+      "structural_deduplications": 1405,
+      "structural_prior_count": 0,
+      "structural_representatives": 1618,
+      "successful_witness_decompositions": 694,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 139991,
+      "total_expanded_work": 140023,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 132,
+      "verification_milliseconds": 0,
+      "version_space_nodes": 2228,
+      "witness_calls": 25980,
+      "witness_unavailable": 5668,
+      "wall_clock_seconds": 112.708998461
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1QS",
+      "witness_policy": "Bidirectional",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3,
+      "schedule_policy": "DeferNonLocal",
+      "deferred_work_budget": 62500,
+      "cover_policy": "CoverRefine",
+      "branch_order": "UnsolvedFirst"
+    },
+    "variant": "B1QS",
+    "base_expressibility": "Constructive Base certificate",
+    "bounded": false,
+    "group": "generated-dev",
+    "execution_elapsed_seconds": 115.98334073099977
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "dev-progression-1",
+    "mode": "Full",
+    "train_exact": true,
+    "heldout_exact": true,
+    "heldout_available": true,
+    "failure": "None",
+    "failure_evidence": "training exact; heldout is assessed only after MDL selection",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))))",
+    "typed_ast": {
+      "type": "ArrowT SceneT SceneT",
+      "expression": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))))",
+      "free_variables": [],
+      "binding_accesses": [
+        "v0",
+        "v1"
+      ],
+      "children": [
+        {
+          "type": "SceneT",
+          "expression": "mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0)))",
+          "free_variables": [
+            "v0"
+          ],
+          "binding_accesses": [
+            "v0",
+            "v1"
+          ],
+          "children": [
+            {
+              "type": "SizeT",
+              "expression": "canvasSize(v0)",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0"
+              ],
+              "children": [
+                {
+                  "type": "SceneT",
+                  "expression": "v0",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "ColorT",
+              "expression": "ColorV 0",
+              "free_variables": [],
+              "binding_accesses": [],
+              "children": []
+            },
+            {
+              "type": "ListT PlacedT",
+              "expression": "map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0",
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "ArrowT PlacedT PlacedT",
+                  "expression": "(lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL)))))",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0",
+                    "v1"
+                  ],
+                  "children": [
+                    {
+                      "type": "PlacedT",
+                      "expression": "place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))",
+                      "free_variables": [
+                        "v0",
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v0",
+                        "v1"
+                      ],
+                      "children": [
+                        {
+                          "type": "ObjectT",
+                          "expression": "objectOf(v1)",
+                          "free_variables": [
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "PlacedT",
+                              "expression": "v1",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CoordT",
+                          "expression": "coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL)))",
+                          "free_variables": [
+                            "v0",
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v0",
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "CoordT",
+                              "expression": "Anchor(v1,TL)",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "PlacedT",
+                                  "expression": "v1",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": []
+                                },
+                                {
+                                  "type": "AnchorT",
+                                  "expression": "TL",
+                                  "free_variables": [],
+                                  "binding_accesses": [],
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VecT",
+                              "expression": "coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))",
+                              "free_variables": [
+                                "v0",
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v0",
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(v1,TL)",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "v1",
+                                      "free_variables": [
+                                        "v1"
+                                      ],
+                                      "binding_accesses": [
+                                        "v1"
+                                      ],
+                                      "children": []
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "TL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(objects(v0)),TL)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(objects(v0))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "objects(v0)",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "SceneT",
+                                              "expression": "v0",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "TL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ListT PlacedT",
+                  "expression": "objects(v0)",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": [
+                    {
+                      "type": "SceneT",
+                      "expression": "v0",
+                      "free_variables": [
+                        "v0"
+                      ],
+                      "binding_accesses": [
+                        "v0"
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "portfolio_count": 1,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 32,
+      "abstraction_rounds": 1,
+      "base_symbols_activated": 33,
+      "base_symbols_rejected": 29,
+      "bidirectional_left_decompositions": 707,
+      "bottom_up_terms": 0,
+      "branch_order_scored": 0,
+      "branch_points": 68,
+      "cost_bound_reached": 21,
+      "cost_strata": 21,
+      "counterfactual_calls": 0,
+      "cover_lazy_candidates": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 5,
+      "deduction_milliseconds": 102920,
+      "deferred_branches": 310,
+      "deferred_pass_memo_invalidations": 25,
+      "deferred_pass_work": 62520,
+      "deferred_released": 7,
+      "deferred_tasks": 7,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 3,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 25,
+      "demands_registered": 0,
+      "demands_resumed": 7,
+      "demands_still_blocked": 0,
+      "demands_suspended": 18,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 0,
+      "distinct_symbol_count": 12,
+      "effect_pruned": 163,
+      "equivalence_classes": 218,
+      "exact_verifier_calls": 1,
+      "expression_tests": 47146,
+      "extraction_milliseconds": 7003,
+      "extraction_work": 37525,
+      "failed_witness_decompositions": 743,
+      "first_solution_states": 134703,
+      "fv_bindings_eliminated": 2956,
+      "grounded_expressions": 1,
+      "induced_tsl_symbol_count": 33,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 363,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 20247,
+      "materialized_child_asts": 37525,
+      "materialized_complete_asts": 1,
+      "max_representatives_per_class": 61,
+      "memo_hits": 920,
+      "memo_queries": 1852,
+      "memoized_learning_tasks": 902,
+      "observer_terms": 75477,
+      "portfolio_cover_work": 12500,
+      "program_ast_length": 25,
+      "propagation_steps": 16374,
+      "pruned_representatives": 85932,
+      "recursive_learning_tasks": 1852,
+      "root_learning_tasks": 1,
+      "selected_cse_nodes_saved": 0,
+      "selected_let_bindings": 0,
+      "selected_mdl_cost": 26,
+      "selected_ungrounded_literal_cost": 0,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 25,
+      "structural_deduplications": 1658,
+      "structural_prior_count": 0,
+      "structural_representatives": 1853,
+      "successful_witness_decompositions": 494,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 134703,
+      "total_expanded_work": 134735,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 132,
+      "verification_milliseconds": 0,
+      "version_space_nodes": 1966,
+      "witness_calls": 26631,
+      "witness_unavailable": 5894,
+      "wall_clock_seconds": 110.167964531
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1Q",
+      "witness_policy": "Bidirectional",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3,
+      "schedule_policy": "DeferNonLocal",
+      "deferred_work_budget": 62500,
+      "cover_policy": "CoverRefine",
+      "branch_order": "CostOrder"
+    },
+    "variant": "B1Q",
+    "base_expressibility": "Constructive Base certificate",
+    "bounded": false,
+    "group": "generated-dev",
+    "execution_elapsed_seconds": 114.19335512899943
+  },
+  {
+    "version": "LATIS-v0.3R.2",
+    "task": "dev-progression-1",
+    "mode": "Full",
+    "train_exact": true,
+    "heldout_exact": true,
+    "heldout_available": true,
+    "failure": "None",
+    "failure_evidence": "training exact; heldout is assessed only after MDL selection",
+    "ambiguity": {
+      "status": "NoDistinguishingInputFoundWithinBounds",
+      "selection_feedback": false
+    },
+    "program": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))))",
+    "typed_ast": {
+      "type": "ArrowT SceneT SceneT",
+      "expression": "(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))))",
+      "free_variables": [],
+      "binding_accesses": [
+        "v0",
+        "v1"
+      ],
+      "children": [
+        {
+          "type": "SceneT",
+          "expression": "mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0)))",
+          "free_variables": [
+            "v0"
+          ],
+          "binding_accesses": [
+            "v0",
+            "v1"
+          ],
+          "children": [
+            {
+              "type": "SizeT",
+              "expression": "canvasSize(v0)",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0"
+              ],
+              "children": [
+                {
+                  "type": "SceneT",
+                  "expression": "v0",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "ColorT",
+              "expression": "ColorV 0",
+              "free_variables": [],
+              "binding_accesses": [],
+              "children": []
+            },
+            {
+              "type": "ListT PlacedT",
+              "expression": "map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))),objects(v0))",
+              "free_variables": [
+                "v0"
+              ],
+              "binding_accesses": [
+                "v0",
+                "v1"
+              ],
+              "children": [
+                {
+                  "type": "ArrowT PlacedT PlacedT",
+                  "expression": "(lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL)))))",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0",
+                    "v1"
+                  ],
+                  "children": [
+                    {
+                      "type": "PlacedT",
+                      "expression": "place(objectOf(v1),coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))))",
+                      "free_variables": [
+                        "v0",
+                        "v1"
+                      ],
+                      "binding_accesses": [
+                        "v0",
+                        "v1"
+                      ],
+                      "children": [
+                        {
+                          "type": "ObjectT",
+                          "expression": "objectOf(v1)",
+                          "free_variables": [
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "PlacedT",
+                              "expression": "v1",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "type": "CoordT",
+                          "expression": "coordAdd(Anchor(v1,TL),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL)))",
+                          "free_variables": [
+                            "v0",
+                            "v1"
+                          ],
+                          "binding_accesses": [
+                            "v0",
+                            "v1"
+                          ],
+                          "children": [
+                            {
+                              "type": "CoordT",
+                              "expression": "Anchor(v1,TL)",
+                              "free_variables": [
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "PlacedT",
+                                  "expression": "v1",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": []
+                                },
+                                {
+                                  "type": "AnchorT",
+                                  "expression": "TL",
+                                  "free_variables": [],
+                                  "binding_accesses": [],
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VecT",
+                              "expression": "coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),TL))",
+                              "free_variables": [
+                                "v0",
+                                "v1"
+                              ],
+                              "binding_accesses": [
+                                "v0",
+                                "v1"
+                              ],
+                              "children": [
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(v1,TL)",
+                                  "free_variables": [
+                                    "v1"
+                                  ],
+                                  "binding_accesses": [
+                                    "v1"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "v1",
+                                      "free_variables": [
+                                        "v1"
+                                      ],
+                                      "binding_accesses": [
+                                        "v1"
+                                      ],
+                                      "children": []
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "TL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "CoordT",
+                                  "expression": "Anchor(head(objects(v0)),TL)",
+                                  "free_variables": [
+                                    "v0"
+                                  ],
+                                  "binding_accesses": [
+                                    "v0"
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PlacedT",
+                                      "expression": "head(objects(v0))",
+                                      "free_variables": [
+                                        "v0"
+                                      ],
+                                      "binding_accesses": [
+                                        "v0"
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "ListT PlacedT",
+                                          "expression": "objects(v0)",
+                                          "free_variables": [
+                                            "v0"
+                                          ],
+                                          "binding_accesses": [
+                                            "v0"
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "SceneT",
+                                              "expression": "v0",
+                                              "free_variables": [
+                                                "v0"
+                                              ],
+                                              "binding_accesses": [
+                                                "v0"
+                                              ],
+                                              "children": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AnchorT",
+                                      "expression": "TL",
+                                      "free_variables": [],
+                                      "binding_accesses": [],
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ListT PlacedT",
+                  "expression": "objects(v0)",
+                  "free_variables": [
+                    "v0"
+                  ],
+                  "binding_accesses": [
+                    "v0"
+                  ],
+                  "children": [
+                    {
+                      "type": "SceneT",
+                      "expression": "v0",
+                      "free_variables": [
+                        "v0"
+                      ],
+                      "binding_accesses": [
+                        "v0"
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "portfolio_count": 1,
+    "task_invented": [],
+    "statistics": {
+      "abstraction_discovery_work": 32,
+      "abstraction_rounds": 1,
+      "base_symbols_activated": 33,
+      "base_symbols_rejected": 29,
+      "bidirectional_left_decompositions": 707,
+      "bottom_up_terms": 0,
+      "branch_order_scored": 1237,
+      "branch_points": 66,
+      "cost_bound_reached": 21,
+      "cost_strata": 21,
+      "counterfactual_calls": 0,
+      "cover_lazy_candidates": 0,
+      "cse_nodes_saved": 0,
+      "cycle_cutoffs": 5,
+      "deduction_milliseconds": 106624,
+      "deferred_branches": 310,
+      "deferred_pass_memo_invalidations": 25,
+      "deferred_pass_work": 62550,
+      "deferred_released": 7,
+      "deferred_tasks": 7,
+      "demand_generated_terms": 0,
+      "demand_memo_invalidations": 0,
+      "demand_memo_reuse": 3,
+      "demand_new_coord_observations": 0,
+      "demand_new_int_observations": 0,
+      "demand_new_observations": 0,
+      "demand_new_vec_observations": 0,
+      "demand_rounds": 0,
+      "demand_work": 0,
+      "demands_distinct": 25,
+      "demands_registered": 0,
+      "demands_resumed": 7,
+      "demands_still_blocked": 0,
+      "demands_suspended": 18,
+      "depth_cutoffs": 0,
+      "discovery_milliseconds": 0,
+      "distinct_symbol_count": 12,
+      "effect_pruned": 163,
+      "equivalence_classes": 218,
+      "exact_verifier_calls": 1,
+      "expression_tests": 47293,
+      "extraction_milliseconds": 6961,
+      "extraction_work": 37525,
+      "failed_witness_decompositions": 737,
+      "first_solution_states": 135097,
+      "fv_bindings_eliminated": 2956,
+      "grounded_expressions": 1,
+      "induced_tsl_symbol_count": 33,
+      "invented_abstractions": 0,
+      "invention_expansion_tests": 0,
+      "invention_hits": 0,
+      "join_nodes": 359,
+      "let_cse_sharing": 0,
+      "lookahead_witness_calls": 20147,
+      "materialized_child_asts": 37525,
+      "materialized_complete_asts": 1,
+      "max_representatives_per_class": 61,
+      "memo_hits": 845,
+      "memo_queries": 1772,
+      "memoized_learning_tasks": 897,
+      "observer_terms": 75477,
+      "portfolio_cover_work": 12500,
+      "program_ast_length": 25,
+      "propagation_steps": 16250,
+      "pruned_representatives": 85932,
+      "recursive_learning_tasks": 1772,
+      "root_learning_tasks": 1,
+      "selected_cse_nodes_saved": 0,
+      "selected_let_bindings": 0,
+      "selected_mdl_cost": 26,
+      "selected_ungrounded_literal_cost": 0,
+      "semantic_deduplications": 0,
+      "shared_alias_work": 25,
+      "structural_deduplications": 1554,
+      "structural_prior_count": 0,
+      "structural_representatives": 1853,
+      "successful_witness_decompositions": 459,
+      "synthesis_work_after_discovery": 0,
+      "synthesis_work_before_discovery": 135097,
+      "total_expanded_work": 135129,
+      "ungrounded_literal_cost": 0,
+      "union_nodes": 131,
+      "verification_milliseconds": 0,
+      "version_space_nodes": 1961,
+      "witness_calls": 26499,
+      "witness_unavailable": 5867,
+      "wall_clock_seconds": 113.812925701
+    },
+    "configuration": {
+      "budget": 250000,
+      "saturation_work_budget": 25000,
+      "structural_cost_bound": 96,
+      "deductive_recursion_guard": 7,
+      "legacy_frontier": 32,
+      "grounded_prior": true,
+      "lambda_ungrounded": 8,
+      "mu_effect": 1,
+      "variant": "B1QS",
+      "witness_policy": "Bidirectional",
+      "demand_policy": "DemandOff",
+      "demand_work_budget": 25000,
+      "demand_operand_cap": 24,
+      "demand_rounds": 3,
+      "schedule_policy": "DeferNonLocal",
+      "deferred_work_budget": 62500,
+      "cover_policy": "CoverRefine",
+      "branch_order": "UnsolvedFirst"
+    },
+    "variant": "B1QS",
+    "base_expressibility": "Constructive Base certificate",
+    "bounded": false,
+    "group": "generated-dev",
+    "execution_elapsed_seconds": 117.79370898100024
+  }
+]
