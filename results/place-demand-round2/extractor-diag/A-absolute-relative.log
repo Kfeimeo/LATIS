@@ -1,0 +1,5 @@
+deduction(B1Q): root=1894 nodes=1894 joins=150 work=31136 deferred_released=4
+refine: budget=12500 attempts=12500 candidates=441 train_exact=441 heldout_correct(post-hoc)=441
+  selected cost=29 heldout=True :: (lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))),objects(v0))))
+lazy: budget=12500 attempts=12500 candidates=1529 train_exact=1529 heldout_correct(post-hoc)=1304
+  selected cost=29 heldout=True :: (lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. place(objectOf(v1),coordAdd(Anchor(head(tail(objects(v0))),Center),coordDelta(Anchor(v1,TL),Anchor(head(objects(v0)),BL))))),objects(v0))))
