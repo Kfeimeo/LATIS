@@ -32,6 +32,7 @@ usage = unlines
   ,"latis solve-v03r2 --task PATH --out results/v03r2/task --mode Full --cost 96"
   ,"place-demand switches: --witness unidirectional|bidirectional --demand off|on --demand-budget 25000 --demand-operands 24 --demand-rounds 3 (B0 = defaults; B1 = bidirectional; B2 = bidirectional + demand on)"
   ,"place-demand round 2: --schedule all|defer-nonlocal --deferred-budget 62500 --cover refine|lazy (Q = defer-nonlocal, X = lazy cover)"
+  ,"place-demand round 4: --branch-order cost|unsolved-first (S = unsolved-first soft ordering inside a Learn call)"
     ,"v03R.2 modes: Full|NoDiversityPreservation|FixedAliasCap|NoLetSharing|NoGroundedLiteralPrior|BeamSearchLegacy|NoCounterfactualDiagnosis|NoPortfolioCover"
     ,"v03R.2 bounds: --budget 250000 --cost 96 --saturation-budget 25000 --branches 32; deductive safety guard remains 7"
   ,"v03R.1 modes: Full|NoOnlineAbstraction|PostHocOnly|NoAntiUnification|NoLambdaLifting|NoNewWitnessCoverage"
@@ -95,9 +96,13 @@ main = do
         "refine" -> pure R2.CoverRefine
         "lazy" -> pure R2.CoverLazy
         _ -> die "--cover requires refine|lazy"
+      order' <- case option "--branch-order" "cost" rest of
+        "cost" -> pure R2.CostOrder
+        "unsolved-first" -> pure R2.UnsolvedFirst
+        _ -> die "--branch-order requires cost|unsolved-first"
       let conf=R2.defaultInduced {R2.workBudget=budget,R2.structuralCostBound=cost,R2.saturationWorkBudget=saturation,R2.inducedCorrespondenceBudget=branches'
             ,R2.witnessPolicy=witnessPolicy',R2.demandPolicy=demandPolicy',R2.demandWorkBudget=demandBudget,R2.demandOperandCap=demandOperands,R2.demandRounds=demandRounds'
-            ,R2.schedulePolicy=schedule',R2.deferredWorkBudget=deferredBudget,R2.coverPolicy=cover'}
+            ,R2.schedulePolicy=schedule',R2.deferredWorkBudget=deferredBudget,R2.coverPolicy=cover',R2.branchOrder=order'}
       r <- R2.inducedSearch runMode conf (training task)
       R2.saveInduced (option "--out" "results/v03r2/03560426" rest) runMode conf task r
       putStrLn ("v03R.2 "++R2.inducedFailure r++" "++show (R2.inducedMetrics r))

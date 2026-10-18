@@ -42,6 +42,13 @@ data DemandPolicy = DemandOff | DemandOn deriving (Eq,Ord,Show,Read,Enum,Bounded
 -- composition per node, then expands single-hole alternatives breadth-first.
 data SchedulePolicy = ScheduleAll | DeferNonLocal deriving (Eq,Ord,Show,Read,Enum,Bounded)
 data CoverPolicy = CoverRefine | CoverLazy deriving (Eq,Ord,Show,Read,Enum,Bounded)
+-- Round-4 switch: order of the branches explored inside one Learn call.
+-- CostOrder is the original (1 + sum of child cost estimates). UnsolvedFirst
+-- is a single interpretable soft ordering on cheap, cached signals: fewer
+-- children without a forward observation first, then more children already
+-- solved in the memo, then the original cost, then the original index. It
+-- removes nothing; each scored branch is charged one unit of work.
+data BranchOrder = CostOrder | UnsolvedFirst deriving (Eq,Ord,Show,Read,Enum,Bounded)
 data InducedConfig = InducedConfig
   { workBudget :: Int, depthBound :: Int, frontierBound :: Int
   , inducedCorrespondenceBudget :: Int, inducedEncoder :: EncoderConfig
@@ -56,11 +63,12 @@ data InducedConfig = InducedConfig
   , schedulePolicy :: SchedulePolicy
   , deferredWorkBudget :: Int -- work share of the deferred pass, inside workBudget
   , coverPolicy :: CoverPolicy
+  , branchOrder :: BranchOrder
   } deriving (Eq,Show)
 defaultInduced :: InducedConfig
-defaultInduced=InducedConfig 250000 7 32 32 defaultEncoder 96 25000 defaultLimits Unidirectional DemandOff 25000 24 3 ScheduleAll 62500 CoverRefine
+defaultInduced=InducedConfig 250000 7 32 32 defaultEncoder 96 25000 defaultLimits Unidirectional DemandOff 25000 24 3 ScheduleAll 62500 CoverRefine CostOrder
 variantLabel :: InducedConfig -> String
-variantLabel conf=base++(if schedulePolicy conf==DeferNonLocal then "Q" else "")++(if coverPolicy conf==CoverLazy then "X" else "")
+variantLabel conf=base++(if schedulePolicy conf==DeferNonLocal then "Q" else "")++(if coverPolicy conf==CoverLazy then "X" else "")++(if branchOrder conf==UnsolvedFirst then "S" else "")
   where base=case (witnessPolicy conf,demandPolicy conf) of
           (Unidirectional,DemandOff)->"B0"; (Bidirectional,DemandOff)->"B1"; (Bidirectional,DemandOn)->"B2"
           (Unidirectional,DemandOn)->"B0+demand"
@@ -109,7 +117,7 @@ data DemandRecord = DemandRecord
   } deriving (Eq,Show)
 
 metricNames :: [String]
-metricNames=words "deferred_tasks deferred_branches deferred_released deferred_pass_work deferred_pass_memo_invalidations cover_lazy_candidates demands_registered demands_distinct demands_suspended demands_resumed demands_still_blocked demand_rounds demand_generated_terms demand_new_observations demand_new_vec_observations demand_new_coord_observations demand_new_int_observations demand_work demand_memo_invalidations demand_memo_reuse bidirectional_left_decompositions root_learning_tasks recursive_learning_tasks memoized_learning_tasks memo_queries memo_hits witness_calls lookahead_witness_calls successful_witness_decompositions failed_witness_decompositions version_space_nodes union_nodes join_nodes materialized_complete_asts materialized_child_asts structural_deduplications semantic_deduplications exact_verifier_calls propagation_steps branch_points expression_tests invented_abstractions induced_tsl_symbol_count base_symbols_activated base_symbols_rejected program_ast_length distinct_symbol_count first_solution_states total_expanded_work effect_pruned fv_bindings_eliminated witness_unavailable depth_cutoffs observer_terms bottom_up_terms structural_prior_count abstraction_rounds invention_expansion_tests invention_hits abstraction_discovery_work synthesis_work_after_discovery synthesis_work_before_discovery equivalence_classes structural_representatives max_representatives_per_class pruned_representatives cost_bound_reached cost_strata let_cse_sharing cse_nodes_saved grounded_expressions ungrounded_literal_cost extraction_work cycle_cutoffs"
+metricNames=words "branch_order_scored deferred_tasks deferred_branches deferred_released deferred_pass_work deferred_pass_memo_invalidations cover_lazy_candidates demands_registered demands_distinct demands_suspended demands_resumed demands_still_blocked demand_rounds demand_generated_terms demand_new_observations demand_new_vec_observations demand_new_coord_observations demand_new_int_observations demand_work demand_memo_invalidations demand_memo_reuse bidirectional_left_decompositions root_learning_tasks recursive_learning_tasks memoized_learning_tasks memo_queries memo_hits witness_calls lookahead_witness_calls successful_witness_decompositions failed_witness_decompositions version_space_nodes union_nodes join_nodes materialized_complete_asts materialized_child_asts structural_deduplications semantic_deduplications exact_verifier_calls propagation_steps branch_points expression_tests invented_abstractions induced_tsl_symbol_count base_symbols_activated base_symbols_rejected program_ast_length distinct_symbol_count first_solution_states total_expanded_work effect_pruned fv_bindings_eliminated witness_unavailable depth_cutoffs observer_terms bottom_up_terms structural_prior_count abstraction_rounds invention_expansion_tests invention_hits abstraction_discovery_work synthesis_work_after_discovery synthesis_work_before_discovery equivalence_classes structural_representatives max_representatives_per_class pruned_representatives cost_bound_reached cost_strata let_cse_sharing cse_nodes_saved grounded_expressions ungrounded_literal_cost extraction_work cycle_cutoffs"
 
 newEngine :: InducedMode -> InducedConfig -> IO Engine
 newEngine runMode conf=Engine conf runMode <$> newIORef emptySpace <*> newIORef M.empty
@@ -351,9 +359,23 @@ learnBase engine remaining q=do
             pure [(p,d) | d<-immediate]
         let branches=concat decompositions
         when (length branches>1) (bump engine "branch_points" 1)
-        scheduled<-forM branches $ \branch@(_,d)->do
+        scheduled<-forM (zip [0::Int ..] branches) $ \(idx,branch@(_,d))->do
           costs<-forM (decompositionChildren d) (estimateCost engine)
-          pure (1+sum costs,branch)
+          if branchOrder (config engine)==CostOrder then pure ((1+sum costs,0,0,idx),branch) else do
+            -- cheap cached signals only; one unit of work per scored branch
+            work engine 1
+            bump engine "branch_order_scored" 1
+            signals<-forM (decompositionChildren d) $ \c->do
+              childPool<-poolFor engine c
+              let ys=map snd (points c)
+                  matched=any (\o->exprType (observedExpr o)==targetType c && length (observedValues o)==length ys && and (zipWith equivalent (observedValues o) ys)) childPool
+                        || (case ys of y:rest->targetType c `elem` [BoolT,IntT,ColorT,CoordT,VecT,SizeT,AnchorT,D4T] && all (equivalent y) rest; _->False)
+                  childKey=show (length invs,remaining-1,fmap S.toAscList active)++":"++canonical c
+              solved<-maybe False (/=0) . M.lookup childKey <$> readIORef (memoRef engine)
+              pure (matched,solved)
+            let unsolved=length [() | (m,sv)<-signals,not m,not sv]
+                cached=length [() | (_,sv)<-signals,sv]
+            pure ((unsolved,negate cached,1+sum costs,idx),branch)
         -- MRV: solve the most constrained child first. Operator traversal is
         -- driven solely by return types/witness results, never task classes.
         joinIds<-forM (map snd (sortOn fst scheduled)) $ \(p,d)->do
