@@ -16,3 +16,15 @@ generated-audit/audit3-scene-leftborder-0/B1: train=False held=False failure=Sea
 generated-audit/audit3-scene-leftborder-0/B1Q: train=True held=True failure=None elapsed=145.00s
 generated-audit/audit3-scene-leftborder-1/B0: train=True held=False failure=AbstractionMissing elapsed=74.39s
 generated-audit/audit3-scene-leftborder-0/B1X: train=False held=False failure=SearchFailure elapsed=257.14s
+generated-audit/audit3-scene-leftborder-0/B1QX: train=True held=True failure=None elapsed=200.08s
+generated-audit/audit3-scene-leftborder-1/B1L: train=True held=False failure=AbstractionMissing elapsed=94.50s
+generated-audit/audit3-scene-leftborder-1/B1Q: train=True held=False failure=AbstractionMissing elapsed=143.22s
+generated-audit/audit3-scene-leftborder-1/B1: train=False held=False failure=SearchFailure elapsed=296.31s
+generated-audit/audit3-sequence-chain-0/B0: train=True held=True failure=None elapsed=108.43s
+generated-audit/audit3-scene-leftborder-1/B1QX: train=True held=False failure=AbstractionMissing elapsed=195.48s
+generated-audit/audit3-scene-leftborder-1/B1X: train=False held=False failure=SearchFailure elapsed=293.27s
+generated-audit/audit3-sequence-chain-0/B1: train=True held=False failure=AbstractionMissing elapsed=128.60s
+generated-audit/audit3-sequence-chain-0/B1L: train=True held=False failure=AbstractionMissing elapsed=114.27s
+generated-audit/audit3-sequence-chain-0/B1Q: train=True held=False failure=AbstractionMissing elapsed=137.82s
+generated-audit/audit3-sequence-chain-1/B0: train=True held=False failure=AbstractionMissing elapsed=47.44s
+generated-audit/audit3-sequence-chain-0/B1X: train=True held=False failure=AbstractionMissing elapsed=127.62s
