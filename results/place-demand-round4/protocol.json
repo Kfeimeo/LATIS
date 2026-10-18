@@ -103,7 +103,7 @@
     "demand_rounds": 3,
     "timeout": 300,
     "workers": 3,
-    "generated_manifest": "data/place-demand-generated-round2/manifest.json",
+    "generated_manifest": "data/place-demand-generated-round3/manifest.json",
     "force": false
   },
   "variants": {
@@ -139,16 +139,12 @@
     "platform": "linux"
   },
   "task_sha256": {
-    "data/place-demand-generated-round2/audit2-same-relative-0/task.json": "adaa29cb2ba83545044ce8baac19753ba312fdaa9537feab1ed29e19230ce1db",
-    "data/place-demand-generated-round2/audit2-same-progression-0/task.json": "00d96768b0c9cf31f78db72ce09ec51f4cb4f884a7a5086d829d7ff2e26e5d31",
-    "data/place-demand-generated-round2/audit2-same-negated-0/task.json": "54ab4ed4012bd5c9eacb8e55458b594fc18a41e3ee51d363dbe7c059b89358e9",
-    "data/place-demand-generated-round2/audit2-same-double-0/task.json": "ad53e75bacb53ca39e57328e19c0dbfa7244090cc2829005b5b54a0e2cb3da51",
-    "data/place-demand-generated-round2/audit2-same-xalign-0/task.json": "4c9f75969889b4b0c520de0a28774589fc3913fc06ff3425f8fe7aba12489768",
-    "data/place-demand-generated-round2/audit2-nonlocal-seedshift-x-0/task.json": "9073ebe9131445341195b8eebfc7616fc797ef9025f6dd67918cb1f304b7b506",
-    "data/place-demand-generated-round2/audit2-nonlocal-seedshift-x-1/task.json": "0da5e07216606ac23957ef35234a7ff3aeef00bf0795e274bc328dd7c45d5935",
-    "data/place-demand-generated-round2/audit2-nonlocal-seedshift-y-0/task.json": "63b18fa07ecde4982c58f5a188237548cf32ac54e360e5232fe8aafd444dfd7a",
-    "data/place-demand-generated-round2/audit2-newstruct-mirror-0/task.json": "04124f745d555c98c4cd9828b8c0ccf6b4dfaa4d95d8b286c99b7945891627b9",
-    "data/place-demand-generated-round2/audit2-newstruct-mirror-1/task.json": "12b7531939bcfbf85d252538476ef8819f62489663a5411e4936e19fa9fdf9cb"
+    "data/place-demand-generated-round3/audit3-crossobj-extremes-0/task.json": "0c105ed01a27e9540fbab6e744a8a826a1ae64d380da545d0040cc00f815ec85",
+    "data/place-demand-generated-round3/audit3-crossobj-extremes-1/task.json": "ade6f2bb60157784c24b8ddf20ee926619982cdb8350f1617de4eb03e13f7706",
+    "data/place-demand-generated-round3/audit3-scene-leftborder-0/task.json": "170dc9f2142e620def56057c12ee01cc05e9e16aeea5a2d077b680a8e43602fa",
+    "data/place-demand-generated-round3/audit3-scene-leftborder-1/task.json": "7a2de14122d7b836ac00a1b64fc9217d67f368c576f8463a45eaf019f968b87f",
+    "data/place-demand-generated-round3/audit3-sequence-chain-0/task.json": "31a0f1bb65c05f7baf64cf97e336a46dc57a8f8d3ac766bf72fa4ebdcb7e4d20",
+    "data/place-demand-generated-round3/audit3-sequence-chain-1/task.json": "269fd5a28a18095ee62ed5339dd2f98553da93f80e3fd42011d30f47317b4f88"
   },
   "diagnostic_label": "PreviouslyOpenedDiagnosticSet"
 }

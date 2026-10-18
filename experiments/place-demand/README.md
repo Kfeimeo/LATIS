@@ -58,3 +58,9 @@ Round-2 audit: `python scripts/generate_place_demand_samples.py --round2` (froze
 certificates via `runghc -isrc GeneratedAudit.hs results/place-demand/generated_certificates_round2.json --round2`.
 Matrix: `python scripts/run_place_demand_round2.py` (round-1 sets) then with `--groups generated-audit --generated-manifest data/place-demand-generated-round2/manifest.json`;
 report: `python scripts/make_place_demand_round2_report.py` → `results/place-demand-round2/REPORT_ROUND2.md`.
+
+## Rounds 3–4
+
+- Round 3 (`results/place-demand-round3/REPORT_ROUND3.md`): controlled-environment mechanism test for non-local deferral (in `test/PlaceDemandMain.hs`), frozen end-to-end audit `data/place-demand-generated-round3` (cross-object / scene / sequence rules; `GeneratedAudit.hs ... --round3`), path audit (`scripts/path_audit_place_demand.py`), fixed-DAG extractor isolation (`ExtractorDiag.hs`, outputs in `results/place-demand-round2/extractor-diag`), no-deadline reruns of the QX deadline rows (`results/place-demand-round2/out-of-protocol`).
+- Round 4 (`results/place-demand-round4/REPORT_ROUND4.md`): `--branch-order cost|unsolved-first` (S), B1Q vs B1QS via `scripts/run_place_demand_round4.py`. Outcome identical on all 60 tasks; S is not adopted.
+- OOM bookkeeping: `results/place-demand-round2/oom_records.json` (original concurrent-protocol failures kept separately from solo reruns) and `commands_for_external_host.md` (commands to rerun elsewhere).
