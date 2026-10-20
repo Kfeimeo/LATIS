@@ -248,6 +248,7 @@ evalGround scene o e = case e of
         go=evalGround scene o
         nonempty []=Left "Empty grounded aggregate"
         nonempty xs=Right xs
+        rank :: Order -> Either String Int
         rank order=case [i | (i,a)<-zip [0..] (orderObjects order (objects scene)),objectId a==objectId o] of
           [i]->Right i; _->Left "Invalid canonical rank"
 runGround :: GroundExpr Coord -> Scene -> Either String Scene
