@@ -11,6 +11,9 @@ library
     Language.Types Language.ML Language.DSA Language.Effect Language.Schema Language.Witness
     Synthesis.Residual Synthesis.Dependency Synthesis.Skeleton Synthesis.Hole
     Synthesis.Search Synthesis.Verify Synthesis.MDL Synthesis.Abstraction
+    Synthesis.FeaturePipeline
+    Synthesis.Triggered
+    ARC.TriggeredEvaluate ARC.TriggeredStress
     ARC.Dataset ARC.Evaluate ARC.JointEvaluate
     Synthesis.Expression.FreeVars Synthesis.Expression.Domain
     Synthesis.Constraint.State Synthesis.Constraint.Metrics Synthesis.Constraint.Propagate
@@ -91,5 +94,21 @@ test-suite induced-r2-tests
   hs-source-dirs: test
   main-is: InducedR2Main.hs
   build-depends: base, latis, containers, directory
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite feature-pipeline-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: FeaturePipelineMain.hs
+  build-depends: base, latis, containers
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite triggered-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: TriggeredMain.hs
+  build-depends: base, latis, containers
   default-language: GHC2021
   ghc-options: -Wall -O1

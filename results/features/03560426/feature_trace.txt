@@ -1,0 +1,14 @@
+failure=bounded search unresolved
+transform_work=918
+construction_work=1665
+reused_programs=0
+unresolved=[Objects]
+SameIdentity: CanvasWidth <- CanvasWidth
+SameIdentity: CanvasHeight <- CanvasHeight
+SameIdentity: Background <- Background
+Transform phases closed (finite grammar or budget); unresolved=[Objects]
+ConstructOutput Objects: output role/constructor grammar exhausted
+CanvasWidth = Transport SameIdentity CanvasWidth Nothing
+CanvasHeight = Transport SameIdentity CanvasHeight Nothing
+Background = Transport SameIdentity Background Nothing
+prediction 0: no exact training program

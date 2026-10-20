@@ -1,5 +1,9 @@
 # LATIS — Latent Task-Induced Synthesis
 
+新增 **v0.4 — Triggered Typed Feature Saturation**：`solve-v04` 优先使用逐对象 Object/Position 特征、触发式可见性、冻结剪枝、全局共享解释与 output-wise construction；失败自动回退原 R2。运行方法与边界见 [设计说明](docs/LATIS_V04.md)，实测与消融见 [v0.4 报告](LATIS_V04_REPORT.md)。
+
+新增实验入口 **`solve-features`**：同特征匹配／同类型程序、跨特征匹配／程序复用、全输出 witness 驱动的剩余特征构造。统一限制为标量常量和跨案例语义指称。实现范围、预算及运行方法见 [三阶段算法说明](docs/FEATURE_PIPELINE.md)；旧版本入口保留用于对照。
+
 最新入口是 **v0.3R.1**：固定 typed Base，扩充 generic deductive witnesses，并让 typed anti-unification / lambda lifting 产生的 task-local inventions 回馈后续 Learn。StructuralPriorCount=0；v0.3R 和 legacy 路径保留。结果与限制见 [LATIS_V03R1_REPORT.md](LATIS_V03R1_REPORT.md)，前一轮见 [LATIS_V03R_REPORT.md](LATIS_V03R_REPORT.md)。
 
 ```powershell

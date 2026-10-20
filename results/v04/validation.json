@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-20",
+  "tests": {
+    "triggered-tests": "PASS",
+    "latis-tests": "PASS",
+    "feature-pipeline-tests": "PASS",
+    "induced-r2-tests": "PASS"
+  },
+  "matrix_rows": 70,
+  "source_sha256": {
+    "src/Synthesis/Triggered.hs": "faf2f3fb074124136ea68bb1b10a3a97442cb553a3c2a21d8801adb6f6f8356f",
+    "src/ARC/TriggeredEvaluate.hs": "a66cc2136b0d4bcda4198f2a8a4640a5ec146a75845854f9ae28632d7c54e9ac",
+    "src/ARC/TriggeredStress.hs": "5ce8c13e91aa3f9e00ba90a5dcfbee62f7af7da283822e84c0107016b00cb178",
+    "src/Synthesis/FeaturePipeline.hs": "406c81899a7ced525e330dc21eb842fc19de6454c595b6f24c0212a1a561d2e0",
+    "test/TriggeredMain.hs": "6060d5d00a3bbc61f81edef7fb0075a9c96e1fac0813eec1846f794c545093db",
+    "app/Main.hs": "f35341e7fb6ce99ea9f2fa2b5d0c046ee6a9d2d176f8dbc63db7b468f0812636",
+    "latis.cabal": "45ef61ebffa5f2873e75357e263344219f9659212f365e74173bd8e0f143407f",
+    "src/Synthesis/InducedR2/Learn.hs": "f84e776bd7ee3c306ce544d657fc509f47f5be634f5af84fdd2fc7bf34b331b4",
+    "scripts/report_v04.py": "6b7b7a75ef0298d0a3a297169fae731a0a286aec255ff149652274cadbdc029b"
+  }
+}

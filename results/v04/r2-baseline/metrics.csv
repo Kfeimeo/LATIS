@@ -1,0 +1,8 @@
+task,train_exact,heldout_exact,r2_search_work,wall_clock
+A-match-pruning,True,True,30125,147.4240958
+B-transform-reuse,True,True,32831,25.1215781
+C-depth-three,True,True,109473,53.2225225
+D-irrelevant-library,True,True,30125,134.6325988
+E-scene-construction,False,False,37,8.6815e-3
+F-intensional-ref,True,True,96245,16.7959621
+G-invalid-abstraction,False,False,37,1.12917e-2
