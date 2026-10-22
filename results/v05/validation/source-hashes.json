@@ -1,0 +1,15 @@
+{
+  "src\\Synthesis\\InducedR2\\AliasSharing.hs": "2c304956c611b2f7da1e74c8aabdb7141463d0a6d3c1274956ab48bf76f5bf30",
+  "src\\Synthesis\\InducedR2\\Counterfactual.hs": "60176a49abfb4538955c7a165ac16db760013978cbd7892871b3d14abf479e8c",
+  "src\\Synthesis\\InducedR2\\Coverage.hs": "f5f8f9f0090e300915edbaff8271c675608fac0ffded592d37506ab7647c903c",
+  "src\\Synthesis\\InducedR2\\Diversity.hs": "76bddecdaae1183795fa8fa9f76d0af34a033afff365d1fe31ecaf73528915ee",
+  "src\\Synthesis\\InducedR2\\EffectDomain.hs": "5b0550e935aaf4958b63d46964d59880095d2d1677ade7397d766a6b8c93ae98",
+  "src\\Synthesis\\InducedR2\\Learn.hs": "f84e776bd7ee3c306ce544d657fc509f47f5be634f5af84fdd2fc7bf34b331b4",
+  "src\\Synthesis\\InducedR2\\NormalForm.hs": "caabac43d13db6884d791bd6d85ba96c2e87e69d0c1b6418d2ff70a3697ed0ef",
+  "src\\Synthesis\\InducedR2\\Observers.hs": "78a8906a0640b469302eeecfdbbccb70cf5834656c684e7593736f1659dd550f",
+  "src\\Synthesis\\InducedR2\\PortfolioCover.hs": "333149b3777e1e5aae04593502fa1ce66dedfc3ba3ad6a73a2d0957ff24592a7",
+  "src\\Synthesis\\InducedR2\\Sharing.hs": "db139c204c535b9baa2670d5bc7eb7e4bfe9a54c1bccb89d220aad71c759b2d1",
+  "src\\Synthesis\\InducedR2\\VersionSpace.hs": "f6d98d4993ba1d7d29c09d2dee882ff91722f96ec72e41a884e2a6520662bc03",
+  "src\\Synthesis\\InducedR2\\Witness.hs": "b5cbe2bb6b5f6581524bcd298accb3442c5be851c9af5b96fb0546fbc4fc2734",
+  "src/ARC/InducedR2Evaluate.hs": "4d9cd04cc9ca33128ecd01c9fa2ba0a3640fab1a43f38ce086b8cb68a7852d81"
+}

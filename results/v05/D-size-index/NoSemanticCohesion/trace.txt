@@ -1,0 +1,51 @@
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+AlignmentLift (XCoord,XCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+realization: final grid exact check failed

@@ -1,0 +1,41 @@
+phase seed: 6 visible keys
+promote I_1 (RankCorrespondence) utility=10 at step 1
+AlignmentLift (Lex (Anchor TL AX) (Anchor TL AY),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 6 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AY) (Anchor TL AX),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 11 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AX) (Anchor TL AY),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 16 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AX) (Anchor TL AY),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 21 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AY) (Anchor TL AX),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 26 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AY) (Anchor TL AX),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+AlignmentFailure: seed ontology exhausted; synthesized key grammar unlocked under NeedCrossItemAlignment
+phase synthesized: 62 visible keys
+alignment budget exhausted
+reuse I_1 at step 31 saved 5 refinement expansions
+AlignmentLift (Extent AY,Lex (Anchor TL AX) (Anchor TL AY))
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class following-AY: 2 representatives, 0 counterfactual splits; selected Plus (Atom (Ext Current (Ax AY))) (Atom (Pos Previous (Ax AY)))
+proposal SequentialScalar below threshold: utility=1
+None

@@ -1,6 +1,6 @@
 # LATIS v0.4 实验报告
 
-实验日期：2026-10-20。此报告由 `scripts/report_v04.py` 从保存的结果生成。
+实验日期：2026-10-21。此报告由 `scripts/report_v04.py` 从保存的结果生成。
 
 新增前端在 A–F 六个机制任务上训练及留出均正确；G 拒绝当前语法内只能靠具体坐标记忆的候选。03560426 前端失败后，原版 R2 训练与留出均正确。
 
@@ -40,7 +40,23 @@ fallback_count=1；R2 expanded work=151856；训练、留出 exact 均为 true�
 
 70 个前端矩阵条目均满足 UntriggeredExpansionCount=0、ConcreteParameterExposureCount=0；脚本逐条检查 graph 节点、hyperedge 引用和 trigger/argument evidence。Full 中 expanded_frozen_features=0。
 
-通过测试套件：triggered-tests、latis-tests、feature-pipeline-tests、induced-r2-tests。新增测试覆盖三层 closure、共享成本全局最优、硬预算、多个结构别名、负向 capture 检查、层级 refinement 和 controlled widening。
+通过测试套件：triggered-tests、latis-tests、feature-pipeline-tests、induced-r2-tests、triggered-parallel-tests。新增测试覆盖三层 closure、共享成本全局最优、硬预算、多个结构别名、负向 capture 检查、层级 refinement 和 controlled widening。
+
+## 并行候选求值（`--workers`）
+
+`solve-v04 --workers N` 只并行化单任务 source closure 中候选表达式的跨案例求值；调度、预算、冻结、匹配和提交顺序由一个权威线程按串行规则执行。`v04-stress --workers 4 +RTS -N4` 的 70 个条目与串行矩阵在 metrics.csv、solution.json、derivation_graph.json、contexts.json、trace.txt 的全部逻辑字段上零差异；03560426 在 4 workers 下的 fallback 决策与串行相同，训练、留出 exact。
+
+| 任务 | work | workers=1 | workers=2 (-N2) | workers=4 (-N4) | w4 加速 | 求值占 closure | w4 实际求值/丢弃 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| A-match-pruning | 61 | 0.0008 s | 0.0009 s | 0.0010 s | 0.82x | 2.3% | 8/0 |
+| B-transform-reuse | 83 | 0.0007 s | 0.0009 s | 0.0010 s | 0.66x | 4.1% | 24/0 |
+| C-depth-three | 3678 | 0.0757 s | 0.0833 s | 0.0906 s | 0.84x | 5.8% | 1736/0 |
+| D-irrelevant-library | 61 | 0.0009 s | 0.0011 s | 0.0013 s | 0.74x | 1.8% | 8/0 |
+| E-scene-construction | 1109 | 0.0000 s | 0.0000 s | 0.0001 s | — | — | 0/0 |
+| F-intensional-ref | 9951 | 0.2102 s | 0.2316 s | 0.2465 s | 0.85x | 4.7% | 4680/0 |
+| G-invalid-abstraction | 9890 | 0.0000 s | 0.0001 s | 0.0001 s | — | — | 0/0 |
+
+closure 耗时为 `v04-bench` 预热 2 次、重复 9 次的中位数，不含编译与序列化；“求值占 closure”是把该次提交的全部 term 在调度器外串行重算的耗时占比。E、G 没有可求值的候选（closure 不到 0.2 ms），不计加速。候选求值只占 closure 的百分之几，其余是必须串行的权威提交路径，因此并行求值在这些任务上没有加速，C 与 F 反而变慢；推测丢弃为 0，额外实际求值为 0。详细环境、RTS 参数、内存与 GHC 9.10.3 对照见 [并行报告](LATIS_V04_PARALLEL_REPORT.md)，语义见 [设计说明](docs/LATIS_V04.md)。
 
 ## 结论与限制
 

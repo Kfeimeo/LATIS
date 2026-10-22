@@ -1,0 +1,83 @@
+phase seed: 6 visible keys
+promote I_1 (RankCorrespondence) utility=22 at step 1
+AlignmentLift (Area,Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 10 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 6 saved 5 refinement expansions
+AlignmentLift (Area,Area)
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 10 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 11 saved 5 refinement expansions
+AlignmentLift (Area,Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 10 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 16 saved 5 refinement expansions
+AlignmentLift (Area,Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 10 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 21 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AX) (Anchor TL AY),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 26 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AX) (Anchor TL AY),Area)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 31 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AY) (Anchor TL AX),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 36 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AY) (Anchor TL AX),Area)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 41 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AX) (Anchor TL AY),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 46 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AX) (Anchor TL AY),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 51 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AY) (Anchor TL AX),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 56 saved 5 refinement expansions
+AlignmentLift (Lex (Anchor TL AY) (Anchor TL AX),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+AlignmentFailure: seed ontology exhausted; synthesized key grammar unlocked under NeedCrossItemAlignment
+phase synthesized: 62 visible keys
+alignment budget exhausted
+reuse I_1 at step 61 saved 5 refinement expansions
+AlignmentLift (Area,Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 10 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 66 saved 5 refinement expansions
+AlignmentLift (Area,Desc (Extent AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 71 saved 5 refinement expansions
+AlignmentLift (Area,Desc Area)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+reuse I_1 at step 76 saved 5 refinement expansions
+AlignmentLift (Area,Area)
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 10 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class following-AY: 1 representatives, 0 counterfactual splits; selected Plus (Plus (Atom (Pos Previous (Ax AY))) (Atom (Ext Previous (Ax AY)))) (Lit 1)
+promote I_2 (SequentialScalar) utility=5 at step 81
+None

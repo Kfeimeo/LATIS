@@ -1,0 +1,10 @@
+compiler=ghc-9.10.3
+arch=x86_64
+os=mingw32
+capabilities=1
+rts_stats_enabled=True
+parallel=Parallel {workers = 1, window = 4, speculationCap = 256}
+config=Config {sourceBudget = 12000, constructBudget = 12000, selectionBudget = 100000, maxDepth = 4, noiseOperators = 0, r2Config = InducedConfig {workBudget = 250000, depthBound = 7, frontierBound = 32, inducedCorrespondenceBudget = 32, inducedEncoder = EncoderConfig {connectivity = Four, encoderBackground = 0}, structuralCostBound = 96, saturationWorkBudget = 25000, abstractionLimits = Limits {maxRounds = 2, maxInventions = 6, maxAST = 96, maxParameters = 4}}}
+mode=Full
+repeats=9
+warmup=2

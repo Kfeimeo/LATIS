@@ -1,5 +1,6 @@
 module ARC.TriggeredStress where
 import Synthesis.Triggered
+import Synthesis.Triggered.Parallel (Parallel(..),serialParallel,frontSearchIO)
 import ARC.Dataset
 import qualified ARC.TriggeredEvaluate as E
 import Latent.Grid
@@ -39,22 +40,27 @@ stressTasks=
 -- Mechanism matrix deliberately measures the front-end alone; R2 fallback
 -- is audited separately on H so its cost cannot hide ablation differences.
 runMatrix :: FilePath -> Config -> IO ()
-runMatrix out conf=do
+runMatrix=runMatrixWith serialParallel
+
+-- The matrix itself stays sequential; `par` only sets the worker count used
+-- inside each single task's source closure.
+runMatrixWith :: Parallel -> FilePath -> Config -> IO ()
+runMatrixWith par out conf=do
   createDirectoryIfMissing True out
   rows'<-forM stressTasks $ \(name,task)->forM [minBound..maxBound] $ \mode->do
     let c=conf {noiseOperators=if take 1 name=="D" then 200 else 0}
     t0<-getMonotonicTimeNSec
-    let f=frontSearch mode c (training task)
+    (f,closureTime)<-frontSearchIO par mode c (training task)
     _<-evaluate (metric "search_work" (graph f)+M.size (features (graph f))+length (show (frontProgram f))+length (frontFailure f))
     t1<-getMonotonicTimeNSec
-    let r=Result f Nothing (fromIntegral (t1-t0)/1e9) "Not run: front-end-only mechanism matrix"
+    let r=Result f Nothing (fromIntegral (t1-t0)/1e9) "Not run: front-end-only mechanism matrix" closureTime
         g=graph f
         exact=maybe False (\p->all (\t->maybe False (\y->runProgram p (testInput t)==Right y) (testOutput t)) (tests task)) (frontProgram f)
-    E.save (out </> name </> show mode) mode c task r
+    E.saveWith par (out </> name </> show mode) mode c task r
     putStrLn (name++" "++show mode++" front="++show (frontFailure f)++" work="++show (metric "search_work" g))
     pure (intercalate "," ([name,show mode,show (maybe False (const True) (frontProgram f)),show exact]
-      ++[show (metric key g) | key<-words "search_work operator_applications frozen_features transform_cache_hits construction_triggers intensional_lift_successes accepted_relations UntriggeredExpansionCount ConcreteParameterExposureCount"]++[show (elapsedSeconds r)]))
-  writeFile (out </> "metrics.csv") (unlines ("task,mode,front_exact,heldout_exact,search_work,operator_applications,frozen_features,transform_cache_hits,construction_triggers,intensional_lift_successes,accepted_relations,UntriggeredExpansionCount,ConcreteParameterExposureCount,wall_clock":concat rows'))
+      ++[show (metric key g) | key<-words "search_work operator_applications frozen_features transform_cache_hits construction_triggers intensional_lift_successes accepted_relations UntriggeredExpansionCount ConcreteParameterExposureCount"]++[show (elapsedSeconds r),show closureTime,show (workers par)]))
+  writeFile (out </> "metrics.csv") (unlines ("task,mode,front_exact,heldout_exact,search_work,operator_applications,frozen_features,transform_cache_hits,construction_triggers,intensional_lift_successes,accepted_relations,UntriggeredExpansionCount,ConcreteParameterExposureCount,wall_clock,closure_wall_clock,workers":concat rows'))
 
 runFallbackMatrix :: FilePath -> Config -> IO ()
 runFallbackMatrix out conf=do

@@ -63,11 +63,13 @@ data Layout = Layout F.Scalar F.Scalar Int deriving (Eq,Ord,Show)
 data Program = Program EncoderConfig Layout (M.Map Target Term) (M.Map String Operator) deriving (Eq,Show)
 data FrontResult = FrontResult { frontProgram :: Maybe Program, graph :: Graph
   , frontFailure :: String, optimalWithinGraph :: Bool } deriving (Eq,Show)
+-- closureSeconds times only the source-closure phase (the part that
+-- Synthesis.Triggered.Parallel can run with several workers).
 data Result = Result { front :: FrontResult, fallback :: Maybe R2.InducedResult
-  , elapsedSeconds :: Double, fallbackReason :: String }
+  , elapsedSeconds :: Double, fallbackReason :: String, closureSeconds :: Double }
 
 metricNames :: [String]
-metricNames=words "initial_features frozen_features active_frontier_size visibility_size visible_opportunities type_compatible_opportunities operator_applications deduplicated_features transform_cache_hits unique_transforms construction_triggers intensional_lift_attempts intensional_lift_successes relation_candidates accepted_relations fallback_count search_work construction_work selection_work UntriggeredExpansionCount ConcreteParameterExposureCount expanded_frozen_features"
+metricNames=words "initial_features frozen_features active_frontier_size visibility_size visible_opportunities type_compatible_opportunities operator_applications evaluation_failures deduplicated_features transform_cache_hits unique_transforms construction_triggers intensional_lift_attempts intensional_lift_successes relation_candidates accepted_relations fallback_count search_work construction_work selection_work UntriggeredExpansionCount ConcreteParameterExposureCount expanded_frozen_features"
 inc :: String -> Int -> Graph -> Graph
 inc k n g=g {counters=M.insertWith (+) k n (counters g)}
 metric :: String -> Graph -> Int
@@ -258,7 +260,7 @@ sourceClosure mode conf inputs layout start=loop 1 start
                   . inc (if used && mode/=NoTransformReuse then "transform_cache_hits" else "unique_transforms") 1 $
                     g {usedDefinitions=S.insert (opName p) (usedDefinitions g)}
             in case traverse (\s->evalTerm (definitions g) s layout M.empty term) inputs of
-              Left _->g0
+              Left _->inc "evaluation_failures" 1 g0
               Right vs->let fresh=Feature 0 (resultType p) vs term (semanticRole f)
                                   (concatMap history args++[opName p]) (sum (map featureCost args)+1) Unmatched depth
                             (i,g1)=insertFeature fresh g0
@@ -467,16 +469,35 @@ controlledWidening cap g reason ty=case reason of
   FailureTrigger _->Right (take (max 0 cap) [opName p | p<-M.elems (definitions g),take 1 (argTypes p)==[ty]])
   _->Left "only FailureTrigger can widen the registered ontology slice"
 
-frontSearch :: Mode -> Config -> [(Grid,Grid)] -> FrontResult
-frontSearch mode conf pairs
-  | null pairs=FrontResult Nothing empty "empty training specification" False
-  | mode==R2FallbackOnly=FrontResult Nothing empty "R2FallbackOnly" False
-  | any (<0) [sourceBudget conf,constructBudget conf,selectionBudget conf,maxDepth conf,noiseOperators conf]=FrontResult Nothing empty "invalid configuration" False
+-- The front-end is split into three pure stages so that the source closure
+-- (the only stage Synthesis.Triggered.Parallel may run with worker threads)
+-- can be swapped while grounding, construction and selection stay identical.
+data Prepared = Prepared { preparedInputs :: [O.Scene], preparedOutputs :: [O.Scene], preparedGraph :: Graph }
+closureLayout :: Layout
+closureLayout=Layout F.OutputWidth F.OutputHeight 0
+emptyGraph :: Graph
+emptyGraph=Graph M.empty [] [] M.empty M.empty M.empty (M.fromList [(k,0) | k<-metricNames]) [] S.empty [] M.empty
+
+frontPrepare :: Mode -> Config -> [(Grid,Grid)] -> Either FrontResult Prepared
+frontPrepare mode conf pairs
+  | null pairs=Left (FrontResult Nothing emptyGraph "empty training specification" False)
+  | mode==R2FallbackOnly=Left (FrontResult Nothing emptyGraph "R2FallbackOnly" False)
+  | any (<0) [sourceBudget conf,constructBudget conf,selectionBudget conf,maxDepth conf,noiseOperators conf]=Left (FrontResult Nothing emptyGraph "invalid configuration" False)
   | otherwise=case initial inputs outputs (operators (noiseOperators conf)) of
-      Left err->FrontResult Nothing empty ("grounding: "++err) False
-      Right g0->
-        let sourceGraph=sourceClosure mode conf inputs (Layout F.OutputWidth F.OutputHeight 0) g0
-            copyLayout=and [O.canvas a==O.canvas b && O.background a==O.background b | (a,b)<-zip inputs outputs]
+      Left err->Left (FrontResult Nothing emptyGraph ("grounding: "++err) False)
+      Right g0->Right (Prepared inputs outputs g0)
+  where
+    enc=R2.inducedEncoder (r2Config conf)
+    inputs=map (encode enc . fst) pairs; outputs=map (encode enc . snd) pairs
+
+frontSearch :: Mode -> Config -> [(Grid,Grid)] -> FrontResult
+frontSearch mode conf pairs=case frontPrepare mode conf pairs of
+  Left r->r
+  Right p->frontFinish mode conf pairs p (sourceClosure mode conf (preparedInputs p) closureLayout (preparedGraph p))
+
+frontFinish :: Mode -> Config -> [(Grid,Grid)] -> Prepared -> Graph -> FrontResult
+frontFinish mode conf pairs (Prepared inputs outputs _) sourceGraph=
+        let copyLayout=and [O.canvas a==O.canvas b && O.background a==O.background b | (a,b)<-zip inputs outputs]
             contextGraph=if copyLayout then sourceGraph else inc "construction_triggers" 1
               (note "NeedConstruct SceneT: source closure closed; infer decoder layout from all contexts" sourceGraph)
             layoutResult=if mode==NoSceneContext && not copyLayout then Left "NoSceneContext blocks layout construction" else layoutFor inputs outputs
@@ -499,19 +520,36 @@ frontSearch mode conf pairs
           in FrontResult (if exact then selected' else Nothing) final why (complete && exact)
   where
     enc=R2.inducedEncoder (r2Config conf)
-    inputs=map (encode enc . fst) pairs; outputs=map (encode enc . snd) pairs
-    empty=Graph M.empty [] [] M.empty M.empty M.empty (M.fromList [(k,0) | k<-metricNames]) [] S.empty [] M.empty
 
-solve :: Mode -> Config -> [(Grid,Grid)] -> IO Result
-solve mode conf pairs=do
+-- Forces the closure graph far enough that its construction is attributed to
+-- the closure timer rather than to the later pure stages.
+forceClosure :: Graph -> IO ()
+forceClosure g=do
+  _<-evaluate (metric "search_work" g+M.size (features g)+length (matches g)+length (edges g)+M.size (semanticStates g))
+  pure ()
+
+-- Runs the front-end with an arbitrary (possibly IO-backed) source closure,
+-- then the unchanged R2 fallback. The serial `solve` is the identity closure.
+solveClosure :: ([O.Scene] -> Layout -> Graph -> IO Graph) -> Mode -> Config -> [(Grid,Grid)] -> IO Result
+solveClosure closure mode conf pairs=do
   t0<-getMonotonicTimeNSec
-  let f=frontSearch mode conf pairs
+  (f,closureTime)<-case frontPrepare mode conf pairs of
+    Left r->pure (r,0)
+    Right p->do
+      c0<-getMonotonicTimeNSec
+      g<-closure (preparedInputs p) closureLayout (preparedGraph p)
+      forceClosure g
+      c1<-getMonotonicTimeNSec
+      pure (frontFinish mode conf pairs p g,fromIntegral (c1-c0)/1e9)
   _<-evaluate (metric "search_work" (graph f)+M.size (features (graph f))+length (show (frontProgram f))+length (frontFailure f))
   old<-case frontProgram f of Just _->pure Nothing; Nothing->Just <$> R2.inducedSearch R2.Full (r2Config conf) pairs
   t1<-getMonotonicTimeNSec
   let reason=if maybe False (const True) old then frontFailure f else "None"
       f'=f {graph=inc "fallback_count" (maybe 0 (const 1) old) (graph f)}
-  pure (Result f' old (fromIntegral (t1-t0)/1e9) reason)
+  pure (Result f' old (fromIntegral (t1-t0)/1e9) reason closureTime)
+
+solve :: Mode -> Config -> [(Grid,Grid)] -> IO Result
+solve mode conf=solveClosure (\inputs layout g->pure (sourceClosure mode conf inputs layout g)) mode conf
 
 predict :: Config -> Result -> Grid -> Either String Grid
 predict conf r x=case frontProgram (front r) of

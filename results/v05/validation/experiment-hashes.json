@@ -1,0 +1,9 @@
+{
+  "src/Synthesis/Collection.hs": "4c1a7a144f1477c65a291f07b4b537222166447fe1cb30daeb3ed2df43a803c0",
+  "src/ARC/CollectionEvaluate.hs": "e852daf914fb3a50057599b1b3fb1367a9d9b20e40923d9f4d8a89581e6bf191",
+  "test/CollectionMain.hs": "abb01f25a86c076155c1c0b696be46eed4ae2bf87b7d32182b39e1c89feaaa46",
+  "app/Main.hs": "823c769b1e946e4c041c35b55634945ca5dfead70fa116a7eacc6f85eecf5865",
+  "latis.cabal": "cbfd77de168620aabf3f70b88da48a0d08eec0ae6d329e7f5679786aeb64c7a1",
+  "data/03560426.json": "098e548544498a4db5e874fd8c8f87922c1b68ad62e7f2616edc69898c8298e1",
+  "build/latis-collection.exe": "229468d5bc4e779581f858ee5d05f5ef6d61151704511e001e1cfebc8cc4d25f"
+}

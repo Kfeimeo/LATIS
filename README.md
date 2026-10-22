@@ -1,6 +1,6 @@
 # LATIS — Latent Task-Induced Synthesis
 
-新增 **v0.4 — Triggered Typed Feature Saturation**：`solve-v04` 优先使用逐对象 Object/Position 特征、触发式可见性、冻结剪枝、全局共享解释与 output-wise construction；失败自动回退原 R2。运行方法与边界见 [设计说明](docs/LATIS_V04.md)，实测与消融见 [v0.4 报告](LATIS_V04_REPORT.md)。
+新增 **v0.4 — Triggered Typed Feature Saturation**：`solve-v04` 优先使用逐对象 Object/Position 特征、触发式可见性、冻结剪枝、全局共享解释与 output-wise construction；失败自动回退原 R2。运行方法与边界见 [设计说明](docs/LATIS_V04.md)，实测与消融见 [v0.4 报告](LATIS_V04_REPORT.md)。`--workers N`（配合 `+RTS -N<N>`）可并行求值单任务 source closure 的候选表达式，结果与串行逐位一致；语义、预算与性能实测见设计说明的并行章节和 [并行报告](LATIS_V04_PARALLEL_REPORT.md)。
 
 新增实验入口 **`solve-features`**：同特征匹配／同类型程序、跨特征匹配／程序复用、全输出 witness 驱动的剩余特征构造。统一限制为标量常量和跨案例语义指称。实现范围、预算及运行方法见 [三阶段算法说明](docs/FEATURE_PIPELINE.md)；旧版本入口保留用于对照。
 
@@ -218,6 +218,27 @@ build/latis-r2-final.exe solve-v03r2 --task data/03560426.json `
 七项消融为 Full / NoDiversityPreservation / FixedAliasCap / NoLetSharing / NoGroundedLiteralPrior / BeamSearchLegacy / NoCounterfactualDiagnosis；额外 `NoPortfolioCover` 检查完整 witness 覆盖的作用。结果与限制见 `LATIS_V03R2_REPORT.md`。每次运行保存 source/binary/input hashes、完整命令、equivalence classes、共享上下文、VSA、portfolio 和原 training/heldout 验证。
 
 首次构建 runner 默认的二进制：`ghc -O2 -isrc -iapp -XGHC2021 -outputdir build/r2-opt app/Main.hs -o build/latis-r2-final.exe`。测试脚本可用 `--cabal`、`--ghc`、`--ghc-pkg` 指定工具路径；它将 R.1 兼容测试的新结果写入 R2 实验目录，保留旧报告数据。
+
+## Dependent Collection + Explained Alignment 实验
+
+新增 `solve-collection` 与 `collection-experiment`，从携带 size index 的无序集合出发，通过带 provenance 的 OrderBy、RankAlign、AlignmentLift 与匿名抽象实现可变数量对象的解释式对齐。03560426 的新前端训练和留出均 exact；七组消融与负向测试检查枚举顺序、尺寸约束、偶然 equality 和高层具体边泄漏。原 v0.4 与 R2 路径保留。
+
+复现与限制见 [集合实验设计](docs/LATIS_COLLECTION.md)，结果见 [实验报告](LATIS_COLLECTION_REPORT.md)。
+
+```powershell
+cabal run latis -- collection-experiment --out results/v05
+python scripts/report_collection.py
+```
+
+## v0.6：Counterfactual-Preserving Online Abstraction
+
+新增 `solve-collection-v6` 与 `collection-v6-experiment`，作为 v0.5 collection front-end 的增量升级（v0.5 模块与 R2 不改动）。三项机制：训练上 denotation 相同的候选保留为 semantic class 内的多个 representative，并用带合法性证明的 counterfactual context 检测它们是否真的不同；alignment key 不再限死为六个手写键，而是在 AlignmentFailure 触发后由受限 KeyExpr 语法合成；语义内聚的子图在搜索过程中被 anti-unify、按 utility 在线 promotion 并在同一次 solve 中复用。附带 dependent size index 反例与 11 组消融。
+
+复现与限制见 [v0.6 设计](docs/LATIS_V06.md)，结果见 [实验报告](LATIS_V06_REPORT.md)。
+
+```powershell
+./scripts/run_collection_v6.ps1
+```
 
 ## 案例与程序可视化
 

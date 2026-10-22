@@ -1,0 +1,5 @@
+phase seed: 6 visible keys
+AlignmentLift (Anchor TL AX,Anchor TL AX)
+class shared-AX: 2 representatives, 1 counterfactual splits; selected Plus (Atom (Pos Current (Ax AX))) (Atom CountShapes)
+class shared-AY: 9 representatives, 1 counterfactual splits; selected Atom (Pos Current (Ax AY))
+None

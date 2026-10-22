@@ -1,0 +1,26 @@
+[46 of 47] Compiling Main             ( test\InducedR2Main.hs, build\collection\Main.o ) [Source file changed]
+test\InducedR2Main.hs:88:111: warning: [GHC-63394] [-Wx-partial]
+    In the use of ��head��
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use pattern matching, 'Data.List.uncons' or 'Data.Maybe.listToMaybe' instead. Consider refactoring to use "Data.List.NonEmpty"."
+   |
+88 |   assert "counterfactual uses the ablation's hypothesis ranking" (case withoutPrior of Just a->hypothesisA a==head (representatives False [identity,fixed]); _->False)
+   |                                                                                                               ^^^^
+
+test\InducedR2Main.hs:109:83: warning: [GHC-63394] [-Wx-partial]
+    In the use of ��head��
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use pattern matching, 'Data.List.uncons' or 'Data.Maybe.listToMaybe' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+109 |   assert "parameterized prefix comes from Learn" (length learned==2 && not (null (head learned)))
+    |                                                                                   ^^^^
+
+test\InducedR2Main.hs:126:148: warning: [GHC-63394] [-Wx-partial]
+    In the use of ��head��
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use pattern matching, 'Data.List.uncons' or 'Data.Maybe.listToMaybe' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+126 |   writeFile "results/v03r2/unit_evidence.json" (objectJSON [("all_checks_passed","true"),("learned_prefix",arrayJSON (map (jsonString . exprText) (head learned)))
+    |                                                                                                                                                    ^^^^
+
+[47 of 47] Linking build/collection-InducedR2-tests.exe

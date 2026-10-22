@@ -1,0 +1,11 @@
+phase seed: 6 visible keys
+promote I_1 (RankCorrespondence) utility=32 at step 1
+AlignmentLift (Anchor TL AX,Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class first-AX: 1 representatives, 0 counterfactual splits; selected Atom (Pos Current (Ax AX))
+class following-AX: 1 representatives, 0 counterfactual splits; selected Plus (Plus (Atom (Pos Previous (Ax AX))) (Atom (Ext Previous (Ax AX)))) (Lit (-1))
+promote I_2 (SequentialScalar) utility=13 at step 5
+class first-AY: 1 representatives, 0 counterfactual splits; selected Atom (Pos Current (Ax AX))
+reuse I_2 at step 8 saved 14 refinement expansions
+class following-AY: 1 representatives, 0 counterfactual splits; selected Call "I_2" [ArgAxis AY,ArgInt (-1)]
+None

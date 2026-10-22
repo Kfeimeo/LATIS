@@ -1,0 +1,51 @@
+PASS set permutation and IDs irrelevant
+PASS Count ignores duplicate placement
+PASS dependent object equality rejects different size
+PASS NoDependentIndex actually removes unification
+PASS polymorphic observer accepts mixed sizes
+PASS ordering is unavailable without an ordering trigger
+PASS invisible key rejected
+PASS wrong trigger rejected
+PASS tie rejected without hidden runtime tiebreaker
+PASS Fin cardinality bounds
+PASS rank only on ordered representation
+PASS cardinality mismatch rejects total alignment
+PASS equal object does not justify cross-origin edge
+PASS witness authorizes only its own pair
+PASS AlignmentLift handles variable cardinality
+PASS AlignmentLift rejects per-case switching
+PASS all enumeration permutations preserve semantic order
+PASS A-variable-count heldout unseen cardinality
+PASS A-variable-count no concrete high-level edges
+PASS A-variable-count triggered expansion invariant
+PASS A-variable-count executable cohesive abstraction
+PASS A-variable-count abstraction decomposition preserves output
+PASS A-variable-count frozen features excluded
+PASS B-runtime-trap heldout unseen cardinality
+PASS B-runtime-trap no concrete high-level edges
+PASS B-runtime-trap triggered expansion invariant
+PASS B-runtime-trap executable cohesive abstraction
+PASS B-runtime-trap abstraction decomposition preserves output
+PASS B-runtime-trap frozen features excluded
+PASS C-accidental-equality heldout unseen cardinality
+PASS C-accidental-equality no concrete high-level edges
+PASS C-accidental-equality triggered expansion invariant
+PASS C-accidental-equality executable cohesive abstraction
+PASS C-accidental-equality abstraction decomposition preserves output
+PASS C-accidental-equality frozen features excluded
+PASS runtime indexing training fits
+PASS runtime indexing heldout fails
+PASS explained alignment reduces equality attempts
+PASS unexplained equality ablation admits accidental matches
+PASS eager abstraction removes concrete high edges
+PASS size mismatch is guarded before equality
+PASS budget zero is enforced
+PASS empty examples rejected
+PASS 03560426 passes variable-cardinality grounding
+PASS 03560426 explained alignment lifted
+PASS 03560426 learned sequence executes on all training grids
+PASS 03560426 heldout exact
+PASS 03560426 no concrete edge leak
+PASS 03560426 geometry completion triggered
+PASS 03560426 inline refinement equivalent
+All collection tests passed.

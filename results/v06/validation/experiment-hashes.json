@@ -1,0 +1,15 @@
+{
+  "src/Synthesis/Collection/Indexed.hs": "193cf8843224d61961357b7ca0124c67954e16973eaac1911e9b69e18555891f",
+  "src/Synthesis/Collection/Counterfactual.hs": "11a01c79712b53bf2c0962c979fa79fbcd34e62f4c040f8e01146632379011b0",
+  "src/Synthesis/Collection/Online.hs": "6e458337e71c36c79354628c81fbd31bedf2c945c8931e69558f8e910bb8ade2",
+  "src/Synthesis/Collection/Front.hs": "c035c72caf51e681cdad4b02b2f3e3a5711b141f48c3233cc99a9bdafbf4a128",
+  "src/ARC/CollectionV6Evaluate.hs": "fe7453a0f31053f80d526263ff7bc8313186067944157fe8cdc3414bd69d512f",
+  "test/CollectionV6Main.hs": "ac9f1dd3ff81ddaba631e82039c3387fde91b2f5facfc6f123b4c01157db17c8",
+  "app/Main.hs": "a981377165a1e5674cb21a4914c819cfa0c39bc99a44bacb3a25040715558f56",
+  "latis.cabal": "e02e7d21ab1737b0c3c05358d8b9eaa174e739e6e775d243b6b1767b7fe6b896",
+  "data/03560426.json": "098e548544498a4db5e874fd8c8f87922c1b68ad62e7f2616edc69898c8298e1",
+  "build/latis-collection-v6.exe": "75a1041df882a6abfd127db13666e4ad70ad4f3455e263158c7372cd8126c735",
+  "src/Synthesis/Collection.hs": "4c1a7a144f1477c65a291f07b4b537222166447fe1cb30daeb3ed2df43a803c0",
+  "src/ARC/CollectionEvaluate.hs": "e852daf914fb3a50057599b1b3fb1367a9d9b20e40923d9f4d8a89581e6bf191",
+  "src/Synthesis/Triggered.hs": "6baba20d5dfa7db37362a14e7162d48ba6b2fea049244d94e6d0780e37121161"
+}

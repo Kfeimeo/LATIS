@@ -13,6 +13,10 @@ library
     Synthesis.Search Synthesis.Verify Synthesis.MDL Synthesis.Abstraction
     Synthesis.FeaturePipeline
     Synthesis.Triggered
+    Synthesis.Collection ARC.CollectionEvaluate
+    Synthesis.Collection.Indexed Synthesis.Collection.Counterfactual Synthesis.Collection.Online
+    Synthesis.Collection.Front ARC.CollectionV6Evaluate
+    Synthesis.Triggered.Parallel
     ARC.TriggeredEvaluate ARC.TriggeredStress
     ARC.Dataset ARC.Evaluate ARC.JointEvaluate
     Synthesis.Expression.FreeVars Synthesis.Expression.Domain
@@ -38,7 +42,7 @@ library
     Synthesis.InducedR2.EffectDomain
     Synthesis.InducedR2.Witness Synthesis.InducedR2.Coverage Synthesis.InducedR2.VersionSpace
     Synthesis.InducedR2.Learn Synthesis.InducedR2.Counterfactual ARC.InducedR2Evaluate
-  build-depends: base >=4.18 && <5, containers, time, directory, filepath, deepseq
+  build-depends: base >=4.18 && <5, containers, time, directory, filepath, deepseq, stm
   default-language: GHC2021
   ghc-options: -Wall -O2
 
@@ -47,7 +51,9 @@ executable latis
   main-is: Main.hs
   build-depends: base, latis, containers, time, directory, filepath
   default-language: GHC2021
-  ghc-options: -Wall -O2 -rtsopts
+  -- -threaded is required for --workers N to run on several OS threads;
+  -- the capability count is still chosen at run time with +RTS -N<k>.
+  ghc-options: -Wall -O2 -threaded -rtsopts
 
 test-suite latis-tests
   type: exitcode-stdio-1.0
@@ -109,6 +115,30 @@ test-suite triggered-tests
   type: exitcode-stdio-1.0
   hs-source-dirs: test
   main-is: TriggeredMain.hs
+  build-depends: base, latis, containers
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite triggered-parallel-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: TriggeredParallelMain.hs
+  build-depends: base, latis, containers
+  default-language: GHC2021
+  ghc-options: -Wall -O1 -threaded -rtsopts
+
+test-suite collection-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: CollectionMain.hs
+  build-depends: base, latis, containers
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite collection-v6-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: CollectionV6Main.hs
   build-depends: base, latis, containers
   default-language: GHC2021
   ghc-options: -Wall -O1

@@ -15,6 +15,18 @@ import qualified Synthesis.FeaturePipeline as FP
 import qualified Synthesis.Triggered as V4
 import qualified ARC.TriggeredEvaluate as V4
 import qualified ARC.TriggeredStress as V4
+import qualified Synthesis.Triggered.Parallel as V4P
+import qualified Synthesis.Collection as V5
+import qualified ARC.CollectionEvaluate as V5
+import qualified Synthesis.Collection.Front as V6
+import qualified ARC.CollectionV6Evaluate as V6
+import Control.Concurrent (getNumCapabilities)
+import Control.Exception (evaluate)
+import GHC.Clock (getMonotonicTimeNSec)
+import GHC.Stats (getRTSStatsEnabled,getRTSStats,RTSStats(..))
+import System.Info (compilerName,fullCompilerVersion,arch,os)
+import Data.Version (showVersion)
+import System.IO (hPutStrLn,stderr)
 import qualified Data.Map.Strict as Map
 import Data.List (intercalate)
 import System.Directory (createDirectoryIfMissing)
@@ -33,8 +45,14 @@ import System.IO (hSetBuffering,stdout,BufferMode(LineBuffering))
 usage :: String
 usage = unlines
   ["LATIS v0.2A (Haskell, symbolic; v0.1 baseline preserved)"
+  ,"latis solve-collection --task data/03560426.json --out results/collection/task --mode Full"
+  ,"latis collection-experiment --out results/collection (seven ablations; actual unchanged R2 fallback)"
+  ,"latis solve-collection-v6 --task data/03560426.json --out results/v06/task --mode Full"
+  ,"latis collection-v6-experiment --out results/v06 (eleven ablations incl. counterfactual/online abstraction; actual unchanged R2 fallback)"
   ,"latis solve-v04 --task PATH --out results/v04/task --mode Full --feature-budget 12000 --construction-budget 12000 --feature-depth 4 --budget 250000"
-  ,"latis v04-stress --out results/v04/stress (all ten front-end ablations; R2 fallback audited separately)"
+  ,"         --workers 1 [--window 4*workers] [--speculation-cap 256]   (source-closure candidate evaluation; pair --workers N with +RTS -N<N> -RTS)"
+  ,"latis v04-stress --out results/v04/stress [--workers N] (all ten front-end ablations, matrix sequential; R2 fallback audited separately)"
+  ,"latis v04-bench --out results/v04-parallel/bench --workers N [--repeats 7] [--warmup 2] [--mode Full] [--tasks A-match-pruning,...] [--task PATH]"
   ,"latis v04-r2-stress --out results/v04/r2-baseline (actual R2FallbackOnly comparison on A-G)"
   ,"latis solve-features --task PATH --out results/features/task --budget 20000 --construction-budget 20000 --composition-depth 2"
   ,"latis solve-v03r --task PATH --out results/v03r/task"
@@ -68,26 +86,128 @@ number :: String -> Int -> [String] -> IO Int
 number key fallback args = case readMaybe (option key (show fallback) args) of
   Just n | n > 0 -> pure n
   _ -> die (key++" requires a positive integer")
+count :: String -> Int -> [String] -> IO Int
+count key fallback args = case readMaybe (option key (show fallback) args) of
+  Just n | n >= 0 -> pure n
+  _ -> die (key++" requires a non-negative integer")
+splitOn :: Char -> String -> [String]
+splitOn c s = case break (==c) s of (a,[]) -> [a]; (a,_:b) -> a:splitOn c b
+-- Worker threads are not RTS capabilities: without +RTS -N<k> the workers
+-- share one OS thread and only interleave, so the pairing is reported.
+parallelOptions :: [String] -> IO V4P.Parallel
+parallelOptions rest = do
+  workers' <- number "--workers" 1 rest
+  window' <- number "--window" (4*workers') rest
+  cap <- count "--speculation-cap" 256 rest
+  par <- either die pure (V4P.validateParallel (V4P.Parallel workers' window' cap))
+  caps <- getNumCapabilities
+  if workers' > 1 && caps < workers'
+    then hPutStrLn stderr ("warning: --workers "++show workers'++" but the RTS has "++show caps++" capabilit"++(if caps==1 then "y" else "ies")
+      ++"; run with +RTS -N"++show workers'++" -RTS for actual parallel evaluation")
+    else hPutStrLn stderr ("workers="++show workers'++" capabilities="++show caps++" window="++show window'++" speculation_cap="++show cap)
+  pure par
+v04Config :: [String] -> IO V4.Config
+v04Config rest = do
+  budget <- number "--budget" 250000 rest
+  featureBudget <- number "--feature-budget" 12000 rest
+  construction <- number "--construction-budget" 12000 rest
+  selection <- number "--selection-budget" 100000 rest
+  depth <- number "--feature-depth" 4 rest
+  pure V4.defaultConfig {V4.sourceBudget=featureBudget,V4.constructBudget=construction,V4.selectionBudget=selection
+    ,V4.maxDepth=depth,V4.r2Config=R2.defaultInduced {R2.workBudget=budget}}
 main :: IO ()
 main = do
   hSetBuffering stdout LineBuffering
   args <- getArgs
   case args of
     [] -> putStr usage
+    "solve-collection":rest -> do
+      mode <- maybe (die "Invalid collection --mode") pure (readMaybe (option "--mode" "Full" rest))
+      legacy <- v04Config rest
+      task <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+      _ <- V5.runTask (option "--out" "results/collection/task" rest) mode V5.defaultConfig {V5.legacyConfig=legacy} task
+      pure ()
+    "collection-experiment":rest -> do
+      legacy <- v04Config rest
+      mechanismBudget <- number "--mechanism-budget" 25000 rest
+      task <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+      V5.runMatrix (option "--out" "results/collection" rest) mechanismBudget V5.defaultConfig {V5.legacyConfig=legacy} task
+    "solve-collection-v6":rest -> do
+      mode <- maybe (die "Invalid collection-v6 --mode") pure (readMaybe (option "--mode" "Full" rest))
+      legacy <- v04Config rest
+      task <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+      _ <- V6.runTask (option "--out" "results/v06/task" rest) mode V6.defaultConfig {V6.legacyConfig=legacy} task
+      pure ()
+    "collection-v6-experiment":rest -> do
+      legacy <- v04Config rest
+      mechanismBudget <- number "--mechanism-budget" 25000 rest
+      task <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+      V6.runMatrix (option "--out" "results/v06" rest) mechanismBudget V6.defaultConfig {V6.legacyConfig=legacy} task
     "solve-v04":rest -> do
       runMode <- maybe (die "Invalid v04 --mode") pure (readMaybe (option "--mode" "Full" rest))
-      budget <- number "--budget" 250000 rest
-      featureBudget <- number "--feature-budget" 12000 rest
-      construction <- number "--construction-budget" 12000 rest
-      selection <- number "--selection-budget" 100000 rest
-      depth <- number "--feature-depth" 4 rest
+      conf <- v04Config rest
+      par <- parallelOptions rest
       task <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
-      let conf=V4.defaultConfig {V4.sourceBudget=featureBudget,V4.constructBudget=construction,V4.selectionBudget=selection
-            ,V4.maxDepth=depth,V4.r2Config=R2.defaultInduced {R2.workBudget=budget}}
-      r <- V4.solve runMode conf (training task)
-      V4.save (option "--out" "results/v04/task" rest) runMode conf task r
-      putStrLn ("v0.4 front="++V4.frontFailure (V4.front r)++"; fallback="++V4.fallbackReason r)
-    "v04-stress":rest -> V4.runMatrix (option "--out" "results/v04/stress" rest) V4.defaultConfig
+      r <- V4P.solveWith par runMode conf (training task)
+      V4.saveWith par (option "--out" "results/v04/task" rest) runMode conf task r
+      putStrLn ("v0.4 front="++V4.frontFailure (V4.front r)++"; fallback="++V4.fallbackReason r
+        ++"; closure_seconds="++show (V4.closureSeconds r)++"; actual_evaluations="++show (V4.metric "parallel_actual_evaluations" (V4.graph (V4.front r))))
+    "v04-stress":rest -> do
+      par <- parallelOptions rest
+      V4.runMatrixWith par (option "--out" "results/v04/stress" rest) V4.defaultConfig
+    "v04-bench":rest -> do
+      runMode <- maybe (die "Invalid v04 --mode") pure (readMaybe (option "--mode" "Full" rest))
+      conf <- v04Config rest
+      par <- parallelOptions rest
+      repeats <- number "--repeats" 7 rest
+      warmup <- count "--warmup" 2 rest
+      let out=option "--out" "results/v04-parallel/bench" rest
+          wanted=case option "--tasks" "" rest of ""->map fst V4.stressTasks; s'->splitOn ',' s'
+      extra <- case option "--task" "" rest of ""->pure []; path->(\t->[(taskId t,t)]) <$> (loadTask path >>= either die pure)
+      let tasks'=[(n,t) | (n,t)<-V4.stressTasks,n `elem` wanted]++extra
+      caps <- getNumCapabilities
+      statsOn <- getRTSStatsEnabled
+      createDirectoryIfMissing True out
+      let header="task,mode,workers,window,speculation_cap,capabilities,repeat,closure_seconds,front_seconds,eval_only_seconds,eval_terms,search_work,operator_applications,actual_evaluations,consumed,inline,discarded,discarded_evaluated,discarded_cancelled,cap_refusals,max_live_bytes,max_mem_in_use_bytes,mutator_cpu_ns,gc_cpu_ns"
+      rows <- fmap concat $ mapM (\(name,task)->do
+        let c=conf {V4.noiseOperators=if take 1 name=="D" then 200 else 0}
+            one i=do
+              s0 <- if statsOn then Just <$> getRTSStats else pure Nothing
+              t0 <- getMonotonicTimeNSec
+              (f,closureTime) <- V4P.frontSearchIO par runMode c (training task)
+              _ <- evaluate (V4.metric "search_work" (V4.graph f)+length (show (V4.frontProgram f))+length (V4.frontFailure f))
+              t1 <- getMonotonicTimeNSec
+              s1 <- if statsOn then Just <$> getRTSStats else pure Nothing
+              -- Evaluation-only profile: re-evaluate every committed closure
+              -- term serially, outside the scheduler, to bound the fraction
+              -- of closure time that worker threads can absorb at all.
+              let g=V4.graph f
+                  m k=show (V4.metric k g)
+                  defs=V4.definitions g
+                  scenes=map (encode (R2.inducedEncoder (V4.r2Config c)) . fst) (training task)
+                  terms=[V4.expression ft | ft<-Map.elems (V4.features g),V4.featureDepth ft>0,V4.featureDepth ft<=V4.maxDepth c]
+              e0 <- getMonotonicTimeNSec
+              mapM_ (\t->evaluate (V4P.forceCases (traverse (\sc->V4.evalTerm defs sc V4.closureLayout Map.empty t) scenes))) terms
+              e1 <- getMonotonicTimeNSec
+              let mem f' = maybe "" (show . f') s1
+                  delta f' = case (s0,s1) of (Just a,Just b)->show (f' b-f' a); _->""
+              pure (closureTime,intercalate "," ([name,show runMode,show (V4P.workers par),show (V4P.window par),show (V4P.speculationCap par),show caps,show i
+                ,show closureTime,show (fromIntegral (t1-t0)/1e9 :: Double),show (fromIntegral (e1-e0)/1e9 :: Double),show (length terms),m "search_work",m "operator_applications"
+                ,if V4P.workers par<=1 then m "operator_applications" else m "parallel_actual_evaluations"
+                ,m "parallel_consumed",m "parallel_inline_evaluations",m "parallel_discarded",m "parallel_discarded_evaluated",m "parallel_discarded_cancelled",m "parallel_cap_refusals"
+                ,mem max_live_bytes,mem max_mem_in_use_bytes,delta mutator_cpu_ns,delta gc_cpu_ns]))
+        mapM_ (\i->one (negate i)) [1..warmup]
+        rs <- mapM one [1..repeats]
+        let times=sort (map fst rs)
+            median=times !! (length times `div` 2)
+        putStrLn (name++" workers="++show (V4P.workers par)++" median_closure_seconds="++show median++" min="++show (minimum times)++" max="++show (maximum times))
+        pure (map snd rs)) tasks'
+      let file=out </> ("bench-workers"++show (V4P.workers par)++"-caps"++show caps++".csv")
+      writeFile file (unlines (header:rows))
+      writeFile (out </> ("env-workers"++show (V4P.workers par)++"-caps"++show caps++".txt")) (unlines
+        ["compiler="++compilerName++"-"++showVersion fullCompilerVersion,"arch="++arch,"os="++os,"capabilities="++show caps
+        ,"rts_stats_enabled="++show statsOn,"parallel="++show par,"config="++show conf,"mode="++show runMode,"repeats="++show repeats,"warmup="++show warmup])
+      putStrLn ("wrote "++file)
     "v04-r2-stress":rest -> V4.runFallbackMatrix (option "--out" "results/v04/r2-baseline" rest) V4.defaultConfig
     "solve-features":rest -> do
       budget <- number "--budget" 20000 rest

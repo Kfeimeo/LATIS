@@ -1,0 +1,6 @@
+phase seed: 6 visible keys
+AlignmentLift (Anchor TL AX,Anchor TL AX)
+class shared-AX: 7 representatives, 2 counterfactual splits; selected Plus (Atom (Pos Current (Ax AX))) (Atom (Ext Current (Ax AX)))
+class shared-AY: 5 representatives, 0 counterfactual splits; selected Atom (Pos Current (Ax AY))
+post-hoc wrap I_1 utility=6
+None

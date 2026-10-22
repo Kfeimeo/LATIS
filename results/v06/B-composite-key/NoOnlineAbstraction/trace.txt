@@ -1,0 +1,33 @@
+phase seed: 6 visible keys
+AlignmentLift (Lex (Anchor TL AX) (Anchor TL AY),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AY))
+AlignmentLift (Lex (Anchor TL AY) (Anchor TL AX),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AY))
+AlignmentLift (Lex (Anchor TL AX) (Anchor TL AY),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AY))
+AlignmentLift (Lex (Anchor TL AX) (Anchor TL AY),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AY))
+AlignmentLift (Lex (Anchor TL AY) (Anchor TL AX),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AY))
+AlignmentLift (Lex (Anchor TL AY) (Anchor TL AX),Lex (Anchor TL AX) (Anchor TL AY))
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AY))
+AlignmentFailure: seed ontology exhausted; synthesized key grammar unlocked under NeedCrossItemAlignment
+phase synthesized: 62 visible keys
+alignment budget exhausted
+AlignmentLift (Extent AY,Lex (Anchor TL AX) (Anchor TL AY))
+class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
+class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AY))
+class following-AY: 2 representatives, 0 counterfactual splits; selected Plus (Atom (Ext Current (Ax AY))) (Atom (Pos Previous (Ax AY)))
+None

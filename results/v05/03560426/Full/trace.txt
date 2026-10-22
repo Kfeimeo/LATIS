@@ -1,0 +1,3 @@
+AlignmentLift (XCoord,YCoord)
+NeedConstruct: preserved indexed geometry; defer validation to full scene
+None

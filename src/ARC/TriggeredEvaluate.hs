@@ -1,5 +1,6 @@
 module ARC.TriggeredEvaluate where
 import Synthesis.Triggered
+import Synthesis.Triggered.Parallel (Parallel(..),serialParallel)
 import qualified Synthesis.InducedR2.Learn as R2
 import qualified ARC.InducedR2Evaluate as R2
 import ARC.Dataset
@@ -38,7 +39,12 @@ graphJSON g=objectJSON
     ,("dependencies",strings (dependencies r))] | r<-relations g])]
 
 save :: FilePath -> Mode -> Config -> Task -> Result -> IO ()
-save dir mode conf task result=do
+save=saveWith serialParallel
+
+-- `parallel` records the physical execution settings; `closure_wall_clock`
+-- times only the source closure. Neither is part of the logical metrics.
+saveWith :: Parallel -> FilePath -> Mode -> Config -> Task -> Result -> IO ()
+saveWith par dir mode conf task result=do
   createDirectoryIfMissing True dir
   let f=front result; g=graph f
       train=all (\(x,y)->predict conf result x==Right y) (training task)
@@ -47,11 +53,13 @@ save dir mode conf task result=do
       predictions=[either (const "null") jsonGrid (predict conf result (testInput t)) | t<-tests task]
       depthMap prefix=objectJSON [(depth,show n) | (k,n)<-M.toAscList (counters g),Just depth<-[stripPrefix prefix k]]
       stats=objectJSON ([(k,show n) | (k,n)<-M.toAscList (counters g)]++[("visibility_ratio",show ratio),("wall_clock",show (elapsedSeconds result))
+        ,("closure_wall_clock",show (closureSeconds result))
         ,("generated_features_by_depth",depthMap "generated_features_by_depth_"),("matched_features_by_depth",depthMap "matched_features_by_depth_")])
       dataJSON=objectJSON [("version",jsonString "LATIS-v0.4"),("mode",jsonString (show mode)),("task",jsonString (taskId task))
         ,("front_success",boolJSON (maybe False (const True) (frontProgram f))),("train_exact",boolJSON train),("heldout_exact",boolJSON held)
         ,("front_failure",jsonString (frontFailure f)),("fallback_reason",jsonString (fallbackReason result))
-        ,("optimal_within_generated_graph",boolJSON (optimalWithinGraph f)),("configuration",jsonString (show conf)),("metrics",stats)
+        ,("optimal_within_generated_graph",boolJSON (optimalWithinGraph f)),("configuration",jsonString (show conf))
+        ,("parallel",objectJSON [("workers",show (workers par)),("window",show (window par)),("speculation_cap",show (speculationCap par))]),("metrics",stats)
         ,("program",maybe "null" (jsonString . show) (frontProgram f)),("predictions",arrayJSON predictions)
         ,("r2_search_work",show (maybe 0 (M.findWithDefault 0 "total_expanded_work" . R2.inducedMetrics) (fallback result)))]
   writeFile (dir </> "solution.json") (dataJSON++"\n")
