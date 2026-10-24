@@ -1,3 +1,0 @@
-runtime enumeration is not an alignment explanation
-DirectSetIndexing: raw encoder enumeration; deliberate unsafe ablation
-None

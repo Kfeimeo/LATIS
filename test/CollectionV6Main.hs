@@ -52,7 +52,7 @@ main=do
   assert "parametrize abstracts axis and literal" (length params==2 && instantiate args pbody==chain)
   assert "axis argument re-instantiates on the other axis" (instantiate [ArgAxis AY,ArgInt 1] pbody==Plus (Plus (Atom (Pos Previous (Ax AY))) (Atom (Ext Previous (Ax AY)))) (Lit 1))
   let lib=M.singleton "I_1" (AbsDef pbody (map snd params))
-      ctx=Ctx (Dimensions 10 10) set (placedFromObject (obj 4 4 1 1 2)) (Just (placedFromObject (obj 1 1 3 2 7))) True
+      ctx=Ctx (Dimensions 10 10) set (placedFromObject (obj 4 4 1 1 2)) (Just (placedFromObject (obj 1 1 3 2 7))) True (Dimensions 10 10)
   assert "Call evaluates through the library" (evalScalar lib ctx (Call "I_1" [ArgAxis AY,ArgInt 1])==Right (1+2+1))
   assert "unbound parameter is an error outside a call" (isLeft (evalScalar lib ctx pbody))
   assert "Previous unavailable at first rank" (isLeft (evalScalar lib ctx {ctxPrevious=Nothing} chain))

@@ -1,3 +1,0 @@
-Manual build used for this matrix (same flags as scripts/run_collection_v6.ps1, warnings suppressed with -w):
-ghc --make -O1 -w -XGHC2021 -threaded -rtsopts -isrc -tmpdir build/collection-v6-tmp -outputdir build/collection-v6 app/Main.hs -o build/latis-collection-v6.exe
-Matrix: ./build/latis-collection-v6.exe collection-v6-experiment --out results/v06 --mechanism-budget 25000

@@ -1,8 +1,0 @@
-﻿[1 of 8] Compiling Latent.Grid      ( src\Latent\Grid.hs, build\collection-v6-FeaturePipeline\Latent\Grid.o )
-[2 of 8] Compiling Latent.Object    ( src\Latent\Object.hs, build\collection-v6-FeaturePipeline\Latent\Object.o )
-[3 of 8] Compiling Latent.Encode    ( src\Latent\Encode.hs, build\collection-v6-FeaturePipeline\Latent\Encode.o )
-[4 of 8] Compiling Latent.Render    ( src\Latent\Render.hs, build\collection-v6-FeaturePipeline\Latent\Render.o )
-[5 of 8] Compiling Language.Induced.Base ( src\Language\Induced\Base.hs, build\collection-v6-FeaturePipeline\Language\Induced\Base.o )
-[6 of 8] Compiling Synthesis.FeaturePipeline ( src\Synthesis\FeaturePipeline.hs, build\collection-v6-FeaturePipeline\Synthesis\FeaturePipeline.o )
-[7 of 8] Compiling Main             ( test\FeaturePipelineMain.hs, build\collection-v6-FeaturePipeline\Main.o )
-[8 of 8] Linking build/collection-v6-FeaturePipeline-tests.exe

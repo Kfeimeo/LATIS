@@ -1,4 +1,0 @@
-runtime enumeration is not an alignment explanation
-NeedConstruct: preserved indexed geometry; defer validation to full scene
-DirectSetIndexing: raw encoder enumeration; deliberate unsafe ablation
-realization: final grid exact check failed

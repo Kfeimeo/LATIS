@@ -20,9 +20,20 @@ data Expr a where
   Add :: Expr Int -> Expr Int -> Expr Int
   Subtract :: Expr Int -> Expr Int -> Expr Int
   Multiply :: Expr Int -> Expr Int -> Expr Int
+  -- Stage A: integer remainder with Haskell `mod` semantics (the result takes
+  -- the sign of the divisor: (-3) `mod` 2 == 1, 3 `mod` (-2) == -1); a zero
+  -- divisor is an explicit evaluation failure, never 0.
+  Mod :: Expr Int -> Expr Int -> Expr Int
+  -- Stage A: parity test; negative odd integers are odd ((-3) -> True).
+  IsOdd :: Expr Int -> Expr Bool
   Less :: Expr Int -> Expr Int -> Expr Bool
   EqualInt :: Expr Int -> Expr Int -> Expr Bool
   Not :: Expr Bool -> Expr Bool
+  -- Stage B: Boolean connectives. Both arguments are evaluated (no short
+  -- circuit): an evaluation failure in either argument is a failure of the
+  -- connective, so And(False, Mod(x,0)) fails instead of returning False.
+  And :: Expr Bool -> Expr Bool -> Expr Bool
+  Or :: Expr Bool -> Expr Bool -> Expr Bool
   Tuple :: Expr a -> Expr b -> Expr (a,b)
   First :: Expr (a,b) -> Expr a
   Second :: Expr (a,b) -> Expr b
@@ -53,9 +64,15 @@ eval (If p a b) = do yes <- eval p; if yes then eval a else eval b
 eval (Add a b) = (+) <$> eval a <*> eval b
 eval (Subtract a b) = (-) <$> eval a <*> eval b
 eval (Multiply a b) = (*) <$> eval a <*> eval b
+eval (Mod a b) = do
+  x <- eval a; y <- eval b
+  if y == 0 then Left "mod: division by zero" else Right (x `mod` y)
+eval (IsOdd a) = odd <$> eval a
 eval (Less a b) = (<) <$> eval a <*> eval b
 eval (EqualInt a b) = (==) <$> eval a <*> eval b
 eval (Not a) = not <$> eval a
+eval (And a b) = (&&) <$> eval a <*> eval b
+eval (Or a b) = (||) <$> eval a <*> eval b
 eval (Tuple a b) = (,) <$> eval a <*> eval b
 eval (First a) = fst <$> eval a
 eval (Second a) = snd <$> eval a

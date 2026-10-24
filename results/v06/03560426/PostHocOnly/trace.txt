@@ -1,9 +1,0 @@
-phase seed: 6 visible keys
-AlignmentLift (Anchor TL AX,Lex (Anchor TL AX) (Anchor TL AY))
-NeedConstruct: preserved indexed geometry; defer validation to full scene
-class first-AX: 13 representatives, 2 counterfactual splits; selected Atom (SceneLow (Ax AX))
-class following-AX: 1 representatives, 0 counterfactual splits; selected Plus (Plus (Atom (Pos Previous (Ax AX))) (Atom (Ext Previous (Ax AX)))) (Lit (-1))
-class first-AY: 13 representatives, 2 counterfactual splits; selected Atom (SceneLow (Ax AY))
-class following-AY: 1 representatives, 0 counterfactual splits; selected Plus (Plus (Atom (Pos Previous (Ax AY))) (Atom (Ext Previous (Ax AY)))) (Lit (-1))
-post-hoc wrap I_1 utility=21
-None

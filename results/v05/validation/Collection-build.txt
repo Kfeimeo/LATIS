@@ -1,4 +1,0 @@
-[43 of 52] Compiling Synthesis.Collection ( src\Synthesis\Collection.hs, build\collection\Synthesis\Collection.o ) [Source file changed]
-[50 of 52] Compiling ARC.CollectionEvaluate ( src\ARC\CollectionEvaluate.hs, build\collection\ARC\CollectionEvaluate.o ) [Source file changed]
-[51 of 52] Compiling Main             ( test\CollectionMain.hs, build\collection\Main.o ) [Source file changed]
-[52 of 52] Linking build/collection-Collection-tests.exe [Objects changed]

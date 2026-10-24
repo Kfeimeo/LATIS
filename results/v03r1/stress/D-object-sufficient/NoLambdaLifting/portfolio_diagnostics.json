@@ -1,1 +1,0 @@
-{"policy":"post-selection audit only; heldout never enters Learn or discovery","candidates":[{"expression":"(lambda v0:SceneT. v0)","base_rank":"(4,1,1,0,\"(lambda v0:SceneT. v0)\")","dictionary_encoded_length":2,"heldout_exact":true}]}

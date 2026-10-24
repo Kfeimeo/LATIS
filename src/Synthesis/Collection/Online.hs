@@ -8,6 +8,7 @@ module Synthesis.Collection.Online
 
 import Synthesis.Collection.Indexed
 import Synthesis.Collection.Counterfactual
+import Synthesis.Collection.Typed (renderT, tLeaves)
 import Data.List (nub, transpose)
 
 -- Parameters a node may carry. PConcrete marks a concrete object ID or a
@@ -32,6 +33,9 @@ scalarNodes prefix e=snd (go "r" e)
     go path (Lit n)=(path,[RNode (prefix++path) "Literal" [PConst n] [] "scalar"])
     go path (ConstVar i)=(path,[RNode (prefix++path) "Constant" [PConcept ("?c"++show i)] [] "scalar"])
     go path (Call n args)=(path,[RNode (prefix++path) "Call" (PAbs n:map arg args) ["abstraction:"++n] "scalar"])
+    -- a typed-hole expression is one refinement node; its leaves are its external references
+    go path (Typed t)=(path,[RNode (prefix++path) "TypedExpr" [PConcept (renderT slotLeafName t)]
+                             (nub (concat [case l of LeafAtom a->take 1 (deps a); LeafGrid _->["ref:Scene"] | l<-tLeaves t])) "scalar"])
     go path (Plus a b)=let (pa,na)=go (path++"l") a; (pb,nb)=go (path++"r") b
                        in (path,na++nb++[RNode (prefix++path) "Plus" [] [prefix++pa,prefix++pb] "scalar"])
     go path (Atom a)=(path,[RNode (prefix++path) (op a) (params a) (deps a) "scalar"])
@@ -44,16 +48,21 @@ scalarNodes prefix e=snd (go "r" e)
     op (SetMin _)="Aggregate Min"
     op CountObjects="Aggregate Count"
     op CountShapes="Aggregate CountShapes"
+    op (Max _ _)="Observe BoundsMax"
+    op (SetMax _)="Aggregate Max"
     params (Pos w a)=[PRef (show w),axis a]
     params (Ext w a)=[PRef (show w),axis a]
+    params (Max w a)=[PRef (show w),axis a]
     params (SceneLow a)=[PRef "Scene",axis a]
     params (SceneHigh a)=[PRef "Scene",axis a]
     params (SetMin a)=[PRef "InputSet",axis a]
+    params (SetMax a)=[PRef "InputSet",axis a]
     params _=[PRef "InputSet"]
     axis (Ax x)=PConcept (show x)
     axis (AxisVar i)=PConcept ("?axis"++show i)
     deps (Pos w _)=["ref:"++show w]
     deps (Ext w _)=["ref:"++show w]
+    deps (Max w _)=["ref:"++show w]
     deps (SceneLow _)=["ref:Scene"]
     deps (SceneHigh _)=["ref:Scene"]
     deps _=["ref:InputSet"]

@@ -1,1 +1,0 @@
-{"definition":"Signature(VS_root) union I_task","base":[{"symbol":"lambda","source":"BaseActivated","support":[{"specification":"ArrowT SceneT SceneT; observations=2; Gamma=[]","witness":"function graph -> parameter binding and output points"}]}],"invented":[]}

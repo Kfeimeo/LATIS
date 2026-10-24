@@ -16,6 +16,10 @@ library
     Synthesis.Collection ARC.CollectionEvaluate
     Synthesis.Collection.Indexed Synthesis.Collection.Counterfactual Synthesis.Collection.Online
     Synthesis.Collection.Front ARC.CollectionV6Evaluate
+    ARC.CollectionV61Generate ARC.CollectionV61Evaluate
+    ARC.ArcTrainOnly
+    Synthesis.Collection.Typed Synthesis.Collection.Size ARC.StageAEvaluate
+    Synthesis.Collection.Referent ARC.StageBEvaluate
     Synthesis.Triggered.Parallel
     ARC.TriggeredEvaluate ARC.TriggeredStress
     ARC.Dataset ARC.Evaluate ARC.JointEvaluate
@@ -139,6 +143,30 @@ test-suite collection-v6-tests
   type: exitcode-stdio-1.0
   hs-source-dirs: test
   main-is: CollectionV6Main.hs
+  build-depends: base, latis, containers
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite stage-b-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: StageBMain.hs
+  build-depends: base, latis, containers
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite stage-a-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: StageAMain.hs
+  build-depends: base, latis, containers
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite collection-v61-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: CollectionV61Main.hs
   build-depends: base, latis, containers
   default-language: GHC2021
   ghc-options: -Wall -O1

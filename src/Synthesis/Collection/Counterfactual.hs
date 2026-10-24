@@ -4,6 +4,8 @@
 -- representatives differ; they never choose one and never act as an oracle.
 module Synthesis.Collection.Counterfactual
   ( AxisE(..), Atom(..), Scalar(..), Arg(..), AbsDef(..), Library, Ctx(..), Row(..)
+  , SlotLeaf(..), slotLeafName, atoms, boundsAtoms, atomAxis, slotLeaves, slotLeavesB, evalSlotLeaf, isTyped
+  , Bounds(..), objectBounds, dependencyContexts
   , evalScalar, instantiate, parametrize, scalarTerms, scalarLength, LeafKind(..), scalarLeaves, intensionality
   , CostComponents(..), ClassPolicy(..), rankCost, accidentalAtoms
   , Representative(..), SemanticClass(..), buildClass
@@ -12,6 +14,7 @@ module Synthesis.Collection.Counterfactual
 
 import Latent.Grid
 import Synthesis.Collection.Indexed
+import Synthesis.Collection.Typed (TExpr(..), TVal(..), evalT, asInt, tLength, tLeaves, tConstants, TTy(..))
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import Data.List (nub, sortOn, intercalate)
@@ -22,13 +25,64 @@ data AxisE = Ax Axis | AxisVar Int deriving (Eq,Ord,Show)
 -- Observer atoms by provenance class: object observers (Current), alignment
 -- references (Previous = previous OUTPUT rank), scene referents, collection
 -- aggregates. There is no object ID, no runtime index and no Attach/At/Chain.
+-- Stage B0 adds the bounding-box maxima: Max w a = Pos w a + Ext w a - 1
+-- (inclusive, x right / y down, origin top-left; Pos IS the bbox minimum
+-- because the encoder normalizes every object's local geometry to a zero
+-- origin) and the collection maximum SetMax a. They are enumerated only when
+-- the Stage B bounds flag is set (boundsAtoms); the v0.6.1 `atoms` list and
+-- grammar are unchanged.
 data Atom = Pos Which AxisE | Ext Which AxisE | SceneLow AxisE | SceneHigh AxisE | SetMin AxisE | CountObjects | CountShapes
+  | Max Which AxisE | SetMax AxisE
   deriving (Eq,Ord,Show)
-data Scalar = Lit Int | ConstVar Int | Atom Atom | Plus Scalar Scalar | Call String [Arg] deriving (Eq,Ord,Show)
+-- Single-object bounds (inclusive). Distinct from the collection bounds
+-- (SetMin/SetMax). An empty object (no occupied cell) has no bounds.
+data Bounds = Bounds { bMinX, bMaxX, bMinY, bMaxY :: Int } deriving (Eq,Ord,Show)
+objectBounds :: Placed -> Either String Bounds
+objectBounds p
+  | obsArea p==0 = Left "Bounds of an empty object"
+  | sigW (placedSig p)<=0 || sigH (placedSig p)<=0 = Left "Bounds of an object with invalid geometry"
+  | otherwise = Right (Bounds (obsPos AX p) (obsAnchor BR AX p) (obsPos AY p) (obsAnchor BR AY p))
+-- Stage A: Typed embeds a typed N-ary expression (Synthesis.Collection.Typed)
+-- whose leaves are the same observer atoms plus the input grid dimensions.
+-- It is produced only by the typed-hole trigger (after the scalar grammar
+-- fails) and is otherwise inert for the v0.6.1 grammar, prior and abstraction.
+data Scalar = Lit Int | ConstVar Int | Atom Atom | Plus Scalar Scalar | Call String [Arg] | Typed (TExpr SlotLeaf) deriving (Eq,Ord,Show)
+data SlotLeaf = LeafAtom Atom | LeafGrid Axis deriving (Eq,Ord,Show)
+slotLeafName :: SlotLeaf -> String
+slotLeafName (LeafAtom a)=show a
+slotLeafName (LeafGrid AX)="GridWidth(Input)"
+slotLeafName (LeafGrid AY)="GridHeight(Input)"
+isTyped :: Scalar -> Bool
+isTyped (Typed _)=True
+isTyped _=False
+-- The axis an atom observes (Nothing: axis-free aggregate).
+atomAxis :: Atom -> Maybe Axis
+atomAxis (Pos _ (Ax a))=Just a
+atomAxis (Ext _ (Ax a))=Just a
+atomAxis (SceneLow (Ax a))=Just a
+atomAxis (SceneHigh (Ax a))=Just a
+atomAxis (SetMin (Ax a))=Just a
+atomAxis (Max _ (Ax a))=Just a
+atomAxis (SetMax (Ax a))=Just a
+atomAxis _=Nothing
+-- Visible leaves of a slot (ontology slice: the slot axis plus axis-free aggregates).
+slotLeaves :: Axis -> [(SlotLeaf,TTy)]
+slotLeaves=slotLeavesB False
+-- Stage B0: the same slice with the bounds atoms (object Max, collection
+-- SetMax of the slot axis) appended after the Stage A leaves.
+slotLeavesB :: Bool -> Axis -> [(SlotLeaf,TTy)]
+slotLeavesB bounds axis=[(LeafAtom a,TyInt) | a<-atoms, atomAxis a `elem` [Just axis,Nothing]]++[(LeafGrid axis,TyInt)]
+  ++[(LeafAtom a,TyInt) | bounds, a<-boundsAtoms, atomAxis a==Just axis]
+evalSlotLeaf :: Library -> Ctx -> SlotLeaf -> Either String TVal
+evalSlotLeaf lib c (LeafAtom a)=VI <$> evalScalar lib c (Atom a)
+evalSlotLeaf _ c (LeafGrid AX)=Right (VI (gridWidth (ctxInput c)))
+evalSlotLeaf _ c (LeafGrid AY)=Right (VI (gridHeight (ctxInput c)))
 data Arg = ArgAxis Axis | ArgInt Int deriving (Eq,Ord,Show)
 data AbsDef = AbsDef { absBody :: Scalar, absParamKinds :: [String] } deriving (Eq,Show)
 type Library = M.Map String AbsDef
-data Ctx = Ctx { ctxDims :: Dimensions, ctxSet :: ObjectSet, ctxCurrent :: Placed, ctxPrevious :: Maybe Placed, ctxDependent :: Bool }
+-- ctxDims is the realization (output) canvas; ctxInput the input canvas. They
+-- coincide whenever the canvas is unchanged (every v0.6.1 path).
+data Ctx = Ctx { ctxDims :: Dimensions, ctxSet :: ObjectSet, ctxCurrent :: Placed, ctxPrevious :: Maybe Placed, ctxDependent :: Bool, ctxInput :: Dimensions }
   deriving (Eq,Show)
 data Row = Row { rowCase :: Int, rowRank :: Int, rowCtx :: Ctx, rowTarget :: Int } deriving (Eq,Show)
 
@@ -43,6 +97,7 @@ instantiate args = go
     go (Atom a)=Atom (atom a)
     go (Plus a b)=Plus (go a) (go b)
     go (Call n as)=Call n as
+    go (Typed t)=Typed t
     axis (AxisVar i)=case drop i axes of (a:_)->Ax a; _->AxisVar i
     axis a=a
     atom (Pos w a)=Pos w (axis a)
@@ -50,6 +105,8 @@ instantiate args = go
     atom (SceneLow a)=SceneLow (axis a)
     atom (SceneHigh a)=SceneHigh (axis a)
     atom (SetMin a)=SetMin (axis a)
+    atom (Max w a)=Max w (axis a)
+    atom (SetMax a)=SetMax (axis a)
     atom a=a
 -- Typed parametrization used by abstraction promotion: every axis Concept and
 -- every literal Constant becomes a free abstract parameter (same axis, same
@@ -62,6 +119,7 @@ parametrize e = let (e',(axes,consts))=go e ([],[]) in (e',map ArgAxis (reverse 
     go (ConstVar i) st=(ConstVar i,st)
     go (Plus a b) st=let (a',st1)=go a st; (b',st2)=go b st1 in (Plus a' b',st2)
     go (Call n xs) st=(Call n xs,st)
+    go (Typed t) st=(Typed t,st)
     go (Atom a) st=let (a',st')=atom a st in (Atom a',st')
     axis (Ax x) (as,cs)=case lookup x (zip (reverse as) [0..]) of
       Just i->(AxisVar i,(as,cs))
@@ -72,6 +130,8 @@ parametrize e = let (e',(axes,consts))=go e ([],[]) in (e',map ArgAxis (reverse 
     atom (SceneLow a) st=let (a',st')=axis a st in (SceneLow a',st')
     atom (SceneHigh a) st=let (a',st')=axis a st in (SceneHigh a',st')
     atom (SetMin a) st=let (a',st')=axis a st in (SetMin a',st')
+    atom (Max w a) st=let (a',st')=axis a st in (Max w a',st')
+    atom (SetMax a) st=let (a',st')=axis a st in (SetMax a',st')
     atom a st=(a,st)
 -- Note: the constant parameters are numbered in post-order of the literal
 -- occurrences, matching ConstVar indices after the axis parameters.
@@ -80,6 +140,7 @@ evalScalar :: Library -> Ctx -> Scalar -> Either String Int
 evalScalar _ _ (Lit n)=Right n
 evalScalar _ _ (ConstVar i)=Left ("unbound abstraction constant "++show i)
 evalScalar lib c (Plus a b)=(+) <$> evalScalar lib c a <*> evalScalar lib c b
+evalScalar lib c (Typed e)=evalT (evalSlotLeaf lib c) e >>= asInt
 evalScalar lib c (Call n args)=case M.lookup n lib of
   Nothing->Left ("missing abstraction refinement "++n)
   Just d | length (absParamKinds d)/=length args->Left ("abstraction arity mismatch for "++n)
@@ -92,6 +153,9 @@ evalScalar _ c (Atom a)=case a of
   SetMin ax->axis ax >>= \x->maybe (Left "SetMin of an empty set") Right (setMinimum (obsPos x) (ctxSet c))
   CountObjects->Right (count (ctxSet c))
   CountShapes->Right (shapeCount (ctxDependent c) (ctxSet c))
+  -- Stage B0: inclusive bbox maximum of a single object (empty objects have no bounds)
+  Max w ax->do x<-axis ax; p<-which w; b<-objectBounds p; Right (if x==AX then bMaxX b else bMaxY b)
+  SetMax ax->axis ax >>= \x->maybe (Left "SetMax of an empty set") Right (setMaximum (obsAnchor BR x) (ctxSet c))
   where which Current=Right (ctxCurrent c)
         which Previous=maybe (Left "Previous is unavailable at first rank") Right (ctxPrevious c)
         axis (Ax x)=Right x
@@ -104,6 +168,9 @@ evalScalar _ c (Atom a)=case a of
 atoms :: [Atom]
 atoms=[Pos Current (Ax a) | a<-[AX,AY]]++[Ext Current (Ax a) | a<-[AX,AY]]++[Pos Previous (Ax a) | a<-[AX,AY]]++[Ext Previous (Ax a) | a<-[AX,AY]]
   ++[SceneLow (Ax a) | a<-[AX,AY]]++[SceneHigh (Ax a) | a<-[AX,AY]]++[SetMin (Ax a) | a<-[AX,AY]]++[CountObjects,CountShapes]
+-- Stage B0 bounds atoms (never part of `atoms`, hence never in scalarTerms).
+boundsAtoms :: [Atom]
+boundsAtoms=[Max Current (Ax a) | a<-[AX,AY]]++[Max Previous (Ax a) | a<-[AX,AY]]++[SetMax (Ax a) | a<-[AX,AY]]
 scalarTerms :: [Scalar]
 scalarTerms=base++lits++[Plus a b | a<-base, b<-lits, b/=Lit 0]++[Plus a b | (i,a)<-zip [0::Int ..] base, b<-drop i base]
   ++[Plus (Plus a b) c | (i,a)<-zip [0::Int ..] base, b<-drop i base, c<-[Lit (-1),Lit 1]]
@@ -111,6 +178,7 @@ scalarTerms=base++lits++[Plus a b | a<-base, b<-lits, b/=Lit 0]++[Plus a b | (i,
 scalarLength :: Scalar -> Int
 scalarLength (Plus a b)=1+scalarLength a+scalarLength b
 scalarLength (Call _ args)=1+length args
+scalarLength (Typed e)=tLength e
 scalarLength _=1
 
 data LeafKind = LiteralLeaf | ObjectObserverLeaf | AlignmentRefLeaf | SceneRefLeaf | CollectionLeaf | AbstractionLeaf deriving (Eq,Ord,Show)
@@ -119,6 +187,10 @@ scalarLeaves (Lit n)=[(LiteralLeaf,"Lit "++show n)]
 scalarLeaves (ConstVar i)=[(LiteralLeaf,"ConstVar "++show i)]
 scalarLeaves (Plus a b)=scalarLeaves a++scalarLeaves b
 scalarLeaves (Call n _)=[(AbstractionLeaf,n)]
+scalarLeaves (Typed e)=[(LiteralLeaf,"Const") | _<-[1..tConstants e]]++concatMap leaf (tLeaves e)
+  where leaf (LeafAtom a)=scalarLeaves (Atom a)
+        leaf (LeafGrid AX)=[(SceneRefLeaf,"GridWidth(Input)")]
+        leaf (LeafGrid AY)=[(SceneRefLeaf,"GridHeight(Input)")]
 scalarLeaves (Atom a)=[(kind a,show a)]
   where kind (Pos Current _)=ObjectObserverLeaf
         kind (Ext Current _)=ObjectObserverLeaf
@@ -126,6 +198,8 @@ scalarLeaves (Atom a)=[(kind a,show a)]
         kind (Ext Previous _)=AlignmentRefLeaf
         kind (SceneLow _)=SceneRefLeaf
         kind (SceneHigh _)=SceneRefLeaf
+        kind (Max Current _)=ObjectObserverLeaf
+        kind (Max Previous _)=AlignmentRefLeaf
         kind _=CollectionLeaf
 intensionality :: Scalar -> String
 intensionality e=case nub (map fst (scalarLeaves e)) of
@@ -151,9 +225,10 @@ literalCount e=length [() | (LiteralLeaf,_)<-scalarLeaves e]+length [() | Call _
 crossAxis :: Axis -> Scalar -> Int
 crossAxis slotAxis=go
   where go (Plus a b)=go a+go b
+        go (Typed e)=sum [case l of LeafAtom a->go (Atom a); LeafGrid x->if x/=slotAxis then 1 else 0 | l<-tLeaves e]
         go (Call _ args)=length [() | ArgAxis a<-args, a/=slotAxis]
         go (Atom a)=case a of
-          Pos _ x->off x; Ext _ x->off x; SceneLow x->off x; SceneHigh x->off x; SetMin x->off x; _->0
+          Pos _ x->off x; Ext _ x->off x; SceneLow x->off x; SceneHigh x->off x; SetMin x->off x; Max _ x->off x; SetMax x->off x; _->0
         go _=0
         off (Ax x)=if x/=slotAxis then 1 else 0
         off _=0
@@ -254,3 +329,35 @@ counterfactualContexts key c dims set=(legal,illegal)
       ++[insertion "InsertIrrelevant duplicate of an existing object" q ["existing objects","existing ranks","CountShapes"] ["CountObjects"] | Just q<-[setSmallest set]]
     legal=translations++[padding,margin,permutation]++[x | Left x<-inserts]
     illegal=badTranslations++[x | Right x<-inserts]
+
+-- Stage B dependency evidence: type-safe counterfactual inputs derived from
+-- ONE grounded context (input canvas, input set, current object; no target).
+-- Every variant is legal by construction (all cells inside the input canvas,
+-- Chebyshev distance >= 2 from every other object's cell so no component
+-- merges); variants that cannot be made legal are dropped. They serve only as
+-- evidence that a term reads its input (DependencyWitness); they are never a
+-- case-agreement context and never carry a training target. The ObjectSet
+-- stays unlisted: other objects are only seen through their cell set.
+dependencyContexts :: Ctx -> [(String,Ctx)]
+dependencyContexts ctx=
+  [("TranslateCurrent "++show (dx,dy),replaceCurrent (shift dx dy cur)) | (dx,dy)<-[(1,0),(0,1),(-1,0),(0,-1)], legal (shift dx dy cur)]
+  ++[("ResizeCurrent "++show (dw,dh),replaceCurrent (resize dw dh cur)) | (dw,dh)<-[(1,0),(0,1),(1,1)], legal (resize dw dh cur)]
+  ++[("PadCanvas +2",ctx {ctxDims=grow (ctxDims ctx), ctxInput=grow (ctxInput ctx)})]
+  ++[("InsertIrrelevant fresh 1x1 pixel",ctx {ctxSet=setInsert p (ctxSet ctx)}) | Just p<-[pixel]]
+  where
+    cur=ctxCurrent ctx
+    inDims=ctxInput ctx
+    shift dx dy p=p {placedPos=Coord (cx (placedPos p)+dx) (cy (placedPos p)+dy)}
+    resize dw dh p=let SizeSig w h=placedSig p; col=head (filter (/=0) (placedPayload p)++[1])
+                   in Placed (SizeSig (w+dw) (h+dh)) (replicate ((w+dw)*(h+dh)) col) (placedPos p)
+    grow (Dimensions w h)=Dimensions (w+2) (h+2)
+    allCells=setCells (ctxSet ctx)
+    otherCells=S.toList (S.difference allCells (S.fromList (absoluteCells cur)))
+    near cells q=any (\e->abs (cx e-cx q)<=1 && abs (cy e-cy q)<=1) cells
+    legal p=all (inBounds inDims) (absoluteCells p) && not (any (near otherCells) (absoluteCells p))
+    replaceCurrent p=ctx {ctxCurrent=p, ctxSet=setMap (\q->if q==cur then p else q) (ctxSet ctx)}
+    freshColor=head ([k | k<-[9,8..1], not (S.member k (setColors (ctxSet ctx)))]++[9])
+    pixel=case [Placed (SizeSig 1 1) [freshColor] (Coord x y) | y<-[gridHeight inDims-1,gridHeight inDims-2..0], x<-[gridWidth inDims-1,gridWidth inDims-2..0]
+               , not (near (S.toList allCells) (Coord x y))] of
+      (p:_)->Just p
+      []->Nothing

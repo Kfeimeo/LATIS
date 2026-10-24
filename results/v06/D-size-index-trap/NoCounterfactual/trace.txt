@@ -1,7 +1,0 @@
-phase seed: 6 visible keys
-promote I_1 (RankCorrespondence) utility=16 at step 1
-AlignmentLift (Anchor TL AX,Anchor TL AX)
-class shared-AX: 2 representatives, 0 counterfactual splits; selected Plus (Atom (Pos Current (Ax AX))) (Atom CountShapes)
-proposal SequentialScalar below threshold: utility=3
-class shared-AY: 9 representatives, 0 counterfactual splits; selected Atom (Pos Current (Ax AY))
-None

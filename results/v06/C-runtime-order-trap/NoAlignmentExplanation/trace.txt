@@ -1,7 +1,0 @@
-NoAlignmentExplanation: unaligned Cartesian Color equality admitted before explained search
-runtime enumeration is not an alignment explanation
-class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
-class first-AY: 10 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AY))
-class following-AY: 1 representatives, 0 counterfactual splits; selected Plus (Plus (Atom (Pos Previous (Ax AY))) (Atom (Ext Previous (Ax AY)))) (Lit 1)
-promote I_1 (SequentialScalar) utility=5 at step 5
-None

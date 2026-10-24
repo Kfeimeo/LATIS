@@ -27,7 +27,11 @@ registry = ml ++ observers ++ relations ++ transforms ++ sceneOps
       ,("if","Bool -> a -> a -> a","lazy selected branch")
       ,("add","Int -> Int -> Int","integer addition"),("subtract","Int -> Int -> Int","integer subtraction")
       ,("multiply","Int -> Int -> Int","integer multiplication"),("less","Int -> Int -> Bool","integer ordering")
+      ,("mod","Int -> Int -> Int","integer remainder, sign of divisor (Haskell mod); zero divisor fails")
+      ,("isOdd","Int -> Bool","parity; negative odd integers are odd")
       ,("equalInt","Int -> Int -> Bool","integer equality"),("not","Bool -> Bool","Boolean negation")
+      ,("and","Bool -> Bool -> Bool","Boolean conjunction; both arguments evaluated, failure propagates")
+      ,("or","Bool -> Bool -> Bool","Boolean disjunction; both arguments evaluated, failure propagates")
       ,("tuple","a -> b -> (a,b)","pair construction"),("first","(a,b) -> a","first projection")
       ,("second","(a,b) -> b","second projection"),("list","List a -> List a","typed list construction")
       ,("head","List a -> a","fails on empty list"),("tail","List a -> List a","fails on empty list")
@@ -56,6 +60,9 @@ registry = ml ++ observers ++ relations ++ transforms ++ sceneOps
       "argmin" -> [Slot "key" "Fn a Int",Slot "list" "List a"]
       "argmax" -> [Slot "key" "Fn a Int",Slot "list" "List a"]
       "not" -> [Slot "value" "Bool"]
+      "and" -> [Slot "left" "Bool",Slot "right" "Bool"]
+      "or" -> [Slot "left" "Bool",Slot "right" "Bool"]
+      "isOdd" -> [Slot "value" "Int"]
       "iterateWhile" -> [Slot "fuel" "Nat",Slot "predicate" "Fn s Bool",Slot "step" "Fn s s",Slot "state" "s"]
       _ -> [Slot "left" "Int",Slot "right" "Int"]
     accumulatorSlots = [Slot "step" "Fn (s,a) s",Slot "initial" "s",Slot "list" "List a"]

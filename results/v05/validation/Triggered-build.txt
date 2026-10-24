@@ -1,2 +1,0 @@
-[52 of 53] Compiling Main             ( test\TriggeredMain.hs, build\collection\Main.o ) [Source file changed]
-[53 of 53] Linking build/collection-Triggered-tests.exe

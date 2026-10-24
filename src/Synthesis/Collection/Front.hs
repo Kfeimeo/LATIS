@@ -3,10 +3,21 @@
 -- module, v0.4 solver and R2 fallback are unchanged. Invariants kept:
 -- trigger before expansion; no alignment without an explanation; matched
 -- features stop expanding; no concrete cross-item edge at high levels.
+--
+-- v0.6.1 adds the SafeOnline reuse policy: an accepted abstraction makes
+-- Call(I_k) a PREFERRED candidate, the residual grammar of that slot is
+-- recorded as a deferred (never deleted) candidate range, and the residual is
+-- resumed on failure of the preferred branch, on realization failure, and
+-- after the first solution so that the final selection ranges over the same
+-- candidate set NoOnlineAbstraction sees. The v0.6 behaviour is kept as the
+-- ExclusiveReuse policy (Full with the default config, ExclusiveReuseLegacy).
 module Synthesis.Collection.Front
-  ( Mode(..), Config(..), defaultConfig, Status(..), IndexedType(..), Feature(..), MatchEdge(..), KeyCandidate(..)
-  , Graph(..), Front(..), Program(..), Execution(..), Definition(..), Body(..)
-  , runProgram, frontSearch, metric, expandedFrontier, policyFor, metricNames
+  ( Mode(..), ReusePolicy(..), Config(..), defaultConfig, Status(..), IndexedType(..), Feature(..), MatchEdge(..), KeyCandidate(..)
+  , Deferred(..), Graph(..), Front(..), Program(..), Execution(..), Definition(..), Body(..)
+  , runProgram, frontSearch, metric, expandedFrontier, policyFor, metricNames, permuteObjects, safePolicy
+  , StageA(..), ArgPolicy(..), stageAOff, SizeRule(..), sizeRuleText, outputSize, Source(..)
+  , StageB(..), stageBOff, Schedule(..), RefSummary(..), GraphStats(..), slotLeafInfo, snapshotFor
+  , scSlotName, scRepTexts, scSelectedText
   ) where
 
 import Latent.Grid
@@ -18,40 +29,116 @@ import qualified Synthesis.InducedR2.Learn as R2
 import Synthesis.Collection.Indexed
 import Synthesis.Collection.Counterfactual
 import Synthesis.Collection.Online
+import Synthesis.Collection.Typed
+import Synthesis.Collection.Size
+import Synthesis.Collection.Referent
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import Control.Monad (forM, forM_, when, unless, filterM)
-import Data.List (sortOn, nub, intercalate)
+import Data.List (sortOn, nub, intercalate, sort)
 import Data.Maybe (fromMaybe, isNothing)
+import Data.Either (isRight)
 
 data Mode = Full | NoCounterfactual | CollapseByTrainingDenotation | NoIntensionalityPrior | FixedAlignmentKeys
   | NoAlignmentExplanation | NoOnlineAbstraction | PostHocOnly | NoDependentIndex | DirectSetIndexing | R2FallbackOnly
+  | SafeOnline | ExclusiveReuseLegacy
   deriving (Eq,Ord,Show,Read,Enum,Bounded)
+-- ExclusiveReuse: v0.6 behaviour, Call(I_k) replaces the slot's alternatives.
+-- SafeReuse: Call(I_k) is preferred, alternatives are deferred and recoverable.
+data ReusePolicy = ExclusiveReuse | SafeReuse deriving (Eq,Ord,Show,Read)
 data Status = Unmatched | Matched | Frozen deriving (Eq,Ord,Show)
 data IndexedType = ObjectT SizeSig | PlacedT SizeSig | ExistsPlacedT | SetT IndexedType | NatT | OrderedT KeyExpr [Int]
-  | AlignmentT [Int] | RefT IndexedType | ConceptT IndexedType | ScalarT String deriving (Eq,Ord,Show)
+  | AlignmentT [Int] | RefT IndexedType | ConceptT IndexedType | ScalarT String
+  | NatPosT | Size2T deriving (Eq,Ord,Show)
 data Feature = Feature
   { featureType :: IndexedType, denotation :: [String], expression :: String, provenance :: [String]
   , trigger :: Maybe Trigger, cost :: Int, status :: Status } deriving (Eq,Show)
 data MatchEdge = AbstractEdge String String | ConcreteEdge String String deriving (Eq,Show)
 data KeyCandidate = KeyCandidate { kcKey :: KeyExpr, kcOrigin :: Origin, kcSeed :: Bool, kcPhase :: String, kcStatus :: String, kcCost :: Int } deriving (Eq,Show)
+-- A deferred candidate range: the residual grammar of a slot whose preferred
+-- Call branch was taken. Provenance, range, visited status and the resume
+-- event are all recorded; nothing is deleted.
+data Deferred = Deferred
+  { dfSlot :: String, dfRange :: (Int,Int), dfAbstraction :: String, dfPromotionStep :: Int, dfCreatedStep :: Int
+  , dfStatus :: String, dfReason :: String, dfResumedStep :: Maybe Int, dfResumedCandidates :: Int
+  , dfClassBefore :: Int, dfClassAfter :: Int, dfSelectedBefore :: String, dfSelectedAfter :: String, dfRecovered :: Bool } deriving (Eq,Show)
 data Graph = Graph
   { features :: [Feature], highEdges :: [MatchEdge], abstractions :: [Abstraction], counters :: M.Map String Int, trace :: [String]
   , alignmentEvidence :: [[Alignment]], keyCandidates :: [KeyCandidate], classes :: [SemanticClass]
-  , counterfactuals :: [Counterfactual], rejectedCounterfactuals :: [Counterfactual], refinements :: [RNode], highLevelView :: [String] } deriving (Eq,Show)
+  , counterfactuals :: [Counterfactual], rejectedCounterfactuals :: [Counterfactual], refinements :: [RNode], highLevelView :: [String]
+  , deferred :: [Deferred], referents :: [RefSummary] } deriving (Eq,Show)
 data Front = Front { program :: Maybe Program, graph :: Graph, failure :: String } deriving (Eq,Show)
+-- stageA (Stage A: grid size feature, typed N-ary holes, mod/isOdd) is all
+-- off by default; the v0.6.1 behaviour is unchanged unless a flag is set.
+-- stageB (Stage B: bounds/Bool primitives, referent graph, structural
+-- generalization, shared VSA, hierarchical schedule) is all off by default;
+-- with it off the behaviour is exactly Stage A.
 data Config = Config { alignmentBudget :: Int, scalarBudget :: Int, synthesisDepth :: Int, synthesisCostBound :: Int, promotionThreshold :: Int
-  , legacyConfig :: V4.Config } deriving (Eq,Show)
+  , reusePolicy :: ReusePolicy, enumerationSeed :: Maybe Int, legacyConfig :: V4.Config, stageA :: StageA, stageB :: StageB } deriving (Eq,Show)
 defaultConfig :: Config
-defaultConfig=Config 400 2000 2 5 4 V4.defaultConfig
+defaultConfig=Config 400 2000 2 5 4 ExclusiveReuse Nothing V4.defaultConfig stageAOff stageBOff
+-- Candidate source of a slot: the v0.6.1 scalar grammar, the Stage B referent
+-- hierarchy (frozen per-axis snapshot, class lookup under a schedule) and the
+-- typed N-ary hole search; the latter two are unlocked only after the grammar
+-- fails on an axis, the hole search only after the hierarchy found nothing.
+data Source = Grammar | Hierarchy | TypedHoles deriving (Eq,Show)
 metric :: String -> Graph -> Int
 metric k=M.findWithDefault 0 k . counters
+-- Text views of a semantic class for audit writers that do not import the scalar IR.
+scSlotName :: SemanticClass -> String
+scSlotName=scSlot
+scRepTexts :: SemanticClass -> [String]
+scRepTexts c=[show (repExpr r) | r<-scReps c]
+scSelectedText :: SemanticClass -> String
+scSelectedText=show . scSelected
 expandedFrontier :: [Feature] -> [Feature]
 expandedFrontier=filter ((==Unmatched) . status)
 policyFor :: Mode -> ClassPolicy
 policyFor m=ClassPolicy (m/=NoCounterfactual) (m==CollapseByTrainingDenotation) (m/=NoIntensionalityPrior)
+safePolicy :: Mode -> Config -> Bool
+safePolicy SafeOnline _=True
+safePolicy ExclusiveReuseLegacy _=False
+safePolicy _ conf=reusePolicy conf==SafeReuse
 metricNames :: [String]
-metricNames=words "UntriggeredExpansionCount ConcreteCrossItemEdgeCount_high_level expanded_frozen_features alignment_attempts alignment_rejections equality_attempts rejected_size_comparisons unexplained_equalities alignment_lift_attempts alignment_lift_successes accepted_abstractions construction_triggers fallback_count semantic_classes representatives max_representatives_per_class counterfactual_contexts_generated counterfactual_contexts_rejected counterfactual_evaluations counterfactual_splits canonical_merges premature_collapses dropped_by_collapse intensional_candidates literal_candidates alignment_key_candidates synthesized_keys_accepted ordering_ties_rejected alignment_witnesses online_abstractions_proposed online_abstractions_accepted online_abstraction_reuses refinement_expansions_saved operator_applications refinement_expansions active_frontier_size visibility_size visibility_keys search_work alignment_failure_triggers posthoc_abstractions_accepted"
+metricNames=words "b_snapshots_built b_snapshot_work b_graph_nodes b_graph_classes b_graph_templates b_graph_closed_terms b_graph_truncations b_constant_only_dropped b_edges_confirmed b_edges_pending b_edges_not_supported b_type_edges b_closure_edges b_sccs b_layers b_substitutions_tried b_outside_universe b_edge_truncations b_vsa_nodes b_vsa_unions b_vsa_expanded b_vsa_expansion_mismatch b_sharing_avg_x100 b_sharing_max_x100 b_dag_evaluations b_reference_evaluations b_witness_full b_hierarchy_slots b_hierarchy_fits b_class_checks b_row_lookups b_flat_row_evaluations b_candidates_covered b_fitting_classes b_layer_exposed b_layer_searched b_layer_truncated b_slot_truncations b_global_truncations b_hierarchy_fallbacks b_hierarchy_solved_slots typed_hole_global_truncations size_rule_templates size_rule_evaluations size_rule_candidates size_rule_truncations size_rule_exact canvas_changes_entering_search typed_hole_slots_triggered typed_hole_templates typed_hole_evaluations typed_hole_fits typed_hole_constant_fits typed_hole_feature_fits typed_hole_truncations grid_realizations_attempted grid_realization_ok realization_render_errors realization_mismatches UntriggeredExpansionCount ConcreteCrossItemEdgeCount_high_level expanded_frozen_features alignment_attempts alignment_rejections equality_attempts rejected_size_comparisons unexplained_equalities alignment_lift_attempts alignment_lift_successes accepted_abstractions construction_triggers fallback_count semantic_classes representatives max_representatives_per_class counterfactual_contexts_generated counterfactual_contexts_rejected counterfactual_evaluations counterfactual_splits canonical_merges premature_collapses dropped_by_collapse intensional_candidates literal_candidates alignment_key_candidates synthesized_keys_accepted ordering_ties_rejected alignment_witnesses online_abstractions_proposed online_abstractions_accepted online_abstraction_reuses refinement_expansions_saved operator_applications refinement_expansions active_frontier_size visibility_size visibility_keys search_work alignment_failure_triggers posthoc_abstractions_accepted reuse_attempts reuse_hits call_attempts call_legality_checks call_legality_rejections deferred_candidates resumed_candidates resume_events resume_retries recovered_solutions reselected_after_completion exclusive_reuse_missed_candidates exclusive_reuse_missed_solutions diagnostic_operator_applications first_solution_work total_work_to_exhaustion completion_work alignment_candidates_remaining rank_reuse_witnesses_verified"
+
+-- Stage B leaf meta-information of the object-slot language. Previous leaves
+-- and set aggregates are partial (rank 0 / empty set); Ext Current is fixed
+-- by the size index of the object binder.
+slotLeafInfo :: LeafInfo SlotLeaf
+slotLeafInfo=LeafInfo (const TyInt) slotLeafName input precondition partial sortDetermined
+  where
+    input (LeafGrid _)="Scene"
+    input (LeafAtom a)=case a of
+      Pos Current _->"Object"; Ext Current _->"Object"; Max Current _->"Object"
+      Pos Previous _->"Previous"; Ext Previous _->"Previous"; Max Previous _->"Previous"
+      SceneLow _->"Scene"; SceneHigh _->"Scene"; _->"Set"
+    precondition (LeafAtom a)=case a of
+      Pos Previous _->["rank > 0 (Previous exists)"]; Ext Previous _->["rank > 0 (Previous exists)"]; Max Previous _->["rank > 0 (Previous exists)"]
+      SetMin _->["non-empty set"]; SetMax _->["non-empty set"]; Max Current _->["non-empty object"]; _->[]
+    precondition _=[]
+    partial l=not (null (precondition l)) && case l of LeafAtom (Max Current _)->False; _->True
+    sortDetermined (LeafAtom (Ext Current _))=True
+    sortDetermined _=False
+previousLeaf :: SlotLeaf -> Bool
+previousLeaf (LeafAtom a)=case a of Pos Previous _->True; Ext Previous _->True; Max Previous _->True; _->False
+previousLeaf _=False
+-- The frozen snapshot of one axis from grounded contexts (id, Ctx). The
+-- dependency counterfactual contexts are derived from every grounded context.
+snapshotFor :: StageB -> HoleConfig -> Axis -> [(String,Ctx)] -> RefGraph SlotLeaf
+snapshotFor sb hc axis grounded=
+  let leaves=[(l,t) | (l,t)<-slotLeavesB (sbBounds sb) axis, not (previousLeaf l)]
+      sortOf p=let SizeSig w h=placedSig p in "Object["++show w++"x"++show h++"]"
+      ctxs=[Context cid (sortOf (ctxCurrent c)) (evalSlotLeaf M.empty c) | (cid,c)<-grounded]
+      deps=[Context (cid++":"++label) (sortOf (ctxCurrent c')) (evalSlotLeaf M.empty c') | (cid,c)<-grounded, (label,c')<-dependencyContexts c]
+  in buildGraph sb hc slotLeafInfo leaves TyInt ctxs deps []
+
+-- Deterministic enumeration permutation (metamorphic tests). The ID-free Set
+-- IR is insensitive to it; only the deliberately unsafe modes can notice.
+permuteObjects :: Maybe Int -> [O.Object] -> [O.Object]
+permuteObjects Nothing xs=xs
+permuteObjects (Just seed) xs=map snd (sortOn fst (zip keys xs))
+  where keys=take (length xs) (tail (iterate (\x->(x*1103515245+12345) `mod` 2147483648) (abs seed+1)))
 
 -- Executable program. The high level sees Call(I_0) and the contract; the
 -- definition (ordering key, sequence body) and the scalar abstraction library
@@ -59,33 +146,43 @@ metricNames=words "UntriggeredExpansionCount ConcreteCrossItemEdgeCount_high_lev
 data Body = Body { bodyFirst :: (Scalar,Scalar), bodyNext :: (Scalar,Scalar) } deriving (Eq,Show)
 data Definition = Definition { defKey :: KeyExpr, defBody :: Body, defUnsafe :: Bool } deriving (Eq,Show)
 data Execution = Inline Definition | CallTop String deriving (Eq,Show)
+-- progSize (Stage A): the Size2 rule that realizes the output canvas from the
+-- input; Nothing keeps the input canvas (v0.6.1).
 data Program = Program { progEncoder :: EncoderConfig, progExec :: Execution, progDefs :: M.Map String Definition
-  , progLibrary :: Library, progDependent :: Bool } deriving (Eq,Show)
+  , progLibrary :: Library, progDependent :: Bool, progPermutation :: Maybe Int, progSize :: Maybe SizeRule } deriving (Eq,Show)
+-- Realization order: encode the input, compute the output canvas from the size
+-- rule (input features and shared constants only), order the input objects,
+-- place every object by the sequence-local body, then render on the output
+-- canvas. Rendering rejects any cell outside the canvas (no clipping); the
+-- background is the encoder background; later objects win on overlap.
 runProgram :: Program -> Grid -> Either String Grid
-runProgram (Program enc ex defs lib dep) grid=do
-  let scene=encode enc grid
+runProgram (Program enc ex defs lib dep perm size) grid=do
+  let scene0=encode enc grid
+      scene=scene0 {O.objects=permuteObjects perm (O.objects scene0)}
       objs=O.objects scene
       set=objectSet objs
+  outDims <- maybe (Right (O.canvas scene)) (\r->outputSize dep r scene) size
   Definition key body unsafe <- case ex of
     Inline d->Right d
     CallTop n->maybe (Left "missing abstraction refinement") Right (M.lookup n defs)
   items <- if unsafe then Right (map placedFromObject objs) else orderedItems <$> orderBy [key] NeedOrderedView InputSet key set
-  out <- walk body (O.canvas scene) set Nothing (zip [0::Int ..] items)
-  render scene {O.objects=map placedToObject out}
+  out <- walk body outDims (O.canvas scene) set Nothing (zip [0::Int ..] items)
+  render scene {O.canvas=outDims, O.objects=map placedToObject out}
   where
-    walk _ _ _ _ []=Right []
-    walk body dims set prev ((i,p):rest)=do
-      let ctx=Ctx dims set p prev dep
+    walk _ _ _ _ _ []=Right []
+    walk body dims inDims set prev ((i,p):rest)=do
+      let ctx=Ctx dims set p prev dep inDims
           (fx,fy)=if i==0 then bodyFirst body else bodyNext body
       x<-evalScalar lib ctx fx
       y<-evalScalar lib ctx fy
       let moved=p {placedPos=Coord x y}
-      (moved:) <$> walk body dims set (Just moved) rest
+      (moved:) <$> walk body dims inDims set (Just moved) rest
 
 -- Search state and a small state monad (no mtl dependency).
 data St = St { stGraph :: Graph, stStep :: Int, stNextAbs :: Int, stLibrary :: Library
   , stViews :: M.Map (KeyExpr,Origin,Int) OrderedView, stTried :: S.Set (KeyExpr,KeyExpr)
-  , stCF :: [(Int,Ctx -> Ctx)], stDerivation :: [RNode], stResults :: [String] }
+  , stCF :: [(Int,Ctx -> Ctx)], stDerivation :: [RNode], stResults :: [String]
+  , stPending :: [(String,[Row],[Scalar])], stGrammarFits :: M.Map String [Scalar], stSnapshots :: M.Map Axis (RefGraph SlotLeaf) }
 newtype Search a = Search { runSearch :: St -> (a,St) }
 instance Functor Search where fmap f (Search g)=Search (\s->let (a,s')=g s in (f a,s'))
 instance Applicative Search where
@@ -100,6 +197,8 @@ onGraph :: (Graph -> Graph) -> Search ()
 onGraph f=modify (\s->s {stGraph=f (stGraph s)})
 inc :: String -> Int -> Search ()
 inc k n=onGraph (\g->g {counters=M.insertWith (+) k n (counters g)})
+setMetric :: String -> Int -> Search ()
+setMetric k n=onGraph (\g->g {counters=M.insert k n (counters g)})
 setMax :: String -> Int -> Search ()
 setMax k n=onGraph (\g->g {counters=M.insertWith max k n (counters g)})
 tick :: Search Int
@@ -117,12 +216,16 @@ addResult :: String -> Search ()
 addResult r=modify (\s->s {stResults=stResults s++[r]})
 visible :: String -> Search [Abstraction]
 visible family=gets (\s->[a | a<-abstractions (stGraph s), absFamily a==family, uAccepted (absUtility a), absPromotionStep a>=0])
+currentWork :: Search Int
+currentWork=gets (\s->metric "operator_applications" (stGraph s)+length (refinements (stGraph s)))
 
 seedGraph :: [(O.Scene,O.Scene)] -> Graph
-seedGraph pairs=Graph fs [] [] (M.fromList [(k,0) | k<-metricNames]) [] [] [] [] [] [] [] []
+seedGraph pairs=Graph fs [] [] (M.fromList [(k,0) | k<-metricNames]) [] [] [] [] [] [] [] [] [] []
   where fs=[Feature (SetT ExistsPlacedT) (map (show . count . objectSet . O.objects . side) pairs) (show origin)
               ["Objects(Scene)","existential size-index packaging"] Nothing 0 Unmatched
            | (origin,side)<-[(InputSet,fst),(OutputSet,snd)]]
+-- Class-derived metrics are recomputed from the final class records so that a
+-- resumed (completed) class replaces, rather than double counts, its record.
 finish :: Maybe Program -> String -> Graph -> Front
 finish p why g=Front p g {counters=M.union (M.fromList
   [("ConcreteCrossItemEdgeCount_high_level",length [() | ConcreteEdge _ _<-highEdges g])
@@ -130,9 +233,19 @@ finish p why g=Front p g {counters=M.union (M.fromList
   ,("expanded_frozen_features",0)
   ,("active_frontier_size",length (expandedFrontier (features g)))
   ,("refinement_expansions",length (refinements g))
-  ,("search_work",metric "operator_applications" g+length (refinements g))
+  ,("search_work",work)
+  ,("total_work_to_exhaustion",work)
+  ,("completion_work",if metric "first_solution_work" g>0 then work-metric "first_solution_work" g else 0)
   ,("visibility_size",metric "visibility_keys" g+length [() | a<-abstractions g, uAccepted (absUtility a), absPromotionStep a>=0, absFamily a/="OrderedCorrespondence"])
-  ,("accepted_abstractions",length [() | a<-abstractions g, uAccepted (absUtility a)])]) (counters g)} why
+  ,("accepted_abstractions",length [() | a<-abstractions g, uAccepted (absUtility a)])
+  ,("semantic_classes",length cs),("representatives",sum (map (length . scReps) cs))
+  ,("max_representatives_per_class",maximum (0:map (length . scReps) cs))
+  ,("counterfactual_splits",sum (map scSplits cs)),("canonical_merges",sum (map scMerges cs))
+  ,("premature_collapses",sum (map scPrematureCollapses cs)),("dropped_by_collapse",sum (map scDropped cs))
+  ,("intensional_candidates",length [() | c<-cs, r<-scReps c, repClass r/="literal-derived"])
+  ,("literal_candidates",length [() | c<-cs, r<-scReps c, repClass r=="literal-derived"])]) (counters g)} why
+  where work=metric "operator_applications" g+length (refinements g)
+        cs=classes g
 
 scanKey :: KeyExpr
 scanKey=Lex (Anchor TL AY) (Anchor TL AX)
@@ -141,34 +254,102 @@ frontSearch :: Mode -> Config -> [(Grid,Grid)] -> Front
 frontSearch mode conf examples
   | mode==R2FallbackOnly = finish Nothing "R2FallbackOnly" (seedGraph [])
   | null examples = finish Nothing "grounding: empty training set" (seedGraph [])
-  | any (\(a,b)->O.canvas a/=O.canvas b) scenes = finish Nothing "layout: collection frontend requires unchanged canvas" (seedGraph scenes)
+  -- The unchanged-canvas guard is the v0.6.1 interface precondition. With the
+  -- Stage A grid-size feature the canvas change is instead a synthesis target.
+  | not (saGridSize sa) && any (\(a,b)->O.canvas a/=O.canvas b) scenes = finish Nothing "layout: collection frontend requires unchanged canvas" (seedGraph scenes)
   | otherwise =
-      let (r,st)=runSearch main (St (seedGraph scenes) 0 1 M.empty M.empty S.empty [] [] [])
+      let (r,st)=runSearch main (St (seedGraph scenes) 0 1 M.empty M.empty S.empty [] [] [] [] M.empty M.empty)
       in finish (either (const Nothing) Just r) (either id (const "None") r) (stGraph st)
   where
+    sa=stageA conf
+    sb=stageB conf
     enc=R2.inducedEncoder (V4.r2Config (legacyConfig conf))
-    scenes=[(encode enc x,encode enc y) | (x,y)<-examples]
+    perm s=s {O.objects=permuteObjects (enumerationSeed conf) (O.objects s)}
+    scenes=[(perm (encode enc x),perm (encode enc y)) | (x,y)<-examples]
     sets=[(objectSet (O.objects a),objectSet (O.objects b)) | (a,b)<-scenes]
-    dims=map (O.canvas . fst) scenes
+    inDims=map (O.canvas . fst) scenes
+    -- Stage A: the Size2 rule is synthesized from input-side features before
+    -- any object search; the realization canvas of every case is its value.
+    sizeOutcome=if saGridSize sa then Just (synthesizeSize sa dep scenes) else Nothing
+    sizeRule=case sizeOutcome of Just (Right r,_)->Just r; _->Nothing
+    dims=case sizeRule of
+      Just r->[either (const (O.canvas x)) id (outputSize dep r x) | (x,_)<-scenes]
+      Nothing->inDims
+    -- typed slot templates depend only on the axis: enumerated once per run
+    -- (Stage B0 appends the Bool operators and the bounds leaves after the
+    -- Stage A ones, so the Stage A enumeration order is a prefix)
+    holeCfg=holeConfigB sa (sbBoolOps sb)
+    slotTemplates AX=templatesAX
+    slotTemplates AY=templatesAY
+    templatesAX=enumerateTemplates holeCfg (slotLeavesB (sbBounds sb) AX) TyInt
+    templatesAY=enumerateTemplates holeCfg (slotLeavesB (sbBounds sb) AY) TyInt
+    -- Stage B frozen snapshot of one axis: grounded over every (case, input
+    -- object) context with the realization canvas of the case; Previous
+    -- leaves are not grounded before alignment and stay in the concrete
+    -- typed-hole layer. Built lazily at the first ScalarFailure trigger.
+    caseObjects c=sort (nub (map placedFromObject (O.objects (fst (scenes !! c)))))
+    objectIndex=M.fromList [((c,p),k) | c<-cases, (k,p)<-zip [0::Int ..] (caseObjects c)]
+    contextId c p=maybe (tag c++"unknown") (\k->tag c++"obj"++show k) (M.lookup (c,p) objectIndex)
+    buildSnapshot axis=snapshotFor sb holeCfg axis [(contextId c p,Ctx (dims !! c) (inSet c) p Nothing dep (inDims !! c)) | c<-cases, p<-caseObjects c]
     cases=[0..length scenes-1]
     ncases=length scenes
     dep=mode/=NoDependentIndex
     pol=policyFor mode
     online=mode `notElem` [NoOnlineAbstraction,PostHocOnly]
+    safe=safePolicy mode conf
+    grammar=take (scalarBudget conf) scalarTerms
     inSet c=fst (sets !! c)
     tag c=("case"++show c++":")
     defaultWhy="alignment: no unique common ordering"
+    axisOf name=if take 2 (reverse name)=="YA" then AY else AX
+    mkProgram ex defs lib=Program enc ex defs lib dep (enumerationSeed conf) sizeRule
 
     main :: Search (Either String Program)
     main=do
       forM_ [(InputSet,fst),(OutputSet,snd)] $ \(o,side)->addFeature (Feature NatT (map (show . count . side) sets) ("Count("++show o++")")
         [show o] (Just NeedCount) 1 (if all (\(a,b)->count a==count b) sets then Frozen else Unmatched))
-      if any (\(a,b)->count a/=count b) sets then pure (Left "RankAlign: unequal input/output cardinality") else do
-        pre<-prePath
-        case pre of
-          Left err->pure (Left err)
-          Right (Just p)->pure (Right p)
-          Right Nothing->explained
+      sized<-sizeStep
+      case sized of
+        Left err->pure (Left err)
+        Right ()->
+          -- The object transformation path still requires equal cardinality;
+          -- the canvas support does not resolve cardinality mismatch.
+          if any (\(a,b)->count a/=count b) sets then pure (Left "RankAlign: unequal input/output cardinality") else do
+            pre<-prePath
+            case pre of
+              Left err->pure (Left err)
+              Right (Just p)->pure (Right p)
+              Right Nothing->explained
+
+    -- Stage A grid size: GridWidth/GridHeight/GridSize are typed features of
+    -- the input; the output size is a training target only. The synthesized
+    -- rule is recorded with its representatives, bindings and work.
+    sizeStep :: Search (Either String ())
+    sizeStep=case sizeOutcome of
+      Nothing->pure (Right ())
+      Just (res,stats)->do
+        let ws=[gridWidth (O.canvas x) | (x,_)<-scenes]; hs=[gridHeight (O.canvas x) | (x,_)<-scenes]
+            ows=[gridWidth (O.canvas y) | (_,y)<-scenes]; ohs=[gridHeight (O.canvas y) | (_,y)<-scenes]
+            w=ssWidth stats; h=ssHeight stats
+        mapM_ addFeature
+          [Feature NatPosT (map show ws) "GridWidth(Input)" ["Grid -> NatPos","input-side feature"] (Just NeedCanvas) 1 Frozen
+          ,Feature NatPosT (map show hs) "GridHeight(Input)" ["Grid -> NatPos","input-side feature"] (Just NeedCanvas) 1 Frozen
+          ,Feature Size2T (map show (zip ws hs)) "GridSize(Input)" ["Grid -> Size2 = (NatPos,NatPos) in (width,height) order"] (Just NeedCanvas) 1 Frozen
+          ,Feature Size2T (map show (zip ows ohs)) "GridSize(Output)" ["ground-truth target during training; never an input of the program"] (Just NeedCanvas) 0 (if isRight res then Matched else Unmatched)]
+        inc "size_rule_templates" (trTemplatesTried w+trTemplatesTried h)
+        inc "size_rule_evaluations" (trEvaluations w+trEvaluations h)
+        inc "operator_applications" (trEvaluations w+trEvaluations h)
+        inc "size_rule_candidates" (length (trFits w)+length (trFits h))
+        inc "size_rule_truncations" (length [() | trTruncated w]+length [() | trTruncated h])
+        traceMsg ("size rule ("++(if ssFixedGrammar stats then "fixed templates" else "typed holes")++"): width "++show (length (trFits w))++" representatives, height "++show (length (trFits h))++" representatives, "++show (trEvaluations w+trEvaluations h)++" evaluations")
+        case res of
+          Left err->do traceMsg ("size: "++err); pure (Left ("size: "++err))
+          Right r->do
+            setMetric "size_rule_exact" 1
+            when (any (\(a,b)->O.canvas a/=O.canvas b) scenes) (inc "canvas_changes_entering_search" 1)
+            addFeature (Feature Size2T (map show [(gridWidth d,gridHeight d) | d<-dims]) (sizeRuleText r) (srWitness r) (Just NeedCanvas) (tCost (srWidth r)+tCost (srHeight r)) Frozen)
+            traceMsg ("SizeRule "++sizeRuleText r)
+            pure (Right ())
 
     -- Deliberate ablations that pair items without an alignment explanation.
     prePath :: Search (Either String (Maybe Program))
@@ -239,15 +420,16 @@ frontSearch mode conf examples
           onGraph (\g->g {keyCandidates=keyCandidates g++[KeyCandidate key origin (isSeedKey key) name ("rejected: "++e) (keyCost key)]})
           pure False
         []->do
-          modify (\s->s {stViews=foldr (\(c,Right v)->M.insert (key,origin,c) v) (stViews s) results})
+          modify (\s->s {stViews=foldr (\(c,r)->either (const id) (M.insert (key,origin,c)) r) (stViews s) results})
           unless (isSeedKey key) (inc "synthesized_keys_accepted" 1)
           onGraph (\g->g {keyCandidates=keyCandidates g++[KeyCandidate key origin (isSeedKey key) name "strict ordering on every case" (keyCost key)]})
           pure True
     loop :: [KeyExpr] -> [(KeyExpr,KeyExpr)] -> String -> Search (Either String Program)
     loop _ [] why=pure (Left why)
     loop keys ((kIn,kOut):rest) why=do
-      modify (\s->s {stTried=S.insert (kIn,kOut) (stTried s), stDerivation=[], stResults=[], stCF=[]})
+      modify (\s->s {stTried=S.insert (kIn,kOut) (stTried s), stDerivation=[], stResults=[], stCF=[], stPending=[], stGrammarFits=M.empty})
       inc "alignment_attempts" 1
+      setMetric "alignment_candidates_remaining" (length rest)
       aligned<-alignAttempt kIn kOut (length rest)
       case aligned of
         Left err->do inc "alignment_rejections" 1; loop keys rest ("alignment: "++err)
@@ -267,7 +449,9 @@ frontSearch mode conf examples
                 Right p->pure (Right p)
                 Left err->loop keys rest err
     -- One explained alignment attempt. After promotion, the per-case
-    -- order/order/align chain is a single Call(I_k) node (reuse).
+    -- order/order/align chain is a single Call(I_k) node (reuse). The reused
+    -- witnesses are the same rankAlign results as the expanded path would
+    -- produce, which is verified and counted (no key pair or witness is lost).
     alignAttempt :: KeyExpr -> KeyExpr -> Int -> Search (Either String ([Alignment],[String]))
     alignAttempt kIn kOut remaining=do
       views<-gets stViews
@@ -281,7 +465,11 @@ frontSearch mode conf examples
               step<-tick
               let node=RNode ("call:"++absName ab++":"++show step) "Call" [PAbs (absName ab),PConcept (show kIn),PConcept (show kOut)]
                          ["set:Input","set:Output","abstraction:"++absName ab] "alignment"
+                  expanded=[(c,rankAlign (views M.! (kIn,InputSet,c)) (views M.! (kOut,OutputSet,c))) | c<-cases]
+                  verified=and [Right w==r | (w,(_,r))<-zip ws expanded]
               reuse ab step (3*ncases-1) [node]
+              if verified then inc "rank_reuse_witnesses_verified" ncases
+                else traceMsg "RankCorrespondence reuse diverged from expansion (should be impossible)"
               pure (replicate ncases (rnId node))
             []->do
               let instances=[(tag c,alignmentNodes (tag c) kIn kOut) | c<-cases]
@@ -336,6 +524,8 @@ frontSearch mode conf examples
 
     -- Realization: indexed equality, lift, NeedConstruct, counterfactual
     -- contexts, slot fitting with semantic classes, exact whole-grid check.
+    -- Under SafeReuse a failed realization first resumes the deferred
+    -- candidates of this alignment before the alignment is abandoned.
     realize :: [KeyExpr] -> (KeyExpr,KeyExpr) -> [[(Placed,Placed)]] -> [Alignment] -> Bool -> Search (Either String Program)
     realize keys expr ps ws unsafe=do
       let flat=concat ps
@@ -360,15 +550,40 @@ frontSearch mode conf examples
         inc "counterfactual_contexts_rejected" (length illegal)
         pure [(c,f) | (_,f)<-legal]
       modify (\s->s {stCF=concat cfs})
-      bodyR<-fitBody ps
-      case bodyR of
-        Left err->pure (Left err)
-        Right body->do
-          lib<-gets stLibrary
-          let def=Definition (fst expr) body unsafe
-              inline=Program enc (Inline def) M.empty lib dep
-          if all (\(x,y)->runProgram inline x==Right y) examples then finalize def ps
-          else pure (Left "realization: final grid exact check failed")
+      slotsR<-fitBody ps
+      let inlineOf m lib=mkProgram (Inline (Definition (fst expr) (bodyFrom m) unsafe)) M.empty lib
+          outcomes m lib=[runProgram (inlineOf m lib) x | (x,_)<-examples]
+          exact m lib=and [r==Right y | (r,(_,y))<-zip (outcomes m lib) examples]
+      lib<-gets stLibrary
+      -- Grid realization is reported separately from whole-grid exactness: a
+      -- render failure (cell outside the realized canvas, invalid size) is not
+      -- the same failure as a rendered grid that differs from the target.
+      attempt<-case slotsR of
+            Left err->pure (Left err)
+            Right m->do
+              inc "grid_realizations_attempted" 1
+              let rs=outcomes m lib
+                  errs=[e | Left e<-rs]
+                  mism=length [() | (Right g,(_,y))<-zip rs examples, g/=y]
+              inc "realization_render_errors" (length errs)
+              inc "realization_mismatches" mism
+              when (null errs) (inc "grid_realization_ok" 1)
+              pure (if exact m lib then Right m else Left (case errs of
+                (e:_)->"realization: output realization failed: "++e
+                []->"realization: final grid exact check failed"))
+      case attempt of
+        Right m->finalize (fst expr) m unsafe ps
+        Left err->do
+          pending<-gets stPending
+          if safe && not (null pending) then do
+            inc "resume_retries" 1
+            traceMsg ("realization failed ("++err++"); resuming deferred candidates of this alignment before abandoning it")
+            alt<-resumeDeferred "realization failure"
+            lib'<-gets stLibrary
+            case slotsR of
+              Right m | exact (M.union alt m) lib'->finalize (fst expr) (M.union alt m) unsafe ps
+              _->pure (Left err)
+          else pure (Left err)
     abstractMatches :: [KeyExpr] -> (KeyExpr,KeyExpr) -> [[(Placed,Placed)]] -> [Alignment] -> Bool -> Search ()
     abstractMatches keys expr ps ws unsafe
       | unsafe = traceMsg "runtime enumeration is not an alignment explanation"
@@ -391,38 +606,176 @@ frontSearch mode conf examples
                   | (key,origin,vs)<-[(fst expr,InputSet,map alignmentLeft ws),(snd expr,OutputSet,map alignmentRight ws)]]
 
     -- Sequence-local body: per axis one shared expression, else First/Following.
-    fitBody :: [[(Placed,Placed)]] -> Search (Either String Body)
+    -- The result is a slot map so that resumed slots can be substituted.
+    bodyFrom :: M.Map String Scalar -> Body
+    bodyFrom m=Body (pick "shared-AX" "first-AX",pick "shared-AY" "first-AY") (pick "shared-AX" "following-AX",pick "shared-AY" "following-AY")
+      where pick shared split=fromMaybe (M.findWithDefault (Lit 0) split m) (M.lookup shared m)
+    fitBody :: [[(Placed,Placed)]] -> Search (Either String (M.Map String Scalar))
     fitBody ps=do
-      let rowsFor axis=[Row c i (Ctx (dims !! c) (inSet c) x prev dep) (obsPos axis y)
+      let rowsFor axis=[Row c i (Ctx (dims !! c) (inSet c) x prev dep (inDims !! c)) (obsPos axis y)
                        | (c,pairs)<-zip cases ps, (i,(x,y))<-zip [0..] pairs
                        , let prev=if i==0 then Nothing else let (pin,pout)=pairs !! (i-1) in Just pin {placedPos=placedPos pout}]
+          -- Trigger before expansion: the typed hole search of an axis opens
+          -- only after the whole v0.6.1 grammar path of that axis has failed,
+          -- so every v0.6.1 solution is reproduced unchanged.
           axisFit axis remainingAfter=do
+            r<-axisPass Grammar axis remainingAfter
+            r'<-case r of
+              Left e | sbGraph sb->do
+               spentB<-gets (\s->metric "b_row_lookups" (stGraph s)+metric "b_flat_row_evaluations" (stGraph s))
+               if spentB>=sbTotalBudget sb then do
+                 inc "b_global_truncations" 1
+                 traceMsg ("ScalarFailure on axis "++show axis++": referent hierarchy not opened (run budget "++show (sbTotalBudget sb)++" exhausted)")
+                 pure r
+               else do
+                -- Stage B: the referent hierarchy of the axis opens on the
+                -- same ScalarFailure trigger, before the typed hole search
+                inc "b_hierarchy_slots" 1
+                traceMsg ("ScalarFailure on axis "++show axis++" ("++e++"): referent hierarchy ("++show (sbSchedule sb)++") unlocked under NeedTransform")
+                rh<-axisPass Hierarchy axis remainingAfter
+                case rh of
+                  Right x->do inc "b_hierarchy_solved_slots" 1; pure (Right x)
+                  Left eh->do inc "b_hierarchy_fallbacks" 1; traceMsg ("hierarchy found no fit on axis "++show axis++" ("++eh++"); concrete typed-hole layer follows"); pure (Left e)
+              _->pure r
+            case r' of
+              Right x->pure (Right x)
+              Left e | saTypedHoles sa->do
+               spent<-gets (metric "typed_hole_evaluations" . stGraph)
+               if spent>=saTotalHoleBudget sa then do
+                 inc "typed_hole_global_truncations" 1
+                 traceMsg ("ScalarFailure on axis "++show axis++": typed hole search not opened (global typed budget "++show (saTotalHoleBudget sa)++" exhausted)")
+                 pure (Left (e++"; typed hole search skipped: global typed budget exhausted"))
+               else do
+                inc "typed_hole_slots_triggered" 1
+                traceMsg ("ScalarFailure on axis "++show axis++" ("++e++"): typed N-ary hole search unlocked under NeedTransform")
+                r2<-axisPass TypedHoles axis remainingAfter
+                pure (either (\e2->Left (e++"; "++e2)) Right r2)
+                     | otherwise->pure (Left e)
+          axisPass src axis remainingAfter=do
             let rs=rowsFor axis
-            shared<-fitSlot ("shared-"++show axis) rs remainingAfter
+            shared<-fitSlot src ("shared-"++show axis) rs remainingAfter
             case shared of
-              Right e->pure (Right (e,e))
+              Right e->pure (Right [("shared-"++show axis,e)])
               Left _->do
-                f<-fitSlot ("first-"++show axis) (filter ((==0) . rowRank) rs) (remainingAfter+1)
-                n<-fitSlot ("following-"++show axis) (filter ((>0) . rowRank) rs) remainingAfter
-                pure ((,) <$> f <*> n)
+                f<-fitSlot src ("first-"++show axis) (filter ((==0) . rowRank) rs) (remainingAfter+1)
+                n<-fitSlot src ("following-"++show axis) (filter ((>0) . rowRank) rs) remainingAfter
+                pure ((\a b->[("first-"++show axis,a),("following-"++show axis,b)]) <$> f <*> n)
       xr<-axisFit AX 1
       case xr of
         Left e->pure (Left e)
-        Right (fx,nx)->do
+        Right xs->do
           yr<-axisFit AY 0
-          pure (fmap (\(fy,ny)->Body (fx,fy) (nx,ny)) yr)
-    fitSlot :: String -> [Row] -> Int -> Search (Either String Scalar)
-    fitSlot name rows' remaining=do
-      let slotAxis=if take 2 (reverse name)=="YA" then AY else AX
+          pure (fmap (\ys->M.fromList (xs++ys)) yr)
+    -- Call(I_k) is admitted only through the same checks as any candidate:
+    -- family/contract, output type, ontology slice, arity, and the same rows.
+    legalCall :: Abstraction -> Bool
+    legalCall ab=absFamily ab=="SequentialScalar" && absOutputType ab=="Int" && "scalar" `elem` absOntologySlice ab
+      && maybe False (\d->length (absParamKinds d)==length (absFreeParams ab)) (absDef ab)
+    fitSlot :: Source -> String -> [Row] -> Int -> Search (Either String Scalar)
+    -- Stage B hierarchy: the slot rows are looked up in the frozen snapshot
+    -- of the axis (one check per agreement class under the schedule; every
+    -- member of a fitting class fits because the rows are grounded contexts).
+    -- NoHierarchy evaluates the same universe candidate by candidate.
+    fitSlot Hierarchy name rows' _=do
+      let slotAxis=axisOf name
+      lib<-gets stLibrary
+      cfs<-gets stCF
+      prior<-gets (M.findWithDefault [] name . stGrammarFits)
+      if null rows' then do traceMsg (name++": no rows; trivially satisfied"); pure (Right (Lit 0)) else do
+        g<-ensureSnapshot slotAxis
+        let ctxIdx=contextIndex g
+            keys=sequence [M.lookup (contextId (rowCase r) (ctxCurrent (rowCtx r))) ctxIdx | r<-rows']
+        case keys of
+          Nothing->do traceMsg (name++": hierarchy: a row context is not a grounded snapshot context"); pure (Left ("hierarchy: row context not grounded for "++name))
+          Just ks->do
+            let search | sbHierarchy sb = searchClasses sb g (zip ks (map (VI . rowTarget) rows'))
+                       | otherwise = searchFlat sb g [(evalSlotLeaf lib (rowCtx r),VI (rowTarget r)) | r<-rows']
+                terms=[(i,rfTerm (rgNodes g M.! i)) | i<-csFits search]
+                typed=[(i,Typed e) | (i,t)<-terms, Just e<-[lambdaToTyped t]]
+                typedFits=map snd typed
+                fits=prior++[f | f<-typedFits, f `notElem` prior]
+            inc "operator_applications" (csRowLookups search+csRowEvaluations search)
+            inc "b_class_checks" (csClassChecks search)
+            inc "b_row_lookups" (csRowLookups search)
+            inc "b_flat_row_evaluations" (csRowEvaluations search)
+            inc "b_candidates_covered" (csCandidatesCovered search)
+            inc "b_fitting_classes" (csFittingClasses search)
+            inc "b_layer_exposed" (sum (M.elems (csLayerExposed search)))
+            inc "b_layer_searched" (sum (M.elems (csLayerSearched search)))
+            inc "b_layer_truncated" (sum (M.elems (csLayerTruncated search)))
+            when (csTruncated search) (inc "b_slot_truncations" 1)
+            traceMsg (name++": hierarchy "++(if sbHierarchy sb then show (sbSchedule sb) else "flat")++": "++show (csClassChecks search)++" class checks, "++show (csFittingClasses search)++" fitting classes, "
+              ++show (csRowLookups search)++" row lookups, "++show (csRowEvaluations search)++" row evaluations, "++show (length typedFits)++" candidates"++(if csTruncated search then " (budget truncated)" else "")
+              ++"; layers exposed/searched/truncated "++show (M.toList (csLayerExposed search))++"/"++show (M.toList (csLayerSearched search))++"/"++show (M.toList (csLayerTruncated search)))
+            if null fits then pure (Left ("feature transformation: no uniform "++name++" expression in the referent hierarchy ("++show (csClassChecks search)++" class checks)")) else do
+              let (cls,evals)=buildClass pol lib name slotAxis rows' cfs fits
+              recordClass cls evals
+              inc "b_hierarchy_fits" (length typedFits)
+              let e=scSelected cls
+                  node=case [i | (i,f)<-typed, f==e] of (i:_)->Just i; []->Nothing
+                  witness=case node of
+                    Just i->let c=rgClassOf g M.! i in
+                      ["referent node #"++show i++", class #"++show c++" of "++show (length (rgClasses g M.! c))++" members, generality "++show (M.findWithDefault 0 i (rgGenerality g))++", schedule "++show (sbSchedule sb)]
+                      ++["edge "++edgeText slotLeafName ed | ed<-take 4 [ed | ed<-rgEdges g, eStatus ed==Confirmed, eFrom ed==i || eTo ed==i]]
+                    Nothing->["selected representative comes from the scalar grammar"]
+                  instances=[(tag c++name++":hier:",scalarNodes (tag c++name++":hier:") e) | c<-cases]
+              addNodes (concatMap snd instances)
+              mapM_ (\c->addResult (tag c++name++":hier:r")) cases
+              addFeature (Feature (ScalarT name) (map (show . rowTarget) rows') (show e)
+                (["referent hierarchy (ScalarFailure trigger)","semantic class of "++show (length (scReps cls))++" representatives",intensionality e]++witness) (Just NeedTransform) (scalarLength e) Frozen)
+              pure (Right e)
+    -- Typed N-ary hole search over the slot's visible leaves (the slot axis
+    -- plus axis-free aggregates and the input grid dimension). The grammar
+    -- fits recorded for this slot stay in the class next to the typed ones:
+    -- constants and input-dependent expressions coexist as representatives.
+    fitSlot TypedHoles name rows' _=do
+      let slotAxis=axisOf name
+      lib<-gets stLibrary
+      cfs<-gets stCF
+      prior<-gets (M.findWithDefault [] name . stGrammarFits)
+      if null rows' then do traceMsg (name++": no rows; trivially satisfied"); pure (Right (Lit 0)) else do
+        let hc=holeCfg
+            tr=synthesizeTyped hc slotLeafName (slotTemplates slotAxis) [(evalSlotLeaf lib (rowCtx r),VI (rowTarget r)) | r<-rows']
+            typedFits=map (Typed . cExpr) (trFits tr)
+            fits=prior++typedFits
+        inc "operator_applications" (trEvaluations tr)
+        inc "typed_hole_templates" (trTemplatesTried tr)
+        inc "typed_hole_evaluations" (trEvaluations tr)
+        inc "typed_hole_fits" (length typedFits)
+        inc "typed_hole_constant_fits" (trConstantFits tr)
+        inc "typed_hole_feature_fits" (trFeatureOnlyFits tr)
+        when (trTruncated tr) (inc "typed_hole_truncations" 1)
+        traceMsg (name++": typed holes: "++show (trTemplatesTried tr)++"/"++show (trTemplates tr)++" templates, "++show (trEvaluations tr)++" evaluations, "++show (length typedFits)++" fits"++(if trTruncated tr then " (budget truncated)" else ""))
+        if null fits then pure (Left ("feature transformation: no uniform "++name++" expression after typed hole search ("++show (trTemplatesTried tr)++" templates)")) else do
+          let (cls,evals)=buildClass pol lib name slotAxis rows' cfs fits
+          recordClass cls evals
+          let e=scSelected cls
+              bindings=case [c | c<-trFits tr, Typed (cExpr c)==e] of
+                (c:_)->map bindingText (cBindings c)
+                []->["selected representative comes from the scalar grammar"]
+              instances=[(tag c++name++":typed:",scalarNodes (tag c++name++":typed:") e) | c<-cases]
+          addNodes (concatMap snd instances)
+          mapM_ (\c->addResult (tag c++name++":typed:r")) cases
+          addFeature (Feature (ScalarT name) (map (show . rowTarget) rows') (show e)
+            (["typed N-ary hole synthesis (ScalarFailure trigger)","semantic class of "++show (length (scReps cls))++" representatives",intensionality e]++bindings) (Just NeedTransform) (scalarLength e) Frozen)
+          pure (Right e)
+    fitSlot Grammar name rows' remaining=do
+      let slotAxis=axisOf name
       step<-tick
       lib<-gets stLibrary
       cfs<-gets stCF
       ops<-visible "SequentialScalar"
-      let calls=[(ab,Call (absName ab) args) | ab<-ops, Just d<-[absDef ab], args<-argCombos (absParamKinds d)]
-      (callFits,n1)<-pure (evaluateAll lib rows' (map snd calls))
+      let legal=filter legalCall ops
+          calls=[(ab,Call (absName ab) args) | ab<-legal, Just d<-[absDef ab], args<-argCombos (absParamKinds d)]
+          (callFits,n1)=evaluateAll lib rows' (map snd calls)
+      inc "call_legality_checks" (length ops)
+      inc "call_legality_rejections" (length ops-length legal)
+      inc "call_attempts" (length calls)
       inc "operator_applications" n1
+      unless (null calls) (inc "reuse_attempts" 1)
       if null rows' then do traceMsg (name++": no rows; trivially satisfied"); pure (Right (Lit 0)) else
         if not (null callFits) then do
+          inc "reuse_hits" 1
           let ab=head [a | (a,c)<-calls, c `elem` callFits]
               node=RNode (name++":call:"++show step) "Call" [PAbs (absName ab)] ["abstraction:"++absName ab,"ref:Current","ref:Previous"] "scalar"
           reuse ab step (uNodesHidden (absUtility ab)*ncases-1) [node]
@@ -430,13 +783,30 @@ frontSearch mode conf examples
           let (cls,evals)=buildClass pol lib name slotAxis rows' cfs callFits
           recordClass cls evals
           addFeature (Feature (ScalarT name) (map (show . rowTarget) rows') (show (scSelected cls)) ["Call of accepted online abstraction",intensionality (scSelected cls)] (Just NeedTransform) (scalarLength (scSelected cls)) Frozen)
+          -- The residual grammar is deferred, never deleted.
+          let df=Deferred name (0,length grammar) (absName ab) (absPromotionStep ab) step
+                   (if safe then "deferred" else "never-resumed (exclusive policy)")
+                   ("preferred Call branch accepted on slot "++name++"; residual scalar grammar ["++show (length grammar)++" terms] deferred")
+                   Nothing 0 (length (scReps cls)) (length (scReps cls)) (show (scSelected cls)) (show (scSelected cls)) False
+          onGraph (\g->g {deferred=deferred g++[df]})
+          inc "deferred_candidates" (length grammar)
+          modify (\s->s {stPending=stPending s++[(name,rows',callFits)]})
           pure (Right (scSelected cls))
         else do
-          let (fits,n2)=evaluateAll lib rows' (take (scalarBudget conf) scalarTerms)
+          let (fits,n2)=evaluateAll lib rows' grammar
           inc "operator_applications" n2
+          modify (\s->s {stGrammarFits=M.insert name fits (stGrammarFits s)})
+          unless (null calls) $ do
+            inc "resume_events" 1
+            inc "resumed_candidates" (length grammar)
+            traceMsg (name++": preferred Call branch failed on the training rows; residual grammar resumed immediately")
+          unless (null calls) $ onGraph (\g->g {deferred=deferred g++[Deferred name (0,length grammar) (intercalate "," (map absName legal)) (-1) step
+            "resumed-immediately" ("preferred Call branch failed on slot "++name++"; residual grammar enumerated") (Just step) (length grammar)
+            0 (length fits) "" (case fits of []->"no training-exact candidate"; _->"see class record") (not (null fits))]})
           if null fits then pure (Left ("feature transformation: no uniform "++name++" scalar expression")) else do
             let (cls,evals)=buildClass pol lib name slotAxis rows' cfs fits
             recordClass cls evals
+            unless (null calls) $ onGraph (\g->g {deferred=[if dfSlot d==name && dfCreatedStep d==step then d {dfClassAfter=length (scReps cls), dfSelectedAfter=show (scSelected cls)} else d | d<-deferred g]})
             let e=scSelected cls
                 instances=[(tag c++name++":",scalarNodes (tag c++name++":") e) | c<-cases]
             addNodes (concatMap snd instances)
@@ -449,6 +819,95 @@ frontSearch mode conf examples
                 ,["Ref Current","Ref Previous (alignment-derived)","Scene","InputSet"],"Int",params,["scalar"]
                 ,["training-exact on every case for slot "++name],Just (AbsDef pbody (map snd params)))
             pure (Right e)
+    -- The frozen snapshot of an axis is built once per run, at the first
+    -- trigger; its statistics are recorded as search work and in the graph.
+    ensureSnapshot :: Axis -> Search (RefGraph SlotLeaf)
+    ensureSnapshot axis=do
+      snaps<-gets stSnapshots
+      case M.lookup axis snaps of
+        Just g->pure g
+        Nothing->do
+          let g=buildSnapshot axis
+              st=rgStats g
+          modify (\s->s {stSnapshots=M.insert axis g (stSnapshots s)})
+          inc "operator_applications" (gsBuildWork st)
+          inc "b_snapshots_built" 1
+          mapM_ (\(k,v)->inc k v)
+            [("b_snapshot_work",gsBuildWork st),("b_graph_nodes",gsNodes st),("b_graph_classes",gsClasses st),("b_graph_templates",gsTemplates st),("b_graph_closed_terms",gsClosedTerms st)
+            ,("b_constant_only_dropped",gsConstantOnlyDropped st),("b_edges_confirmed",gsEdgesConfirmed st),("b_edges_pending",gsEdgesPending st),("b_edges_not_supported",gsEdgesNotSupported st)
+            ,("b_type_edges",gsTypeEdges st),("b_closure_edges",gsClosureEdges st),("b_sccs",gsSCCs st),("b_substitutions_tried",gsSubstitutionsTried st),("b_outside_universe",gsOutsideUniverse st)
+            ,("b_vsa_nodes",gsVSANodes st),("b_vsa_unions",gsVSAUnions st),("b_vsa_expanded",gsExpanded st),("b_dag_evaluations",gsDAGEvaluations st),("b_reference_evaluations",gsReferenceEvaluations st)
+            ,("b_witness_full",gsWitnessFull st),("b_graph_truncations",if gsTruncated st then 1 else 0),("b_edge_truncations",if gsEdgeTruncated st then 1 else 0)
+            ,("b_vsa_expansion_mismatch",if gsExpansionOk st then 0 else 1)]
+          setMax "b_layers" (gsLayers st)
+          setMax "b_sharing_avg_x100" (gsSharingAvgX100 st)
+          setMax "b_sharing_max_x100" (gsSharingMaxX100 st)
+          onGraph (\gr->gr {referents=referents gr++[graphSummary (show axis) (sbSchedule sb) slotLeafName g]})
+          traceMsg ("referent snapshot "++show axis++": "++show (gsNodes st)++" nodes ("++show (gsTemplates st)++" templates, "++show (gsClosedTerms st)++" closed terms"++(if gsTruncated st then ", universe truncated" else "")++"), "
+            ++show (gsClasses st)++" classes, edges confirmed/pending/unsupported "++show (gsEdgesConfirmed st)++"/"++show (gsEdgesPending st)++"/"++show (gsEdgesNotSupported st)
+            ++", type edges "++show (gsTypeEdges st)++", layers "++show (gsLayers st)++", DAG nodes "++show (gsVSANodes st)++" (unions "++show (gsVSAUnions st)++"), build work "++show (gsBuildWork st)
+            ++" (dag "++show (gsDAGEvaluations st)++" / reference "++show (gsReferenceEvaluations st)++"), expansion check "++(if gsExpansionOk st then "ok" else "MISMATCH")++", snapshot hash "++show (rgSnapshotHash g))
+          pure g
+    -- Resume every deferred slot of the current alignment: enumerate the
+    -- residual grammar, complete the class (Call representatives stay in it),
+    -- re-rank with the same prior, and report whether the selection changed.
+    resumeDeferred :: String -> Search (M.Map String Scalar)
+    resumeDeferred reason=do
+      pending<-gets stPending
+      modify (\s->s {stPending=[]})
+      lib<-gets stLibrary
+      cfs<-gets stCF
+      fmap M.fromList $ forM pending $ \(name,rows',callFits)->do
+        step<-tick
+        let (fits,n)=evaluateAll lib rows' grammar
+            allFits=callFits++[f | f<-fits, f `notElem` callFits]
+            (cls,evals)=buildClass pol lib name (axisOf name) rows' cfs allFits
+        inc "operator_applications" n
+        inc "resume_events" 1
+        inc "resumed_candidates" (length grammar)
+        inc "counterfactual_evaluations" evals
+        old<-gets (\s->[c | c<-classes (stGraph s), scSlot c==name])
+        let before=case old of []->Lit 0; cs->scSelected (last cs)
+            changed=scSelected cls/=before
+        onGraph (\g->g {classes=replaceLastClass name cls (classes g)
+          , deferred=replaceLastDeferred name (\d->d {dfStatus="resumed", dfReason=dfReason d++"; resumed: "++reason, dfResumedStep=Just step
+              , dfResumedCandidates=length grammar, dfClassAfter=length (scReps cls), dfSelectedAfter=show (scSelected cls), dfRecovered=changed}) (deferred g)})
+        when changed $ do
+          inc "recovered_solutions" 1
+          let e=scSelected cls
+              instances=[(tag c++name++":resumed:",scalarNodes (tag c++name++":resumed:") e) | c<-cases]
+          addNodes (concatMap snd instances)
+          mapM_ (\c->addResult (tag c++name++":resumed:r")) cases
+          addFeature (Feature (ScalarT name) (map (show . rowTarget) rows') (show e) ["re-selected after resuming "++show (length grammar)++" deferred candidates",intensionality e] (Just NeedTransform) (scalarLength e) Frozen)
+        traceMsg ("resume "++name++" ("++reason++"): class "++show (length (scReps cls))++" representatives; selected "++show (scSelected cls)++(if changed then " (re-selected)" else " (unchanged)"))
+        pure (name,scSelected cls)
+    -- Exclusive policy diagnostic: measure what the solver never saw. This
+    -- runs after the search and is counted separately from search work.
+    diagnoseExclusive :: Search ()
+    diagnoseExclusive=do
+      pending<-gets stPending
+      modify (\s->s {stPending=[]})
+      lib<-gets stLibrary
+      cfs<-gets stCF
+      forM_ pending $ \(name,rows',callFits)->do
+        let (fits,n)=evaluateAll lib rows' grammar
+            missed=[f | f<-fits, f `notElem` callFits]
+            (cls,_)=buildClass pol lib name (axisOf name) rows' cfs (callFits++missed)
+            lost=scSelected cls `notElem` callFits
+        inc "diagnostic_operator_applications" n
+        inc "exclusive_reuse_missed_candidates" (length missed)
+        when lost (inc "exclusive_reuse_missed_solutions" 1)
+        onGraph (\g->g {deferred=replaceLastDeferred name (\d->d {dfReason=dfReason d++"; diagnostic (not used by the solver): "++show (length missed)++" residual training-exact candidates never seen"
+          , dfClassAfter=length (scReps cls), dfSelectedAfter=show (scSelected cls), dfRecovered=False}) (deferred g)})
+        traceMsg ("exclusive diagnostic "++name++": "++show (length missed)++" missed candidates; complete-class selection "++show (scSelected cls)++(if lost then " differs from the Call" else " equals the Call"))
+    replaceLastClass :: String -> SemanticClass -> [SemanticClass] -> [SemanticClass]
+    replaceLastClass name cls cs=case break ((==name) . scSlot) (reverse cs) of
+      (after,_:before)->reverse before++[cls]++reverse after
+      _->cs++[cls]
+    replaceLastDeferred :: String -> (Deferred -> Deferred) -> [Deferred] -> [Deferred]
+    replaceLastDeferred name f ds=case break (\d->dfSlot d==name && dfStatus d `elem` ["deferred","never-resumed (exclusive policy)"]) (reverse ds) of
+      (after,d:before)->reverse before++[f d]++reverse after
+      _->ds
     argCombos :: [String] -> [[Arg]]
     argCombos kinds=sequence [if k=="Constant" then map ArgInt [-1,0,1] else map ArgAxis [AX,AY] | k<-kinds]
     evaluateAll :: Library -> [Row] -> [Scalar] -> ([Scalar],Int)
@@ -459,28 +918,38 @@ frontSearch mode conf examples
     recordClass :: SemanticClass -> Int -> Search ()
     recordClass cls evals=do
       onGraph (\g->g {classes=classes g++[cls]})
-      inc "semantic_classes" 1
-      inc "representatives" (length (scReps cls))
-      setMax "max_representatives_per_class" (length (scReps cls))
       inc "counterfactual_evaluations" evals
-      inc "counterfactual_splits" (scSplits cls)
-      inc "canonical_merges" (scMerges cls)
-      inc "premature_collapses" (scPrematureCollapses cls)
-      inc "dropped_by_collapse" (scDropped cls)
-      inc "intensional_candidates" (length [() | r<-scReps cls, repClass r/="literal-derived"])
-      inc "literal_candidates" (length [() | r<-scReps cls, repClass r=="literal-derived"])
       traceMsg ("class "++scSlot cls++": "++show (length (scReps cls))++" representatives, "++show (scSplits cls)++" counterfactual splits; selected "++show (scSelected cls))
 
     -- Final wrapping (I_0) and the high-level view. PostHocOnly additionally
     -- extracts scalar abstractions now, after the search, without feedback.
-    finalize :: Definition -> [[(Placed,Placed)]] -> Search (Either String Program)
-    finalize def0 ps=do
+    -- SafeReuse exhausts the preferred branch here: every deferred slot is
+    -- resumed so the final selection ranges over the complete candidate set.
+    finalize :: KeyExpr -> M.Map String Scalar -> Bool -> [[(Placed,Placed)]] -> Search (Either String Program)
+    finalize key slots0 unsafe ps=do
+      firstWork<-currentWork
+      setMetric "first_solution_work" firstWork
+      pending<-gets stPending
+      slots<-if safe && not (null pending) then do
+          traceMsg "first solution found; exhausting the preferred branch: resuming deferred candidates"
+          alt<-resumeDeferred "exhaust preferred branch after first solution"
+          lib'<-gets stLibrary
+          let m'=M.union alt slots0
+              inline=mkProgram (Inline (Definition key (bodyFrom m') unsafe)) M.empty lib'
+          if m'/=slots0 then
+            if all (\(x,y)->runProgram inline x==Right y) examples then do inc "reselected_after_completion" 1; traceMsg "re-selected program after completion is training exact"; pure m'
+            else do traceMsg "re-selected program diverged on training (unexpected); keeping the first solution"; pure slots0
+          else pure slots0
+        else do
+          unless safe diagnoseExclusive
+          pure slots0
+      let def0=Definition key (bodyFrom slots) unsafe
       def<-if mode==PostHocOnly then postHoc def0 else pure def0
       results<-gets stResults
       addNodes [RNode "realize" "Realize" [] results "realization"]
       nodes<-gets stDerivation
       lib<-gets stLibrary
-      let Definition key body unsafe=def
+      let Definition _ body _=def
           slotExprs=[fst (bodyFirst body),snd (bodyFirst body),fst (bodyNext body),snd (bodyNext body)]
           usedAbs=nub [n | e<-slotExprs, n<-callsIn e]
           wrap=mode/=NoOnlineAbstraction && not unsafe && cohesive nodes
@@ -491,7 +960,7 @@ frontSearch mode conf examples
                 ["final wrapping of the successful derivation (cohesion-gated, not utility-promoted)",show body]
                 (length nodes) 1 (Utility ncases (length nodes) 1 0 0 0 0 0 0 1 1 0 (promotionThreshold conf) True) 0 0 Nothing 0 0 Nothing
           (exec,defs)=if wrap then (CallTop "I_0",M.singleton "I_0" def) else (Inline def,M.empty)
-          p=Program enc exec defs lib dep
+          p=mkProgram exec defs lib
       when wrap (onGraph (\g->g {abstractions=abstractions g++[top]}))
       addFeature (Feature (ConceptT (SetT ExistsPlacedT)) (map (show . map (placedPos . snd)) ps) (show exec)
         ["sequence-local First/Current/Previous",if wrap then "hidden refinement: "++show (length nodes)++" nodes" else show body] (Just NeedTransform) (length (show body)) Frozen)

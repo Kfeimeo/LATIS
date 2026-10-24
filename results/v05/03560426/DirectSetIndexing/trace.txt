@@ -1,2 +1,0 @@
-DirectSetIndexing: raw encoder enumeration; deliberate unsafe ablation
-alignment validation: aligned Color observer differs

@@ -1,6 +1,0 @@
-DirectSetIndexing: raw encoder enumeration; deliberate unsafe ablation
-runtime enumeration is not an alignment explanation
-class shared-AX: 2 representatives, 1 counterfactual splits; selected Plus (Atom (Pos Current (Ax AX))) (Atom CountShapes)
-proposal SequentialScalar below threshold: utility=3
-class shared-AY: 9 representatives, 1 counterfactual splits; selected Atom (Pos Current (Ax AY))
-None

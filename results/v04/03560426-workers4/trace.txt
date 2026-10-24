@@ -1,2 +1,0 @@
-front failure: grounding: semantic role coverage: missing, tied, or varying object cardinality
-fallback: grounding: semantic role coverage: missing, tied, or varying object cardinality

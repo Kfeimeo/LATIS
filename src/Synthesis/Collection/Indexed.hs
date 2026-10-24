@@ -98,7 +98,7 @@ objectEqual dependent a b
 data KeyExpr = Anchor Corner Axis | Extent Axis | Area | Color | Desc KeyExpr | Lex KeyExpr KeyExpr deriving (Eq,Ord,Show)
 data Origin = InputSet | OutputSet deriving (Eq,Ord,Show)
 data Trigger = NeedCrossItemAlignment | NeedOrderedView | NeedUniqueRef | AlignmentFailure
-  | NeedCount | NeedTransform | NeedConstruct | NeedSemanticCohesion deriving (Eq,Ord,Show)
+  | NeedCount | NeedTransform | NeedConstruct | NeedSemanticCohesion | NeedCanvas deriving (Eq,Ord,Show)
 seedKeys :: [KeyExpr]
 seedKeys = [Anchor TL AX, Anchor TL AY, Area, Color, Lex (Anchor TL AX) (Anchor TL AY), Lex (Anchor TL AY) (Anchor TL AX)]
 isSeedKey :: KeyExpr -> Bool

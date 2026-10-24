@@ -91,6 +91,7 @@ graphJSON g=objectJSON
   ,("rejected_counterfactual_contexts",arrayJSON (map cfJSON (rejectedCounterfactuals g)))
   ,("abstractions",arrayJSON (map absJSON (abstractions g)))
   ,("refinement_nodes",arrayJSON (map nodeJSON (refinements g)))
+  ,("deferred_candidates",arrayJSON (map deferredJSON (deferred g)))
   ,("trace",strings (trace g))]
 
 -- Audit sections required by the v0.6 prompt (19.1-19.3).
@@ -224,11 +225,20 @@ stressTasks =
     f3=[rectOb (10,3) 3 1 6,rectOb (3,9) 1 1 2,rectOb (16,14) 2 3 8]
     fH=[rectOb (12,1) 1 1 1,rectOb (3,5) 2 2 4,rectOb (20,9) 3 1 2,rectOb (7,14) 1 3 9,rectOb (15,22) 2 1 3]
 
+-- The eleven v0.6 modes; v0.6.1 adds SafeOnline/ExclusiveReuseLegacy elsewhere.
+v6Modes :: [Mode]
+v6Modes=[Full,NoCounterfactual,CollapseByTrainingDenotation,NoIntensionalityPrior,FixedAlignmentKeys,NoAlignmentExplanation
+  ,NoOnlineAbstraction,PostHocOnly,NoDependentIndex,DirectSetIndexing,R2FallbackOnly]
+deferredJSON :: Deferred -> String
+deferredJSON d=objectJSON [("slot",jsonString (dfSlot d)),("grammar_range",ints [fst (dfRange d),snd (dfRange d)]),("abstraction",jsonString (dfAbstraction d))
+  ,("promotion_step",show (dfPromotionStep d)),("created_step",show (dfCreatedStep d)),("status",jsonString (dfStatus d)),("reason",jsonString (dfReason d))
+  ,("resumed_step",maybe "null" show (dfResumedStep d)),("resumed_candidates",show (dfResumedCandidates d)),("class_before",show (dfClassBefore d))
+  ,("class_after",show (dfClassAfter d)),("selected_before",jsonString (dfSelectedBefore d)),("selected_after",jsonString (dfSelectedAfter d)),("recovered",boolJSON (dfRecovered d))]
 runMatrix :: FilePath -> Int -> Config -> Task -> IO ()
 runMatrix out mechanismBudget conf vertical=do
   createDirectoryIfMissing True out
   rs<-forM (stressTasks++[("03560426",vertical {taskId="03560426"})]) $ \(name,t)->do
     let legacy=legacyConfig conf
         cfg=if name=="03560426" then conf else conf {legacyConfig=legacy {V4.r2Config=(V4.r2Config legacy) {R2.workBudget=mechanismBudget}}}
-    forM [minBound..maxBound] $ \mode->runTask (out </> name </> show mode) mode cfg t
+    forM v6Modes $ \mode->runTask (out </> name </> show mode) mode cfg t
   writeFile (out </> "metrics.csv") (unlines (("task,mode,front_train,front_heldout,train_exact,heldout_exact,"++intercalate "," csvMetrics):concat rs))

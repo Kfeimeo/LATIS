@@ -1,5 +1,0 @@
-NeedConstruct ObjectT; source closure closed; target=(Unique Nothing,Object)
-OutputWiseWitness (Unique Nothing,Object): all-output witness covered every object
-NeedConstruct CoordT; source closure closed; target=(Unique Nothing,Position)
-front failure: None
-fallback: Not run: front-end-only mechanism matrix

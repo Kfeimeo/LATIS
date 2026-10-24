@@ -240,6 +240,24 @@ python scripts/report_collection.py
 ./scripts/run_collection_v6.ps1
 ```
 
+## v0.6.1：Safe Online Abstraction & Robustness Audit
+
+新增 `solve-collection-v61`、`collection-v61-experiment`、`collection-v61-battery`。在线抽象的复用改为 SafeOnline：`Call(I_k)` 只是优先候选，残余语法作为 deferred 候选保存并在 preferred branch 失败、realization 失败或第一个解之后 resume，最终 class 覆盖 NoOnlineAbstraction 的候选集；`ExclusiveReuseLegacy` 保留 v0.6 行为作对照。新增误导复用任务 G/H、训练完全相同的 paired 任务 P、七个任务族的种子化 metamorphic battery（置换不变、平移等变、size-index 合法性、tie 拒绝、抽象稳健性）。
+
+设计与命令见 [v0.6.1 设计](docs/LATIS_V061.md)，结果见 [实验报告](LATIS_V061_REPORT.md)。
+
+```powershell
+./scripts/run_collection_v61.ps1
+```
+
+## v0.6.1：真实 ARC-AGI-1 Train-only Fallback 实验
+
+只做评估，不改算法：在官方 ARC-AGI-1 `training` split 全部 400 个任务上（`data/arc1-training/`，原样副本），求解器只接收剥离了 `test` 字段的 train-only 文件，先运行 v0.6.1 前端（Feature），无 train-exact 程序、超时、不受支持或运行错误时在**独立进程**中回退到既有 R2；v0.4 feature front 作为诊断列单独运行。新子命令 `arc-train-only-stage`，驱动器 `scripts/arc_train_only.py`（prepare / test / run / report），一键 `scripts/run_arc_train_only.ps1`。方法见 [说明](docs/LATIS_V061_ARC_TRAIN_ONLY.md)，指标、失败分类与任务 ID 见 `results/arc_agi1_train_only_fallback/summary.md`，总结报告见 [LATIS_V061_ARC_TRAIN_ONLY_REPORT.md](LATIS_V061_ARC_TRAIN_ONLY_REPORT.md)。
+
+## 阶段 A：Grid Size Feature + Typed N-ary Feature Synthesis + ML Parity
+
+在 v0.6.1 之上的最小增量（默认全部关闭，`Config.stageA`）：`GridWidth/GridHeight/GridSize` 作为输入侧类型化 Feature，合成的 `Size2` 规则真正创建输出画布再放置对象（`Synthesis.Collection.Size`）；二元 `P(fi)=fo` 推广为类型驱动的 N 元算子应用与 Typed Hole 填充（Feature-first → composed → 跨案例共享的 fitted constant，联合拟合、预算、representatives 全保留；`Synthesis.Collection.Typed`），在 v0.6.1 scalar 语法失败后按触发打开；ML 增加 `mod`/`isOdd`（`Language.ML`）。新子命令 `stage-a-mechanism`、`stage-a-solve`、`arc-train-only-stage --stage stage-a-<Config>`；驱动器 `scripts/arc_stage_a.py`，一键 `scripts/run_stage_a.ps1`。设计见 [docs/LATIS_STAGE_A.md](docs/LATIS_STAGE_A.md)，机制任务、消融与真实 ARC-AGI-1 400 题 train-only 结果见 [docs/LATIS_STAGE_A_REPORT.md](docs/LATIS_STAGE_A_REPORT.md)，数据在 `results/stage_a/`。
+
 ## 案例与程序可视化
 
 `python scripts/visualize_latis.py --solution results/v03r2/core/03560426/Full --out docs/03560426.html`

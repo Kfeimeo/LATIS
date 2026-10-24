@@ -1,6 +1,0 @@
-NeedConstruct ObjectT; source closure closed; target=(Unique Nothing,Object)
-OutputWiseWitness (Unique Nothing,Object): output role/constructor grammar exhausted
-NeedConstruct CoordT; source closure closed; target=(Unique Nothing,Position)
-OutputWiseWitness (Unique Nothing,Position): output role/constructor grammar exhausted
-front failure: source closure/construction unresolved: [(Unique Nothing,Object),(Unique Nothing,Position)]
-fallback: Not run: front-end-only mechanism matrix

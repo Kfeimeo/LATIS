@@ -1,3 +1,0 @@
-NoAlignmentExplanation: unaligned Cartesian equality admitted before explained search
-AlignmentLift (XCoord,YCoord)
-None

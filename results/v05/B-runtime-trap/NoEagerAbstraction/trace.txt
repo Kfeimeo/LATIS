@@ -1,2 +1,0 @@
-AlignmentLift (XCoord,YCoord)
-None

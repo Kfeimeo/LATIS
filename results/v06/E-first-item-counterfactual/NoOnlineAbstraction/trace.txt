@@ -1,7 +1,0 @@
-phase seed: 6 visible keys
-AlignmentLift (Anchor TL AX,Anchor TL AX)
-class first-AX: 13 representatives, 2 counterfactual splits; selected Atom (SceneLow (Ax AX))
-class following-AX: 1 representatives, 0 counterfactual splits; selected Plus (Atom (Pos Previous (Ax AX))) (Atom (Ext Previous (Ax AX)))
-class first-AY: 13 representatives, 2 counterfactual splits; selected Atom (SceneLow (Ax AY))
-class following-AY: 1 representatives, 0 counterfactual splits; selected Plus (Atom (Pos Previous (Ax AY))) (Atom (Ext Previous (Ax AY)))
-None

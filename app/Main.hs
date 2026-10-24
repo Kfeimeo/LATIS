@@ -20,6 +20,10 @@ import qualified Synthesis.Collection as V5
 import qualified ARC.CollectionEvaluate as V5
 import qualified Synthesis.Collection.Front as V6
 import qualified ARC.CollectionV6Evaluate as V6
+import qualified ARC.CollectionV61Evaluate as V61
+import qualified ARC.ArcTrainOnly as ATO
+import qualified ARC.StageAEvaluate as SA
+import qualified ARC.StageBEvaluate as SB
 import Control.Concurrent (getNumCapabilities)
 import Control.Exception (evaluate)
 import GHC.Clock (getMonotonicTimeNSec)
@@ -49,6 +53,14 @@ usage = unlines
   ,"latis collection-experiment --out results/collection (seven ablations; actual unchanged R2 fallback)"
   ,"latis solve-collection-v6 --task data/03560426.json --out results/v06/task --mode Full"
   ,"latis collection-v6-experiment --out results/v06 (eleven ablations incl. counterfactual/online abstraction; actual unchanged R2 fallback)"
+  ,"latis solve-collection-v61 --task data/03560426.json --out results/v061/task --mode SafeOnline"
+  ,"latis collection-v61-experiment --out results/v061 [--repeats 5] (SafeOnline reuse, misleading/paired tasks, nine ablations)"
+  ,"latis collection-v61-battery --out results/v061/battery [--seed-base 2000] [--per-family 20] (seeded metamorphic battery, front-end only)"
+  ,"latis arc-train-only-stage --stage feature|feature-v04|r2|stage-a-<Config> --task TRAIN_ONLY.json --out DIR [--timeout-ms N] (one stage, one task; train-only file required)"
+  ,"latis stage-a-mechanism --out results/stage_a/mechanism [--per-family 3] (Stage A synthetic mechanism tasks x ablation configs + v0.6.1 regression rows)"
+  ,"latis stage-a-solve --task PATH --out DIR --config FullA (one task, one Stage A configuration; writes solution.json/derivation_graph.json/trace.txt)"
+  ,"latis stage-b-mechanism --out results/stage_b/mechanism [--per-family 3] (Stage B synthetic mechanism tasks x ablation configs + Stage A regression rows)"
+  ,"latis stage-b-solve --task PATH --out DIR --config FullB (one task, one Stage B configuration; writes solution.json/derivation_graph.json/trace.txt)"
   ,"latis solve-v04 --task PATH --out results/v04/task --mode Full --feature-budget 12000 --construction-budget 12000 --feature-depth 4 --budget 250000"
   ,"         --workers 1 [--window 4*workers] [--speculation-cap 256]   (source-closure candidate evaluation; pair --workers N with +RTS -N<N> -RTS)"
   ,"latis v04-stress --out results/v04/stress [--workers N] (all ten front-end ablations, matrix sequential; R2 fallback audited separately)"
@@ -143,6 +155,61 @@ main = do
       mechanismBudget <- number "--mechanism-budget" 25000 rest
       task <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
       V6.runMatrix (option "--out" "results/v06" rest) mechanismBudget V6.defaultConfig {V6.legacyConfig=legacy} task
+    "solve-collection-v61":rest -> do
+      mode <- maybe (die "Invalid collection-v61 --mode") pure (readMaybe (option "--mode" "SafeOnline" rest))
+      legacy <- v04Config rest
+      repeats <- number "--repeats" 5 rest
+      task <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+      _ <- V61.runTask61 (option "--out" "results/v061/task" rest) repeats mode V61.v61Config {V6.legacyConfig=legacy} task
+      pure ()
+    "collection-v61-experiment":rest -> do
+      legacy <- v04Config rest
+      mechanismBudget <- number "--mechanism-budget" 25000 rest
+      repeats <- number "--repeats" 5 rest
+      task <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+      V61.runMatrix61 (option "--out" "results/v061" rest) mechanismBudget repeats V61.v61Config {V6.legacyConfig=legacy} task
+    "collection-v61-battery":rest -> do
+      legacy <- v04Config rest
+      seedBase <- number "--seed-base" 2000 rest
+      perFamily <- number "--per-family" 20 rest
+      V61.runBattery (option "--out" "results/v061/battery" rest) seedBase perFamily V61.v61Config {V6.legacyConfig=legacy}
+    "stage-a-mechanism":rest -> do
+      per <- number "--per-family" 3 rest
+      vertical <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+      SA.runMechanism (option "--out" "results/stage_a/mechanism" rest) per vertical
+    "stage-a-solve":rest -> do
+      let cfgName=option "--config" "FullA" rest
+      conf <- maybe (die ("Invalid --config; one of "++unwords SA.configNames)) pure (SA.configByName cfgName)
+      task <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+      let out=option "--out" "results/stage_a/single" rest
+      createDirectoryIfMissing True out
+      (f,secs) <- SA.runFront conf (training task)
+      writeFile (out </> "solution.json") (SA.frontJSON cfgName task f secs++"\n")
+      writeFile (out </> "derivation_graph.json") (V6.graphJSON (V6.graph f)++"\n")
+      writeFile (out </> "trace.txt") (unlines (V6.trace (V6.graph f)++[V6.failure f]))
+      putStrLn (taskId task++" "++cfgName++" train="++show (SA.trainExactOf task f)++" held="++show (SA.heldExactOf task f)++" "++V6.failure f)
+    "stage-b-mechanism":rest -> do
+      per <- number "--per-family" 3 rest
+      vertical <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+      SB.runMechanismB (option "--out" "results/stage_b/mechanism" rest) per vertical
+    "stage-b-solve":rest -> do
+      let cfgName=option "--config" "FullB" rest
+      conf <- maybe (die ("Invalid --config; one of "++unwords SB.configNamesB)) pure (SB.configByNameB cfgName)
+      task <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+      let out=option "--out" "results/stage_b/single" rest
+      createDirectoryIfMissing True out
+      (f,secs) <- SA.runFront conf (training task)
+      writeFile (out </> "solution.json") (SB.frontJSONB cfgName task f secs++"\n")
+      writeFile (out </> "derivation_graph.json") (V6.graphJSON (V6.graph f)++"\n")
+      writeFile (out </> "trace.txt") (unlines (V6.trace (V6.graph f)++[V6.failure f]))
+      putStrLn (taskId task++" "++cfgName++" train="++show (SA.trainExactOf task f)++" held="++show (SA.heldExactOf task f)++" "++V6.failure f)
+    "arc-train-only-stage":rest -> do
+      stage <- maybe (die "Invalid --stage (feature|feature-v04|r2|stage-a-<Config>|stage-b-<Config>)") pure (ATO.parseStage (option "--stage" "feature" rest))
+      ms <- number "--timeout-ms" 60000 rest
+      case (option "--task" "" rest,option "--out" "" rest) of
+        ("",_) -> die "--task is required"
+        (_,"") -> die "--out is required"
+        (task,out) -> ATO.runStage stage task out ms
     "solve-v04":rest -> do
       runMode <- maybe (die "Invalid v04 --mode") pure (readMaybe (option "--mode" "Full" rest))
       conf <- v04Config rest

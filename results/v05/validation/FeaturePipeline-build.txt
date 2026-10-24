@@ -1,2 +1,0 @@
-[7 of 8] Compiling Main             ( test\FeaturePipelineMain.hs, build\collection\Main.o ) [Source file changed]
-[8 of 8] Linking build/collection-FeaturePipeline-tests.exe

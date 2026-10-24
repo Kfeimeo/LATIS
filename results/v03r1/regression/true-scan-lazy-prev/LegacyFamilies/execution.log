@@ -1,5 +1,0 @@
-LatentMetrics {latentProposals = 55, localProposals = 24, globalProposals = 7, fusionProposals = 24, acceptedHypotheses = 0, rejectedHypotheses = 55, latentBranchPoints = 0, latentPropagationSteps = 2, latentContradictions = 55, decoderFailures = 0, reconstructionFailures = 0, discoveryChecks = 106, latentExpressionTests = 759, exactVerifierCalls = 1, totalExpanded = 1276, firstSolutionStates = Just 253, wallClock = 3.41635e-2, deltaMDL = Nothing, level0Cost = Just 37.0, level1Cost = Nothing, latentSymbols = 0, symbolsSaved = 0, descriptionsSaved = 0, hitBudget = False}
-objects = sortBy(LeftToRight, objects)
-Start = lambda current: Translate(current, GridTL - TL(current))
-Attach = lambda prev,current: Translate(current, BR(prev) - TL(current))
-scan(Attach, Start(head(objects)), tail(objects))

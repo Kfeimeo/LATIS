@@ -1,6 +1,0 @@
-DirectSetIndexing: raw encoder enumeration; deliberate unsafe ablation
-runtime enumeration is not an alignment explanation
-NeedConstruct: preserved indexed geometry; defer validation to full scene
-class shared-AX: 4 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AX))
-class first-AY: 7 representatives, 0 counterfactual splits; selected Atom (SceneLow (Ax AY))
-feature transformation: no uniform following-AY scalar expression
