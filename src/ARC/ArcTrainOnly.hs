@@ -26,6 +26,8 @@ import qualified Synthesis.Collection.Front as F
 import qualified ARC.CollectionV61Evaluate as V61
 import qualified ARC.StageAEvaluate as SA
 import qualified ARC.StageBEvaluate as SB
+import qualified ARC.StageCEvaluate as SC
+import qualified ARC.StageDEvaluate as SD
 import qualified Synthesis.Triggered as V4
 import qualified Synthesis.InducedR2.Learn as R2
 import Language.Induced.Base (exprText)
@@ -41,26 +43,34 @@ import GHC.Stats (getRTSStatsEnabled, getRTSStats, RTSStats(..))
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath ((</>), takeBaseName)
 import System.Exit (exitWith, ExitCode(..))
+import Debug.Trace (traceEventIO)
 
 --   stage-b-<C>  Stage B front end under configuration C (ARC.StageBEvaluate:
 --                BaselineA | B0Only | NoStructuralGeneralization | NoSharedVSA |
 --                NoHierarchy | FullB | FullB-SpecificFirst | FullB-CostFirst |
 --                FullB-Interleaved); same search, same isolation, extra JSON
-data Stage = FeatureStage | FeatureV04Stage | R2Stage | StageAStage String | StageBStage String deriving (Eq,Show)
+--   stage-c-<C>  Stage C front end under configuration C (ARC.StageCEvaluate:
+--                BaselineA | BaselineB | ShapeOnly | RelationsOnly | ObjectShapeFull |
+--                ObjectShapeGoalDirected); same search, same isolation, extra JSON
+--                (stage_c metrics, object transformation, relation witnesses, shapes)
+data Stage = FeatureStage | FeatureV04Stage | R2Stage | StageAStage String | StageBStage String | StageCStage String | StageDStage String deriving (Eq,Show)
 parseStage :: String -> Maybe Stage
 parseStage "feature"=Just FeatureStage
 parseStage "feature-v04"=Just FeatureV04Stage
 parseStage "r2"=Just R2Stage
-parseStage s=case (stripPrefix "stage-a-" s,stripPrefix "stage-b-" s) of
-  (Just c,_) | Just _<-SA.configByName c->Just (StageAStage c)
-  (_,Just c) | Just _<-SB.configByNameB c->Just (StageBStage c)
-  _->Nothing
+parseStage s=case (stripPrefix "stage-a-" s,stripPrefix "stage-b-" s,stripPrefix "stage-c-" s) of
+  (Just c,_,_) | Just _<-SA.configByName c->Just (StageAStage c)
+  (_,Just c,_) | Just _<-SB.configByNameB c->Just (StageBStage c)
+  (_,_,Just c) | Just _<-SC.configByNameC c->Just (StageCStage c)
+  _->case stripPrefix "stage-d-" s of Just c | Just _<-SD.configByNameD c->Just (StageDStage c); _->Nothing
 stageName :: Stage -> String
 stageName FeatureStage="feature"
 stageName FeatureV04Stage="feature-v04"
 stageName R2Stage="r2"
 stageName (StageAStage c)="stage-a-"++c
 stageName (StageBStage c)="stage-b-"++c
+stageName (StageCStage c)="stage-c-"++c
+stageName (StageDStage c)="stage-d-"++c
 
 -- Budgets are the existing defaults of the respective entries; they are fixed
 -- here and recorded verbatim in every result file.
@@ -120,13 +130,21 @@ runFeature ms pairs=settle <$> timed ms (do
 -- feature stage; the JSON additionally separates SizeRule-exact, grid
 -- realization and whole-grid exactness and records the hole bindings.
 runStageA :: String -> Int -> [(Grid,Grid)] -> IO Outcome
-runStageA cfgName=runConfigured (maybe (error ("unknown Stage A configuration "++cfgName)) id (SA.configByName cfgName)) False
+runStageA cfgName=runConfigured (maybe (error ("unknown Stage A configuration "++cfgName)) id (SA.configByName cfgName)) False False
 -- Stage B stage: identical timing/guards; the JSON additionally carries the
 -- Stage B metrics and the referent graph summaries (witness samples).
 runStageB :: String -> Int -> [(Grid,Grid)] -> IO Outcome
-runStageB cfgName=runConfigured (maybe (error ("unknown Stage B configuration "++cfgName)) id (SB.configByNameB cfgName)) True
-runConfigured :: F.Config -> Bool -> Int -> [(Grid,Grid)] -> IO Outcome
-runConfigured conf stageB ms pairs=settle <$> timed ms (do
+runStageB cfgName=runConfigured (maybe (error ("unknown Stage B configuration "++cfgName)) id (SB.configByNameB cfgName)) True False
+-- Stage C stage: identical timing/guards; the JSON additionally carries the
+-- Stage C metrics, the selected object transformation with its relation
+-- witnesses, every surviving transformation and the shape decompositions.
+runStageC :: String -> Int -> [(Grid,Grid)] -> IO Outcome
+runStageC cfgName=runConfigured (maybe (error ("unknown Stage C configuration "++cfgName)) id (SC.configByNameC cfgName)) True True
+runStageD :: String -> Int -> [(Grid,Grid)] -> IO Outcome
+runStageD cfgName=runConfigured (maybe (error ("unknown Stage D configuration "++cfgName)) id (SD.configByNameD cfgName)) True True
+runConfigured :: F.Config -> Bool -> Bool -> Int -> [(Grid,Grid)] -> IO Outcome
+runConfigured conf stageB stageC ms pairs=settle <$> timed ms (do
+  traceEventIO "latis-search-start"
   let f=F.frontSearch F.SafeOnline conf pairs
   _<-evaluate (length (show f))
   let g=F.graph f
@@ -136,6 +154,7 @@ runConfigured conf stageB ms pairs=settle <$> timed ms (do
                | otherwise->Outcome "no_solution" ("program returned but not train-exact: "++F.failure f) (Just (show p)) (m "search_work") (F.counters g) []
         Nothing->Outcome (if frontUnsupported (F.failure f) then "unsupported" else "no_solution") (F.failure f) Nothing (m "search_work") (F.counters g) []
   _<-evaluate (length (oStatus o)+length (oDetail o)+maybe 0 length (oProgram o)+oWork o)
+  traceEventIO "latis-search-end"
   statsOn<-getRTSStatsEnabled
   mem<-if statsOn then (\st->[("rts_max_live_bytes",show (max_live_bytes st)),("rts_max_mem_in_use_bytes",show (max_mem_in_use_bytes st))]) <$> getRTSStats
        else pure [("rts_max_live_bytes","null"),("rts_max_mem_in_use_bytes","null")]
@@ -150,7 +169,11 @@ runConfigured conf stageB ms pairs=settle <$> timed ms (do
     ,("typed_slot_features",SA.stageAFeaturesJSON g)
     ,("semantic_classes_detail",arrayJSON [objectJSON [("slot",jsonString (F.scSlotName c)),("representatives",arrayJSON (map jsonString (F.scRepTexts c))),("selected",jsonString (F.scSelectedText c))] | c<-F.classes g])
     ,("memory_note",jsonString "RTS max_live_bytes / max_mem_in_use_bytes are process-wide maxima (requires +RTS -T); not a per-search peak")]
-    ++(if stageB then [("stage_b",SB.stageBMetricsJSON g),("referents",SB.referentsJSON g)] else [])++mem})
+    ++(if stageB then [("stage_b",SB.stageBMetricsJSON g),("referents",SB.referentsJSON g)] else [])
+    ++(if stageC then [("stage_c",SC.stageCMetricsJSON g),("relations",SC.relationsJSON g),("shapes",SC.shapesJSON g)
+                      ,("object_transform",maybe "null" (jsonString . F.transformText) (F.program f >>= F.progTransform))
+                      ,("object_count_exact",boolJSON (m "c_object_count_exact">0)),("object_transform_exact",boolJSON (m "c_object_transform_exact">0))] else [])
+    ++[("stage_d",SD.stageDMetricsJSON g),("parameter_goals",SD.goalsJSON g),("execution_witnesses",SD.witnessesJSON pairs (F.program f))]++mem})
 runV04 :: Int -> [(Grid,Grid)] -> IO Outcome
 runV04 ms pairs=settle <$> timed ms (do
   let f=V4.frontSearch V4.Full v04Config pairs
@@ -198,6 +221,8 @@ configText FeatureV04Stage=show v04Config
 configText R2Stage=show r2Config
 configText (StageAStage c)=maybe "unknown" show (SA.configByName c)
 configText (StageBStage c)=maybe "unknown" show (SB.configByNameB c)
+configText (StageCStage c)=maybe "unknown" show (SC.configByNameC c)
+configText (StageDStage c)=maybe "unknown" show (SD.configByNameD c)
 
 runStage :: Stage -> FilePath -> FilePath -> Int -> IO ()
 runStage stage taskPath out ms=do
@@ -220,7 +245,7 @@ runStage stage taskPath out ms=do
           let pairs=training task
           diag<-diagnostics pairs
           start<-getMonotonicTimeNSec
-          o<-case stage of FeatureStage->runFeature ms pairs; FeatureV04Stage->runV04 ms pairs; R2Stage->runR2 ms pairs; StageAStage c->runStageA c ms pairs; StageBStage c->runStageB c ms pairs
+          o<-case stage of FeatureStage->runFeature ms pairs; FeatureV04Stage->runV04 ms pairs; R2Stage->runR2 ms pairs; StageAStage c->runStageA c ms pairs; StageBStage c->runStageB c ms pairs; StageCStage c->runStageC c ms pairs; StageDStage c->runStageD c ms pairs
           end<-getMonotonicTimeNSec
           let seconds=fromIntegral (end-start)/1e9 :: Double
           writeFile file (base (oStatus o) (oDetail o)

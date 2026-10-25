@@ -77,7 +77,7 @@ main=do
   -- 3. size feature and realization
   let g1=gridOf 6 4 [(1,1,3)]; g2=gridOf 8 5 [(2,2,4)]
       scene=encode defaultEncoder
-      (same,_)=synthesizeSize (stageAOff {saGridSize=True, saTypedHoles=True}) True [(scene g1,scene g1),(scene g2,scene g2)]
+      (same,_)=synthesizeSize (stageAOff {saGridSize=True, saTypedHoles=True}) False True [(scene g1,scene g1),(scene g2,scene g2)]
   assert "unchanged canvas: identity size rule is the selected representative" (fmap srWidth same==Right (TLeaf GWidth) && fmap srHeight same==Right (TLeaf GHeight))
   assert "GridSize is realized from the input only" (either (const False) (\r->outputSize True r (scene g2)==Right (Dimensions 8 5)) same)
   let shrink=SizeRule (TApp OpSub [TLeaf GWidth,TConst (VI 10)]) (TLeaf GHeight) [] [] []

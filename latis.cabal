@@ -1,4 +1,4 @@
-cabal-version: 3.0
+cabal-version: 3.16
 name: latis
 version: 0.1.0.0
 build-type: Simple
@@ -20,6 +20,9 @@ library
     ARC.ArcTrainOnly
     Synthesis.Collection.Typed Synthesis.Collection.Size ARC.StageAEvaluate
     Synthesis.Collection.Referent ARC.StageBEvaluate
+    Synthesis.Collection.Shape Synthesis.Collection.Relation ARC.StageCEvaluate
+    Synthesis.Collection.Parameter
+    Synthesis.Collection.Unified ARC.StageDEvaluate ARC.StageDMechanism
     Synthesis.Triggered.Parallel
     ARC.TriggeredEvaluate ARC.TriggeredStress
     ARC.Dataset ARC.Evaluate ARC.JointEvaluate
@@ -64,6 +67,30 @@ test-suite latis-tests
   hs-source-dirs: test
   main-is: Main.hs
   build-depends: base, latis, containers, directory
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite stage-d-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: StageDMain.hs
+  build-depends: base, latis, containers, directory
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite stage-d-full-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: StageDFullMain.hs
+  build-depends: base, latis, containers, directory
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite stage-d-control-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: StageDControlMain.hs
+  build-depends: base, latis, containers
   default-language: GHC2021
   ghc-options: -Wall -O1
 
@@ -143,6 +170,14 @@ test-suite collection-v6-tests
   type: exitcode-stdio-1.0
   hs-source-dirs: test
   main-is: CollectionV6Main.hs
+  build-depends: base, latis, containers
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite stage-c-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: StageCMain.hs
   build-depends: base, latis, containers
   default-language: GHC2021
   ghc-options: -Wall -O1

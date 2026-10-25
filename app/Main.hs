@@ -24,6 +24,9 @@ import qualified ARC.CollectionV61Evaluate as V61
 import qualified ARC.ArcTrainOnly as ATO
 import qualified ARC.StageAEvaluate as SA
 import qualified ARC.StageBEvaluate as SB
+import qualified ARC.StageCEvaluate as SC
+import qualified ARC.StageDMechanism as SDM
+import qualified ARC.StageDEvaluate as SD
 import Control.Concurrent (getNumCapabilities)
 import Control.Exception (evaluate)
 import GHC.Clock (getMonotonicTimeNSec)
@@ -61,6 +64,8 @@ usage = unlines
   ,"latis stage-a-solve --task PATH --out DIR --config FullA (one task, one Stage A configuration; writes solution.json/derivation_graph.json/trace.txt)"
   ,"latis stage-b-mechanism --out results/stage_b/mechanism [--per-family 3] (Stage B synthetic mechanism tasks x ablation configs + Stage A regression rows)"
   ,"latis stage-b-solve --task PATH --out DIR --config FullB (one task, one Stage B configuration; writes solution.json/derivation_graph.json/trace.txt)"
+  ,"latis stage-c-mechanism --out results/stage_c/mechanism [--per-family 3] (Stage C synthetic mechanism tasks x ablation configs + baseline regression rows)"
+  ,"latis stage-c-solve --task PATH --out DIR --config ObjectShapeFull (one task, one Stage C configuration; writes solution.json/derivation_graph.json/trace.txt)"
   ,"latis solve-v04 --task PATH --out results/v04/task --mode Full --feature-budget 12000 --construction-budget 12000 --feature-depth 4 --budget 250000"
   ,"         --workers 1 [--window 4*workers] [--speculation-cap 256]   (source-closure candidate evaluation; pair --workers N with +RTS -N<N> -RTS)"
   ,"latis v04-stress --out results/v04/stress [--workers N] (all ten front-end ablations, matrix sequential; R2 fallback audited separately)"
@@ -203,8 +208,26 @@ main = do
       writeFile (out </> "derivation_graph.json") (V6.graphJSON (V6.graph f)++"\n")
       writeFile (out </> "trace.txt") (unlines (V6.trace (V6.graph f)++[V6.failure f]))
       putStrLn (taskId task++" "++cfgName++" train="++show (SA.trainExactOf task f)++" held="++show (SA.heldExactOf task f)++" "++V6.failure f)
+    "stage-d-mechanism":rest -> do
+      let names=if option "--config" "" rest=="" then take 8 SD.configNamesD else [option "--config" "FullD" rest]
+      SDM.runMechanismD (option "--out" "results/stage_d/full_p0/mechanism" rest) names
+    "stage-c-mechanism":rest -> do
+      per <- number "--per-family" 3 rest
+      vertical <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+      SC.runMechanismC (option "--out" "results/stage_c/mechanism" rest) per vertical
+    "stage-c-solve":rest -> do
+      let cfgName=option "--config" "ObjectShapeFull" rest
+      conf <- maybe (die ("Invalid --config; one of "++unwords SC.configNamesC)) pure (SC.configByNameC cfgName)
+      task <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure
+      let out=option "--out" "results/stage_c/single" rest
+      createDirectoryIfMissing True out
+      (f,secs) <- SA.runFront conf (training task)
+      writeFile (out </> "solution.json") (SC.frontJSONC cfgName task f secs++"\n")
+      writeFile (out </> "derivation_graph.json") (V6.graphJSON (V6.graph f)++"\n")
+      writeFile (out </> "trace.txt") (unlines (V6.trace (V6.graph f)++[V6.failure f]))
+      putStrLn (taskId task++" "++cfgName++" train="++show (SA.trainExactOf task f)++" held="++show (SA.heldExactOf task f)++" "++V6.failure f)
     "arc-train-only-stage":rest -> do
-      stage <- maybe (die "Invalid --stage (feature|feature-v04|r2|stage-a-<Config>|stage-b-<Config>)") pure (ATO.parseStage (option "--stage" "feature" rest))
+      stage <- maybe (die "Invalid --stage (feature|feature-v04|r2|stage-a-<Config>|stage-b-<Config>|stage-c-<Config>)") pure (ATO.parseStage (option "--stage" "feature" rest))
       ms <- number "--timeout-ms" 60000 rest
       case (option "--task" "" rest,option "--out" "" rest) of
         ("",_) -> die "--task is required"

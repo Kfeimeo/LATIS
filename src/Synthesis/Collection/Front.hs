@@ -14,10 +14,12 @@
 module Synthesis.Collection.Front
   ( Mode(..), ReusePolicy(..), Config(..), defaultConfig, Status(..), IndexedType(..), Feature(..), MatchEdge(..), KeyCandidate(..)
   , Deferred(..), Graph(..), Front(..), Program(..), Execution(..), Definition(..), Body(..)
-  , runProgram, frontSearch, metric, expandedFrontier, policyFor, metricNames, permuteObjects, safePolicy
+  , runProgram, runProgramEvidence, frontSearch, metric, expandedFrontier, policyFor, metricNames, permuteObjects, safePolicy
   , StageA(..), ArgPolicy(..), stageAOff, SizeRule(..), sizeRuleText, outputSize, Source(..)
-  , StageB(..), stageBOff, Schedule(..), RefSummary(..), GraphStats(..), slotLeafInfo, snapshotFor
+  , StageB(..), stageBOff, Schedule(..), RefSummary(..), GraphStats(..), slotLeafInfo, snapshotFor, snapshotForLeaves, goalLeaves
   , scSlotName, scRepTexts, scSelectedText
+  , StageC(..), stageCOff, RelationRecord(..), ShapeRecord(..), ObjectTransform, transformText
+  , StageD(..), stageDOff, stageDFull
   ) where
 
 import Latent.Grid
@@ -32,6 +34,10 @@ import Synthesis.Collection.Online
 import Synthesis.Collection.Typed
 import Synthesis.Collection.Size
 import Synthesis.Collection.Referent
+import Synthesis.Collection.Relation
+import Synthesis.Collection.Shape
+import Synthesis.Collection.Unified
+import Debug.Trace (traceEvent)
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import Control.Monad (forM, forM_, when, unless, filterM)
@@ -66,17 +72,25 @@ data Graph = Graph
   { features :: [Feature], highEdges :: [MatchEdge], abstractions :: [Abstraction], counters :: M.Map String Int, trace :: [String]
   , alignmentEvidence :: [[Alignment]], keyCandidates :: [KeyCandidate], classes :: [SemanticClass]
   , counterfactuals :: [Counterfactual], rejectedCounterfactuals :: [Counterfactual], refinements :: [RNode], highLevelView :: [String]
-  , deferred :: [Deferred], referents :: [RefSummary] } deriving (Eq,Show)
+  , deferred :: [Deferred], referents :: [RefSummary]
+  , relations :: [RelationRecord], shapes :: [ShapeRecord], dGoals :: [GoalAudit] } deriving (Eq,Show)
+-- Stage C audit records: every training-exact object transformation (the
+-- selected one carries the relation witnesses) and the canonical Shape
+-- decomposition of every distinct object mask of the training scenes.
+data RelationRecord = RelationRecord { rrTransform :: String, rrCost :: Int, rrConstants :: Int, rrUsesShape :: Bool, rrSelected :: Bool, rrWitnesses :: [String] } deriving (Eq,Show)
+data ShapeRecord = ShapeRecord { shMask :: String, shOccurrences :: Int, shDecomposition :: Maybe String, shSize :: Int, shTies :: Int, shCandidates :: Int, shTruncated :: Bool } deriving (Eq,Show)
 data Front = Front { program :: Maybe Program, graph :: Graph, failure :: String } deriving (Eq,Show)
 -- stageA (Stage A: grid size feature, typed N-ary holes, mod/isOdd) is all
 -- off by default; the v0.6.1 behaviour is unchanged unless a flag is set.
 -- stageB (Stage B: bounds/Bool primitives, referent graph, structural
 -- generalization, shared VSA, hierarchical schedule) is all off by default;
 -- with it off the behaviour is exactly Stage A.
+-- stageC (Stage C: Shape algebra, diagonal view, object-set transformations,
+-- object-level size features, goal-directed snapshot) is all off by default.
 data Config = Config { alignmentBudget :: Int, scalarBudget :: Int, synthesisDepth :: Int, synthesisCostBound :: Int, promotionThreshold :: Int
-  , reusePolicy :: ReusePolicy, enumerationSeed :: Maybe Int, legacyConfig :: V4.Config, stageA :: StageA, stageB :: StageB } deriving (Eq,Show)
+  , reusePolicy :: ReusePolicy, enumerationSeed :: Maybe Int, legacyConfig :: V4.Config, stageA :: StageA, stageB :: StageB, stageC :: StageC, stageD :: StageD } deriving (Eq,Show)
 defaultConfig :: Config
-defaultConfig=Config 400 2000 2 5 4 ExclusiveReuse Nothing V4.defaultConfig stageAOff stageBOff
+defaultConfig=Config 400 2000 2 5 4 ExclusiveReuse Nothing V4.defaultConfig stageAOff stageBOff stageCOff stageDOff
 -- Candidate source of a slot: the v0.6.1 scalar grammar, the Stage B referent
 -- hierarchy (frozen per-axis snapshot, class lookup under a schedule) and the
 -- typed N-ary hole search; the latter two are unlocked only after the grammar
@@ -100,7 +114,7 @@ safePolicy SafeOnline _=True
 safePolicy ExclusiveReuseLegacy _=False
 safePolicy _ conf=reusePolicy conf==SafeReuse
 metricNames :: [String]
-metricNames=words "b_snapshots_built b_snapshot_work b_graph_nodes b_graph_classes b_graph_templates b_graph_closed_terms b_graph_truncations b_constant_only_dropped b_edges_confirmed b_edges_pending b_edges_not_supported b_type_edges b_closure_edges b_sccs b_layers b_substitutions_tried b_outside_universe b_edge_truncations b_vsa_nodes b_vsa_unions b_vsa_expanded b_vsa_expansion_mismatch b_sharing_avg_x100 b_sharing_max_x100 b_dag_evaluations b_reference_evaluations b_witness_full b_hierarchy_slots b_hierarchy_fits b_class_checks b_row_lookups b_flat_row_evaluations b_candidates_covered b_fitting_classes b_layer_exposed b_layer_searched b_layer_truncated b_slot_truncations b_global_truncations b_hierarchy_fallbacks b_hierarchy_solved_slots typed_hole_global_truncations size_rule_templates size_rule_evaluations size_rule_candidates size_rule_truncations size_rule_exact canvas_changes_entering_search typed_hole_slots_triggered typed_hole_templates typed_hole_evaluations typed_hole_fits typed_hole_constant_fits typed_hole_feature_fits typed_hole_truncations grid_realizations_attempted grid_realization_ok realization_render_errors realization_mismatches UntriggeredExpansionCount ConcreteCrossItemEdgeCount_high_level expanded_frozen_features alignment_attempts alignment_rejections equality_attempts rejected_size_comparisons unexplained_equalities alignment_lift_attempts alignment_lift_successes accepted_abstractions construction_triggers fallback_count semantic_classes representatives max_representatives_per_class counterfactual_contexts_generated counterfactual_contexts_rejected counterfactual_evaluations counterfactual_splits canonical_merges premature_collapses dropped_by_collapse intensional_candidates literal_candidates alignment_key_candidates synthesized_keys_accepted ordering_ties_rejected alignment_witnesses online_abstractions_proposed online_abstractions_accepted online_abstraction_reuses refinement_expansions_saved operator_applications refinement_expansions active_frontier_size visibility_size visibility_keys search_work alignment_failure_triggers posthoc_abstractions_accepted reuse_attempts reuse_hits call_attempts call_legality_checks call_legality_rejections deferred_candidates resumed_candidates resume_events resume_retries recovered_solutions reselected_after_completion exclusive_reuse_missed_candidates exclusive_reuse_missed_solutions diagnostic_operator_applications first_solution_work total_work_to_exhaustion completion_work alignment_candidates_remaining rank_reuse_witnesses_verified"
+metricNames=words "b_goal_queries b_goal_leaves_dropped b_goal_cache_hits b_goal_level1_hits b_goal_level2_builds c_relation_triggered c_relation_trigger_cardinality c_relation_trigger_fallback c_relation_candidates c_relation_tried c_relation_executions c_relation_fits c_relation_truncated c_relation_selected_cost c_relation_shape_used c_object_count_exact c_object_transform_exact c_shape_masks c_shape_decomposed c_shape_decomposed_truncated c_shape_unrepresentable c_shape_truncated c_shape_ast_total c_shape_ties c_shape_work c_diagonal_chains_accepted c_diagonal_chains_rejected c_view_pixels_merged c_size_object_features b_snapshots_built b_snapshot_work b_graph_nodes b_graph_classes b_graph_templates b_graph_closed_terms b_graph_truncations b_constant_only_dropped b_edges_confirmed b_edges_pending b_edges_not_supported b_type_edges b_closure_edges b_sccs b_layers b_substitutions_tried b_outside_universe b_edge_truncations b_vsa_nodes b_vsa_unions b_vsa_expanded b_vsa_expansion_mismatch b_sharing_avg_x100 b_sharing_max_x100 b_dag_evaluations b_reference_evaluations b_witness_full b_hierarchy_slots b_hierarchy_fits b_class_checks b_row_lookups b_flat_row_evaluations b_candidates_covered b_fitting_classes b_layer_exposed b_layer_searched b_layer_truncated b_slot_truncations b_global_truncations b_hierarchy_fallbacks b_hierarchy_solved_slots typed_hole_global_truncations size_rule_templates size_rule_evaluations size_rule_candidates size_rule_truncations size_rule_exact canvas_changes_entering_search typed_hole_slots_triggered typed_hole_templates typed_hole_evaluations typed_hole_fits typed_hole_constant_fits typed_hole_feature_fits typed_hole_truncations grid_realizations_attempted grid_realization_ok realization_render_errors realization_mismatches UntriggeredExpansionCount ConcreteCrossItemEdgeCount_high_level expanded_frozen_features alignment_attempts alignment_rejections equality_attempts rejected_size_comparisons unexplained_equalities alignment_lift_attempts alignment_lift_successes accepted_abstractions construction_triggers fallback_count semantic_classes representatives max_representatives_per_class counterfactual_contexts_generated counterfactual_contexts_rejected counterfactual_evaluations counterfactual_splits canonical_merges premature_collapses dropped_by_collapse intensional_candidates literal_candidates alignment_key_candidates synthesized_keys_accepted ordering_ties_rejected alignment_witnesses online_abstractions_proposed online_abstractions_accepted online_abstraction_reuses refinement_expansions_saved operator_applications refinement_expansions active_frontier_size visibility_size visibility_keys search_work alignment_failure_triggers posthoc_abstractions_accepted reuse_attempts reuse_hits call_attempts call_legality_checks call_legality_rejections deferred_candidates resumed_candidates resume_events resume_retries recovered_solutions reselected_after_completion exclusive_reuse_missed_candidates exclusive_reuse_missed_solutions diagnostic_operator_applications first_solution_work total_work_to_exhaustion completion_work alignment_candidates_remaining rank_reuse_witnesses_verified"
 
 -- Stage B leaf meta-information of the object-slot language. Previous leaves
 -- and set aggregates are partial (rank 0 / empty set); Ext Current is fixed
@@ -126,12 +140,28 @@ previousLeaf _=False
 -- The frozen snapshot of one axis from grounded contexts (id, Ctx). The
 -- dependency counterfactual contexts are derived from every grounded context.
 snapshotFor :: StageB -> HoleConfig -> Axis -> [(String,Ctx)] -> RefGraph SlotLeaf
-snapshotFor sb hc axis grounded=
-  let leaves=[(l,t) | (l,t)<-slotLeavesB (sbBounds sb) axis, not (previousLeaf l)]
-      sortOf p=let SizeSig w h=placedSig p in "Object["++show w++"x"++show h++"]"
+snapshotFor sb hc axis=snapshotForLeaves sb hc [(l,t) | (l,t)<-slotLeavesB (sbBounds sb) axis, not (previousLeaf l)]
+-- The same snapshot over an explicit leaf set (Stage C4: the Typed Goal's
+-- visible input sources; the universe depth is sbGraphDepth of the block).
+snapshotForLeaves :: StageB -> HoleConfig -> [(SlotLeaf,TTy)] -> [(String,Ctx)] -> RefGraph SlotLeaf
+snapshotForLeaves sb hc leaves grounded=
+  let sortOf p=let SizeSig w h=placedSig p in "Object["++show w++"x"++show h++"]"
       ctxs=[Context cid (sortOf (ctxCurrent c)) (evalSlotLeaf M.empty c) | (cid,c)<-grounded]
       deps=[Context (cid++":"++label) (sortOf (ctxCurrent c')) (evalSlotLeaf M.empty c') | (cid,c)<-grounded, (label,c')<-dependencyContexts c]
   in buildGraph sb hc slotLeafInfo leaves TyInt ctxs deps []
+-- Stage C4 Typed Goal: of the axis' visible leaves only those that are input
+-- SOURCES for this task, i.e. whose value varies over the grounded contexts or
+-- their type-safe dependency counterfactuals. A leaf that is constant on all of
+-- them cannot explain any variation of an Int target and is covered by the
+-- constant holes; dropping it removes no goal-reachable candidate of the
+-- reference universe (completeness is checked by the tests).
+goalLeaves :: StageB -> Axis -> [(String,Ctx)] -> ([(SlotLeaf,TTy)],[(SlotLeaf,TTy)])
+goalLeaves sb axis grounded=
+  let allLeaves=[(l,t) | (l,t)<-slotLeavesB (sbBounds sb) axis, not (previousLeaf l)]
+      ctxs=[c | (_,c)<-grounded]++[c' | (_,c)<-grounded, (_,c')<-dependencyContexts c]
+      varying l=length (nub [v | c<-ctxs, Right v<-[evalSlotLeaf M.empty c l]])>1
+      kept=[(l,t) | (l,t)<-allLeaves, varying l]
+  in (kept,[(l,t) | (l,t)<-allLeaves, not (varying l)])
 
 -- Deterministic enumeration permutation (metamorphic tests). The ID-free Set
 -- IR is insensitive to it; only the deliberately unsafe modes can notice.
@@ -148,26 +178,60 @@ data Definition = Definition { defKey :: KeyExpr, defBody :: Body, defUnsafe :: 
 data Execution = Inline Definition | CallTop String deriving (Eq,Show)
 -- progSize (Stage A): the Size2 rule that realizes the output canvas from the
 -- input; Nothing keeps the input canvas (v0.6.1).
+-- progTransform (Stage C): when present the output objects are produced by the
+-- Set[Object] -> Set[Object] transformation instead of the sequence-local body;
+-- progView: the local diagonal-bar view is applied to the encoded input.
 data Program = Program { progEncoder :: EncoderConfig, progExec :: Execution, progDefs :: M.Map String Definition
-  , progLibrary :: Library, progDependent :: Bool, progPermutation :: Maybe Int, progSize :: Maybe SizeRule } deriving (Eq,Show)
+  , progLibrary :: Library, progDependent :: Bool, progPermutation :: Maybe Int, progSize :: Maybe SizeRule
+  , progTransform :: Maybe ObjectTransform, progView :: Bool } deriving (Eq,Show)
 -- Realization order: encode the input, compute the output canvas from the size
 -- rule (input features and shared constants only), order the input objects,
 -- place every object by the sequence-local body, then render on the output
 -- canvas. Rendering rejects any cell outside the canvas (no clipping); the
 -- background is the encoder background; later objects win on overlap.
 runProgram :: Program -> Grid -> Either String Grid
-runProgram (Program enc ex defs lib dep perm size) grid=do
+runProgram p grid=do
+  (scene,dims,es)<-runProgramObjects p grid
+  render scene {O.canvas=dims,O.objects=map eoObject es}
+
+-- Evidence uses the same execution core; its independent pixel verifier does
+-- not trust the renderer's resulting grid or connected-component partition.
+runProgramEvidence :: Program -> Grid -> Either String ([EmittedObject],RenderWitness)
+runProgramEvidence p grid=do
+  (scene,dims,es)<-runProgramObjects p grid
+  rw<-renderWitness dims (O.background scene) es
+  if verifyRenderWitness dims (O.background scene) es rw then Right (es,rw)
+    else Left "render witness failed independent replay"
+
+runProgramObjects :: Program -> Grid -> Either String (O.Scene,Dimensions,[EmittedObject])
+runProgramObjects (Program enc ex defs lib dep perm size tr view) grid=do
   let scene0=encode enc grid
-      scene=scene0 {O.objects=permuteObjects perm (O.objects scene0)}
+      scene1=if view then let (os,_,_)=applyDiagonalView (O.objects scene0) in scene0 {O.objects=os} else scene0
+      scene=scene1 {O.objects=permuteObjects perm (O.objects scene1)}
       objs=O.objects scene
       set=objectSet objs
+      sourcesByPlaced=M.fromListWith (++) [(placedFromObject o,[O.objectId o]) | o<-objs]
   outDims <- maybe (Right (O.canvas scene)) (\r->outputSize dep r scene) size
-  Definition key body unsafe <- case ex of
-    Inline d->Right d
-    CallTop n->maybe (Left "missing abstraction refinement") Right (M.lookup n defs)
-  items <- if unsafe then Right (map placedFromObject objs) else orderedItems <$> orderBy [key] NeedOrderedView InputSet key set
-  out <- walk body outDims (O.canvas scene) set Nothing (zip [0::Int ..] items)
-  render scene {O.canvas=outDims, O.objects=map placedToObject out}
+  case tr of
+   Just t->do
+    d<-case ex of
+      Inline def->Right def
+      CallTop n->maybe (Left "missing abstraction refinement") Right (M.lookup n defs)
+    if d/=Definition scanKey (Body (Lit 0,Lit 0) (Lit 0,Lit 0)) True
+      then Left "relation: sequence body cannot be silently ignored; use typed MapPosition or an explicit OrderedView adapter"
+      else Right ()
+    emitted<-either (\e->Left ("relation: "++e)) Right (emitObjectsInput t (O.canvas scene) outDims objs)
+    Right (scene,outDims,emitted)
+   Nothing->do
+    Definition key body unsafe <- case ex of
+     Inline d->Right d
+     CallTop n->maybe (Left "missing abstraction refinement") Right (M.lookup n defs)
+    items <- if unsafe then Right (map placedFromObject objs) else orderedItems <$> orderBy [key] NeedOrderedView InputSet key set
+    out <- walk body outDims (O.canvas scene) set Nothing (zip [0::Int ..] items)
+    emitted<-traverse (\(original,moved)->case M.findWithDefault [] original sourcesByPlaced of
+      [source]->let o=(placedToObject moved) {O.objectId=source} in Right (EmittedObject o [source] "sequence body (OrderedView checked by execution)")
+      _->Left "sequence binder has ambiguous input source identity") (zip items out)
+    Right (scene,outDims,emitted)
   where
     walk _ _ _ _ _ []=Right []
     walk body dims inDims set prev ((i,p):rest)=do
@@ -182,7 +246,7 @@ runProgram (Program enc ex defs lib dep perm size) grid=do
 data St = St { stGraph :: Graph, stStep :: Int, stNextAbs :: Int, stLibrary :: Library
   , stViews :: M.Map (KeyExpr,Origin,Int) OrderedView, stTried :: S.Set (KeyExpr,KeyExpr)
   , stCF :: [(Int,Ctx -> Ctx)], stDerivation :: [RNode], stResults :: [String]
-  , stPending :: [(String,[Row],[Scalar])], stGrammarFits :: M.Map String [Scalar], stSnapshots :: M.Map Axis (RefGraph SlotLeaf) }
+  , stPending :: [(String,[Row],[Scalar])], stGrammarFits :: M.Map String [Scalar], stSnapshots :: M.Map (Axis,Int) (RefGraph SlotLeaf) }
 newtype Search a = Search { runSearch :: St -> (a,St) }
 instance Functor Search where fmap f (Search g)=Search (\s->let (a,s')=g s in (f a,s'))
 instance Applicative Search where
@@ -220,7 +284,7 @@ currentWork :: Search Int
 currentWork=gets (\s->metric "operator_applications" (stGraph s)+length (refinements (stGraph s)))
 
 seedGraph :: [(O.Scene,O.Scene)] -> Graph
-seedGraph pairs=Graph fs [] [] (M.fromList [(k,0) | k<-metricNames]) [] [] [] [] [] [] [] [] [] []
+seedGraph pairs=Graph fs [] [] (M.fromList [(k,0) | k<-metricNames]) [] [] [] [] [] [] [] [] [] [] [] [] []
   where fs=[Feature (SetT ExistsPlacedT) (map (show . count . objectSet . O.objects . side) pairs) (show origin)
               ["Objects(Scene)","existential size-index packaging"] Nothing 0 Unmatched
            | (origin,side)<-[(InputSet,fst),(OutputSet,snd)]]
@@ -263,14 +327,22 @@ frontSearch mode conf examples
   where
     sa=stageA conf
     sb=stageB conf
+    sc=stageC conf
     enc=R2.inducedEncoder (V4.r2Config (legacyConfig conf))
     perm s=s {O.objects=permuteObjects (enumerationSeed conf) (O.objects s)}
-    scenes=[(perm (encode enc x),perm (encode enc y)) | (x,y)<-examples]
+    -- Stage C1: the local diagonal-bar view is applied to both sides of every
+    -- training pair (same encoding view at inference, applied by runProgram);
+    -- the global 4-connectivity encoding itself is unchanged.
+    viewOf s=if scDiagonalView sc then let (os,ch,rj)=applyDiagonalView (O.objects s) in (s {O.objects=os},ch,rj) else (s,[],[])
+    viewed=[(viewOf (encode enc x),viewOf (encode enc y)) | (x,y)<-examples]
+    scenes=[(perm a,perm b) | ((a,_,_),(b,_,_))<-viewed]
+    viewChains=[ch | ((_,c1,_),(_,c2,_))<-viewed, ch<-c1++c2]
+    viewRejections=[r | ((_,_,r1),(_,_,r2))<-viewed, r<-r1++r2]
     sets=[(objectSet (O.objects a),objectSet (O.objects b)) | (a,b)<-scenes]
     inDims=map (O.canvas . fst) scenes
     -- Stage A: the Size2 rule is synthesized from input-side features before
     -- any object search; the realization canvas of every case is its value.
-    sizeOutcome=if saGridSize sa then Just (synthesizeSize sa dep scenes) else Nothing
+    sizeOutcome=if saGridSize sa then Just (synthesizeSize sa (scObjectSizeFeatures sc) dep scenes) else Nothing
     sizeRule=case sizeOutcome of Just (Right r,_)->Just r; _->Nothing
     dims=case sizeRule of
       Just r->[either (const (O.canvas x)) id (outputSize dep r x) | (x,_)<-scenes]
@@ -290,7 +362,11 @@ frontSearch mode conf examples
     caseObjects c=sort (nub (map placedFromObject (O.objects (fst (scenes !! c)))))
     objectIndex=M.fromList [((c,p),k) | c<-cases, (k,p)<-zip [0::Int ..] (caseObjects c)]
     contextId c p=maybe (tag c++"unknown") (\k->tag c++"obj"++show k) (M.lookup (c,p) objectIndex)
-    buildSnapshot axis=snapshotFor sb holeCfg axis [(contextId c p,Ctx (dims !! c) (inSet c) p Nothing dep (inDims !! c)) | c<-cases, p<-caseObjects c]
+    groundedOf=[(contextId c p,Ctx (dims !! c) (inSet c) p Nothing dep (inDims !! c)) | c<-cases, p<-caseObjects c]
+    -- Stage C4: goal-directed snapshot = goal leaves + the requested universe depth
+    buildSnapshot axis depth
+      | scGoalDirected sc = let (kept,dropped)=goalLeaves sb axis groundedOf in (snapshotForLeaves sb {sbGraphDepth=depth} holeCfg kept groundedOf,length dropped)
+      | otherwise = (snapshotFor sb holeCfg axis groundedOf,0)
     cases=[0..length scenes-1]
     ncases=length scenes
     dep=mode/=NoDependentIndex
@@ -302,24 +378,137 @@ frontSearch mode conf examples
     tag c=("case"++show c++":")
     defaultWhy="alignment: no unique common ordering"
     axisOf name=if take 2 (reverse name)=="YA" then AY else AX
-    mkProgram ex defs lib=Program enc ex defs lib dep (enumerationSeed conf) sizeRule
+    mkProgram ex defs lib=Program enc ex defs lib dep (enumerationSeed conf) sizeRule Nothing (scDiagonalView sc)
 
     main :: Search (Either String Program)
     main=do
       forM_ [(InputSet,fst),(OutputSet,snd)] $ \(o,side)->addFeature (Feature NatT (map (show . count . side) sets) ("Count("++show o++")")
         [show o] (Just NeedCount) 1 (if all (\(a,b)->count a==count b) sets then Frozen else Unmatched))
+      when (scDiagonalView sc) $ do
+        inc "c_diagonal_chains_accepted" (length viewChains)
+        inc "c_diagonal_chains_rejected" (length viewRejections)
+        inc "c_view_pixels_merged" (sum (map (length . dcPixels) viewChains))
+        unless (null viewChains && null viewRejections) $ traceMsg ("diagonal view: "++show (length viewChains)++" chains merged ("++show (sum (map (length . dcPixels) viewChains))++" pixels), "++show (length viewRejections)++" candidate chains rejected"
+          ++concat [" ["++drReason r++"]" | r<-take 3 viewRejections])
+      when (scShape sc) shapeAudit
+      when (scObjectSizeFeatures sc) (setMetric "c_size_object_features" 1)
       sized<-sizeStep
       case sized of
         Left err->pure (Left err)
         Right ()->
-          -- The object transformation path still requires equal cardinality;
-          -- the canvas support does not resolve cardinality mismatch.
-          if any (\(a,b)->count a/=count b) sets then pure (Left "RankAlign: unequal input/output cardinality") else do
+          -- The sequence-local object path requires equal cardinality. Stage C
+          -- opens the Set[Object] transformation search on a cardinality
+          -- mismatch (and, with the fallback trigger, after the equal-count
+          -- path has failed); without it the v0.6.1 rejection is unchanged.
+          if any (\(a,b)->count a/=count b) sets then
+            (if scRelations sc then relationPath "cardinality mismatch" Nothing else pure (Left "RankAlign: unequal input/output cardinality"))
+          else do
             pre<-prePath
-            case pre of
+            r<-case pre of
               Left err->pure (Left err)
               Right (Just p)->pure (Right p)
               Right Nothing->explained
+            case r of
+              Left err | scRelations sc && scFallbackTrigger sc->relationPath "equal-count path failed" (Just err)
+              _->pure r
+
+    -- Stage C1 audit: canonical Shape decomposition of every distinct object
+    -- mask of the training scenes (input and output sides); counted as work.
+    shapeAudit :: Search ()
+    shapeAudit=do
+      let masks=M.toList (M.fromListWith (+) [(objMask o,1::Int) | (a,b)<-scenes, o<-O.objects a++O.objects b])
+          recs=[(m,n,decompose (scDecompBudget sc) m) | (m,n)<-masks]
+          work=sum [dcCandidates d+dcPairsTried d | (_,_,d)<-recs]
+      inc "c_shape_masks" (length recs)
+      -- Counting unit: distinct masks of THIS task (both sides, all cases).
+      -- A mask can be decomposed AND truncated (an expression was found among
+      -- the candidates kept under the budget, so its minimality is not
+      -- guaranteed): decomposed + unrepresentable + (truncated - decomposed_truncated) = masks.
+      inc "c_shape_decomposed" (length [() | (_,_,d)<-recs, Just _<-[dcExpr d]])
+      inc "c_shape_decomposed_truncated" (length [() | (_,_,d)<-recs, Just _<-[dcExpr d], dcTruncated d])
+      inc "c_shape_unrepresentable" (length [() | (_,_,d)<-recs, Nothing<-[dcExpr d], not (dcTruncated d)])
+      inc "c_shape_truncated" (length [() | (_,_,d)<-recs, dcTruncated d])
+      inc "c_shape_ast_total" (sum [dcSize d | (_,_,d)<-recs])
+      inc "c_shape_ties" (sum [max 0 (dcTies d-1) | (_,_,d)<-recs])
+      inc "c_shape_work" work
+      inc "operator_applications" work
+      onGraph (\g->g {shapes=[ShapeRecord (show (maskCells m)) n (fmap shapeText (dcExpr d)) (dcSize d) (dcTies d) (dcCandidates d) (dcTruncated d) | (m,n,d)<-recs]})
+      addFeature (Feature (ConceptT ExistsPlacedT) [show (length [() | o<-O.objects a, Just _<-[dcExpr (decompose (scDecompBudget sc) (objMask o))]])++"/"++show (length (O.objects a)) | (a,_)<-scenes]
+        "ShapeDecomposition(Objects(Input))" ["Shape algebra: canonical minimum-AST decomposition per distinct mask (depth <= 2, budgeted)","masks not representable within the budget keep their raw ShapeMask"] (Just NeedConstruct) 0 Frozen)
+      traceMsg ("shape audit: "++show (length recs)++" distinct masks, "++show (length [() | (_,_,d)<-recs, Just _<-[dcExpr d]])++" decomposed, "++show (length [() | (_,_,d)<-recs, dcTruncated d])++" truncated, work "++show work)
+
+    -- Stage C2/C3: executable Set[Object] -> Set[Object] transformations. Every
+    -- candidate is executed on every training input and verified by the final
+    -- whole-grid exact check; all training-exact candidates survive as
+    -- representatives, the selection is by (structural cost, enumeration order).
+    relationPath :: String -> Maybe String -> Search (Either String Program)
+    relationPath why prior=do
+      relationStartWork<-currentWork
+      inc "c_relation_triggered" 1
+      inc (if isNothing prior then "c_relation_trigger_cardinality" else "c_relation_trigger_fallback") 1
+      traceMsg ("ObjectRelation trigger ("++why++"): Set[Object] -> Set[Object] transformation search unlocked under NeedConstruct")
+      let colors=sort (nub [c | (a,b)<-scenes, o<-O.objects a++O.objects b, Just c<-[objColor o]])
+          grammar=RelationGrammar colors (scShape sc) (scDiagonalView sc) (scGaps sc) (scCounts sc) (scRelationMaxCandidates sc)
+          cands=enumerateTransforms grammar
+          searchCases=[SearchCase (O.objects (fst (scenes !! c))) (dims !! c) (encoderBackground enc) (snd (examples !! c)) | c<-cases]
+          res=searchTransforms (scRelationBudget sc) (scRelationMaxFits sc) cands searchCases
+          failWith msg=case prior of Just e->Left (e++"; relation search: "++msg); Nothing->Left ("relation: "++msg)
+          summary=show (srTried res)++"/"++show (srCandidates res)++" candidates, "++show (srExecutions res)++" case executions"++(if srTruncated res then ", budget truncated" else "")
+      inc "c_relation_candidates" (srCandidates res)
+      inc "c_relation_tried" (srTried res)
+      inc "c_relation_executions" (srExecutions res)
+      inc "operator_applications" (srExecutions res)
+      when (srTruncated res) (inc "c_relation_truncated" 1)
+      traceMsg ("relation search: "++summary++", "++show (length (srFits res))++" training-exact transformations")
+      case srFits res of
+        []->if sdEnabled (stageD conf) then unifiedPath prior else pure (failWith ("no executable object transformation fits ("++summary++")"))
+        fits@((t,emitted):_)->do
+          let outsOf c=O.objects (snd (scenes !! c))
+              ws=[relationWitness (O.objects (fst (scenes !! c))) em (outsOf c) | (c,em)<-zip cases emitted]
+              countExact=and [length em==length (outsOf c) | (c,em)<-zip cases emitted]
+              transformExact=and [null (rwUnexplainedOutputs w) && rwUnmatchedEmitted w==0 | w<-ws]
+              p=(mkProgram (Inline (Definition scanKey (Body (Lit 0,Lit 0) (Lit 0,Lit 0)) True)) M.empty M.empty) {progTransform=Just t}
+          inc "c_relation_fits" (length fits)
+          setMetric "c_relation_selected_cost" (transformCost t)
+          when countExact (setMetric "c_object_count_exact" 1)
+          when transformExact (setMetric "c_object_transform_exact" 1)
+          when (usesShape t) (inc "c_relation_shape_used" 1)
+          onGraph (\g->g {relations=[RelationRecord (transformText t') (transformCost t') (transformConstants t') (usesShape t') (t'==t) [witnessText w | w<-ws, t'==t] | (t',_)<-fits]})
+          let nodes=[RNode (tag c++"object-transform") "ObjectTransform" [PConcept (transformText t)] ["set:Input","canvas:SizeRule"] "realization" | c<-cases]
+          addNodes nodes
+          mapM_ (addResult . rnId) nodes
+          addFeature (Feature (ConceptT (SetT ExistsPlacedT)) (map (show . length) emitted) ("ObjectTransform: "++transformText t)
+            (["Set[Object] -> Set[Object] transformation (NeedConstruct trigger: "++why++")"
+             ,show (length fits)++" training-exact transformations survive as representatives; selected by (structural cost, enumeration order)"
+             ,"shared constants: "++show (transformConstants t),if usesShape t then "uses the Shape algebra" else "no Shape primitive"
+             ,"whole-grid exact on every training case; object-count exact: "++show countExact++"; object-transform exact: "++show transformExact]++map witnessText ws)
+            (Just NeedConstruct) (transformCost t) Frozen)
+          traceMsg ("ObjectTransform selected: "++transformText t++" (cost "++show (transformCost t)++", "++show (length fits)++" representatives)")
+          work<-currentWork
+          setMetric "first_solution_work" (relationStartWork+maybe (srExecutions res) id (srFirstExecutions res))
+          if all (\(x,y)->runProgram p x==Right y) examples then pure (Right p) else pure (failWith "selected transformation diverged on re-execution")
+
+    unifiedPath :: Maybe String -> Search (Either String Program)
+    unifiedPath prior=do
+      traceMsg "NeedConstruct: legacy relation universe exhausted; Stage D parameter holes and bounded compositions unlocked"
+      before<-currentWork
+      let cs=[DCase a (dims!!i) target (O.objects b) | (i,((a,b),(_,target)))<-zip [0..] (zip scenes examples)]
+          result=searchUnified (stageD conf) cs
+      mapM_ (uncurry inc) (M.toList (drMetrics result))
+      inc "operator_applications" (M.findWithDefault 0 "d_total_work" (drMetrics result))
+      onGraph (\g->g {dGoals=drGoals result})
+      mapM_ traceMsg (drTrace result)
+      case drFits result of
+        []->pure (Left ((maybe "relation: " (++"; ") prior)++"composition: no fit in bounded Stage D universe; consult d_* truncation states"))
+        t:_->do
+          let p=(mkProgram (Inline (Definition scanKey (Body (Lit 0,Lit 0) (Lit 0,Lit 0)) True)) M.empty M.empty) {progTransform=Just t}
+              witnesses=[executePipeline t (O.canvas (dInput c)) (dOutputDims c) (O.objects (dInput c)) | c<-cs]
+          onGraph (\g->g {relations=relations g++[RelationRecord (transformText t) (transformCost t) (transformConstants t) (usesShape t) True (map show witnesses)]})
+          addFeature (Feature (ConceptT (SetT ExistsPlacedT)) (map (show . fmap (length . pwEmitted)) witnesses) (transformText t)
+            ["typed A parameters; bounded C composition; B parameter snapshots when enabled","whole-grid forward exact; witnesses checked independently"] (Just NeedConstruct) (transformCost t) Frozen)
+          setMetric "first_solution_work" (before+M.findWithDefault 0 "d_first_exact_work" (drMetrics result))
+          if all (\(x,y)->runProgram p x==Right y) examples then pure (Right p)
+            else pure (Left "composition: selected typed program failed runProgram replay")
 
     -- Stage A grid size: GridWidth/GridHeight/GridSize are typed features of
     -- the input; the output size is a training target only. The synthesized
@@ -682,28 +871,47 @@ frontSearch mode conf examples
       cfs<-gets stCF
       prior<-gets (M.findWithDefault [] name . stGrammarFits)
       if null rows' then do traceMsg (name++": no rows; trivially satisfied"); pure (Right (Lit 0)) else do
-        g<-ensureSnapshot slotAxis
-        let ctxIdx=contextIndex g
-            keys=sequence [M.lookup (contextId (rowCase r) (ctxCurrent (rowCtx r))) ctxIdx | r<-rows']
-        case keys of
+        -- Stage C4: demand-driven depth. The depth-1 universe is searched first;
+        -- the full-depth universe is built only when no class of it fits.
+        let fullDepth=sbGraphDepth sb
+            levels | scGoalDirected sc && fullDepth>1 = [1,fullDepth]
+                   | otherwise = [fullDepth]
+            lookupKeys g=sequence [M.lookup (contextId (rowCase r) (ctxCurrent (rowCtx r))) (contextIndex g) | r<-rows']
+            searchIn g ks | sbHierarchy sb = searchClasses sb g (zip ks (map (VI . rowTarget) rows'))
+                          | otherwise = searchFlat sb g [(evalSlotLeaf lib (rowCtx r),VI (rowTarget r)) | r<-rows']
+            account search=do
+              inc "operator_applications" (csRowLookups search+csRowEvaluations search)
+              inc "b_class_checks" (csClassChecks search)
+              inc "b_row_lookups" (csRowLookups search)
+              inc "b_flat_row_evaluations" (csRowEvaluations search)
+              inc "b_candidates_covered" (csCandidatesCovered search)
+              inc "b_fitting_classes" (csFittingClasses search)
+              inc "b_layer_exposed" (sum (M.elems (csLayerExposed search)))
+              inc "b_layer_searched" (sum (M.elems (csLayerSearched search)))
+              inc "b_layer_truncated" (sum (M.elems (csLayerTruncated search)))
+              when (csTruncated search) (inc "b_slot_truncations" 1)
+            go [] _=pure Nothing
+            go (d:ds) _=do
+              g<-ensureSnapshot slotAxis d
+              case lookupKeys g of
+                Nothing->pure Nothing
+                Just ks->do
+                  let search=searchIn g ks
+                  account search
+                  if not (null (csFits search)) then do
+                    when (scGoalDirected sc && d<fullDepth) (inc "b_goal_level1_hits" 1)
+                    pure (Just (g,search))
+                  else case ds of
+                    []->pure (Just (g,search))
+                    _->do inc "b_goal_level2_builds" 1; traceMsg (name++": goal-directed depth "++show d++" universe has no fitting class; extending to depth "++show (head ds)); go ds ()
+        found<-go levels ()
+        case found of
           Nothing->do traceMsg (name++": hierarchy: a row context is not a grounded snapshot context"); pure (Left ("hierarchy: row context not grounded for "++name))
-          Just ks->do
-            let search | sbHierarchy sb = searchClasses sb g (zip ks (map (VI . rowTarget) rows'))
-                       | otherwise = searchFlat sb g [(evalSlotLeaf lib (rowCtx r),VI (rowTarget r)) | r<-rows']
-                terms=[(i,rfTerm (rgNodes g M.! i)) | i<-csFits search]
+          Just (g,search)->do
+            let terms=[(i,rfTerm (rgNodes g M.! i)) | i<-csFits search]
                 typed=[(i,Typed e) | (i,t)<-terms, Just e<-[lambdaToTyped t]]
                 typedFits=map snd typed
                 fits=prior++[f | f<-typedFits, f `notElem` prior]
-            inc "operator_applications" (csRowLookups search+csRowEvaluations search)
-            inc "b_class_checks" (csClassChecks search)
-            inc "b_row_lookups" (csRowLookups search)
-            inc "b_flat_row_evaluations" (csRowEvaluations search)
-            inc "b_candidates_covered" (csCandidatesCovered search)
-            inc "b_fitting_classes" (csFittingClasses search)
-            inc "b_layer_exposed" (sum (M.elems (csLayerExposed search)))
-            inc "b_layer_searched" (sum (M.elems (csLayerSearched search)))
-            inc "b_layer_truncated" (sum (M.elems (csLayerTruncated search)))
-            when (csTruncated search) (inc "b_slot_truncations" 1)
             traceMsg (name++": hierarchy "++(if sbHierarchy sb then show (sbSchedule sb) else "flat")++": "++show (csClassChecks search)++" class checks, "++show (csFittingClasses search)++" fitting classes, "
               ++show (csRowLookups search)++" row lookups, "++show (csRowEvaluations search)++" row evaluations, "++show (length typedFits)++" candidates"++(if csTruncated search then " (budget truncated)" else "")
               ++"; layers exposed/searched/truncated "++show (M.toList (csLayerExposed search))++"/"++show (M.toList (csLayerSearched search))++"/"++show (M.toList (csLayerTruncated search)))
@@ -821,15 +1029,19 @@ frontSearch mode conf examples
             pure (Right e)
     -- The frozen snapshot of an axis is built once per run, at the first
     -- trigger; its statistics are recorded as search work and in the graph.
-    ensureSnapshot :: Axis -> Search (RefGraph SlotLeaf)
-    ensureSnapshot axis=do
+    ensureSnapshot :: Axis -> Int -> Search (RefGraph SlotLeaf)
+    ensureSnapshot axis depth=do
       snaps<-gets stSnapshots
-      case M.lookup axis snaps of
-        Just g->pure g
+      case M.lookup (axis,depth) snaps of
+        Just g->do when (scGoalDirected sc) (inc "b_goal_cache_hits" 1); pure g
         Nothing->do
-          let g=buildSnapshot axis
+          let (g,dropped)=buildSnapshot axis depth
               st=rgStats g
-          modify (\s->s {stSnapshots=M.insert axis g (stSnapshots s)})
+          modify (\s->s {stSnapshots=M.insert (axis,depth) g (stSnapshots s)})
+          when (scGoalDirected sc) $ do
+            inc "b_goal_queries" 1
+            inc "b_goal_leaves_dropped" dropped
+            traceMsg ("goal-directed query "++show axis++" depth "++show depth++": "++show dropped++" constant leaves dropped from the universe")
           inc "operator_applications" (gsBuildWork st)
           inc "b_snapshots_built" 1
           mapM_ (\(k,v)->inc k v)
@@ -842,7 +1054,7 @@ frontSearch mode conf examples
           setMax "b_layers" (gsLayers st)
           setMax "b_sharing_avg_x100" (gsSharingAvgX100 st)
           setMax "b_sharing_max_x100" (gsSharingMaxX100 st)
-          onGraph (\gr->gr {referents=referents gr++[graphSummary (show axis) (sbSchedule sb) slotLeafName g]})
+          onGraph (\gr->gr {referents=referents gr++[graphSummary (show axis++(if scGoalDirected sc then " depth "++show depth else "")) (sbSchedule sb) slotLeafName g]})
           traceMsg ("referent snapshot "++show axis++": "++show (gsNodes st)++" nodes ("++show (gsTemplates st)++" templates, "++show (gsClosedTerms st)++" closed terms"++(if gsTruncated st then ", universe truncated" else "")++"), "
             ++show (gsClasses st)++" classes, edges confirmed/pending/unsupported "++show (gsEdgesConfirmed st)++"/"++show (gsEdgesPending st)++"/"++show (gsEdgesNotSupported st)
             ++", type edges "++show (gsTypeEdges st)++", layers "++show (gsLayers st)++", DAG nodes "++show (gsVSANodes st)++" (unions "++show (gsVSAUnions st)++"), build work "++show (gsBuildWork st)
@@ -926,7 +1138,7 @@ frontSearch mode conf examples
     -- SafeReuse exhausts the preferred branch here: every deferred slot is
     -- resumed so the final selection ranges over the complete candidate set.
     finalize :: KeyExpr -> M.Map String Scalar -> Bool -> [[(Placed,Placed)]] -> Search (Either String Program)
-    finalize key slots0 unsafe ps=do
+    finalize key slots0 unsafe ps=traceEvent "latis-train-exact" $ do
       firstWork<-currentWork
       setMetric "first_solution_work" firstWork
       pending<-gets stPending
