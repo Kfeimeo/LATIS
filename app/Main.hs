@@ -27,6 +27,7 @@ import qualified ARC.StageBEvaluate as SB
 import qualified ARC.StageCEvaluate as SC
 import qualified ARC.StageDMechanism as SDM
 import qualified ARC.StageDEvaluate as SD
+import qualified ARC.ContentFirstMechanism as CFM
 import qualified ARC.TraceIO as TIO
 import Control.Concurrent (getNumCapabilities)
 import Control.Exception (evaluate)
@@ -68,6 +69,7 @@ usage = unlines
   ,"latis stage-b-mechanism --out results/stage_b/mechanism [--per-family 3] (Stage B synthetic mechanism tasks x ablation configs + Stage A regression rows)"
   ,"latis stage-b-solve --task PATH --out DIR --config FullB (one task, one Stage B configuration; writes solution.json/derivation_graph.json/trace.txt)"
   ,"latis stage-c-mechanism --out results/stage_c/mechanism [--per-family 3] (Stage C synthetic mechanism tasks x ablation configs + baseline regression rows)"
+  ,"latis content-first-mechanism --out DIR [--config FrozenD,ContentFirstOnly,...] [--regression-ids FILE --arc-dir data/arc1-training] (Content-first mechanism families x configs; optional old-solution regression on train pairs)"
   ,"latis stage-c-solve --task PATH --out DIR --config ObjectShapeFull (one task, one Stage C configuration; writes solution.json/derivation_graph.json/trace.txt)"
   ,"latis solve-v04 --task PATH --out results/v04/task --mode Full --feature-budget 12000 --construction-budget 12000 --feature-depth 4 --budget 250000"
   ,"         --workers 1 [--window 4*workers] [--speculation-cap 256]   (source-closure candidate evaluation; pair --workers N with +RTS -N<N> -RTS)"
@@ -214,6 +216,10 @@ main = do
     "stage-d-mechanism":rest -> do
       let names=if option "--config" "" rest=="" then take 8 SD.configNamesD else [option "--config" "FullD" rest]
       SDM.runMechanismD (option "--out" "results/stage_d/full_p0/mechanism" rest) names
+    "content-first-mechanism":rest -> do
+      let names=if option "--config" "" rest=="" then ["FrozenD","ContentFirstOnly","ContentFirstExploreAlternatives"] else splitOn ',' (option "--config" "" rest)
+          regression=case option "--regression-ids" "" rest of ""->Nothing; f->Just (option "--arc-dir" "data/arc1-training" rest,f)
+      CFM.runMechanismCF (option "--out" "results/content_first/mechanism" rest) names regression
     "stage-c-mechanism":rest -> do
       per <- number "--per-family" 3 rest
       vertical <- loadTask (option "--task" "data/03560426.json" rest) >>= either die pure

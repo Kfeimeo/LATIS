@@ -23,6 +23,7 @@ library
     Synthesis.Collection.Shape Synthesis.Collection.Relation ARC.StageCEvaluate
     Synthesis.Collection.Parameter
     Synthesis.Collection.Unified Synthesis.Collection.Diagnostics ARC.StageDEvaluate ARC.StageDMechanism
+    Synthesis.Collection.ContentFirst ARC.ContentFirstEvaluate ARC.ContentFirstMechanism
     ARC.TraceIO
     Synthesis.Triggered.Parallel
     ARC.TriggeredEvaluate ARC.TriggeredStress
@@ -67,6 +68,14 @@ test-suite latis-tests
   type: exitcode-stdio-1.0
   hs-source-dirs: test
   main-is: Main.hs
+  build-depends: base, latis, containers, directory
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite content-first-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: ContentFirstMain.hs
   build-depends: base, latis, containers, directory
   default-language: GHC2021
   ghc-options: -Wall -O1

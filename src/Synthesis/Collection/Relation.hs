@@ -27,7 +27,7 @@
 -- the actual output objects, and it is stored as evidence only.
 module Synthesis.Collection.Relation
   ( Pred(..), Selector(..), Others(..), CountExpr(..), OffsetExpr(..), PerObject(..), MergeMode(..), TBody(..), ObjectTransform(..)
-  , transformText, transformCost, transformConstants, usesShape
+  , transformText, transformCost, transformConstants, usesShape, predText
   , EmittedObject(..), emitObjects, evalPred, selectObjects
   , RelationWitness(..), relationWitness, witnessText
   , RelationGrammar(..), enumerateTransforms, SearchCase(..), SearchResult(..), searchTransforms

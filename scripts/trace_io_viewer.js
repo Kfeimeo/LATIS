@@ -67,7 +67,7 @@ var LATIS = (function () {
   // Dead cross references: candidate -> parent branch, replay -> candidate.
   function deadLinks(d) {
     var v = validateBundle(d), dead = [];
-    var roots = { task: 1, unified: 1, legacy: 1, 'unified.joint': 1, 'unified.extension': 1, alignment: 1, size: 1, shape: 1 };
+    var roots = { task: 1, unified: 1, legacy: 1, 'unified.joint': 1, 'unified.extension': 1, alignment: 1, size: 1, shape: 1, content_first: 1, 'content_first.search': 1 };
     ((d.candidates || {}).candidates || []).forEach(function (c) {
       if (c.parent_branch_id && !v.branch_ids[c.parent_branch_id] && !roots[c.parent_branch_id]) dead.push({ from: c.candidate_id, to: c.parent_branch_id });
     });
@@ -120,8 +120,43 @@ var LATIS = (function () {
     }
     return out;
   }
+  // Content-first evidence (pure readers over the embedded record; nothing is inferred).
+  function contentFirstInfo(record) {
+    var cf = record && record.content_first;
+    if (!cf || typeof cf !== 'object') return null;
+    var runs = cf.runs || [];
+    return { classification: cf.final_classification || null, selected_plan: cf.selected_plan || null, selected_plan_text: cf.selected_plan_text || null,
+             metrics: cf.metrics || {}, runs: runs, witnesses: cf.witnesses || [], deferred: cf.deferred || [],
+             entered: runs.length > 0, trigger: runs.length ? runs[0].trigger : null, size_first_status: runs.length ? runs[0].size_first_status : null };
+  }
+  function boundsRect(b) { return b ? [b.min_x, b.min_y, b.max_x - b.min_x + 1, b.max_y - b.min_y + 1] : null; }
+  // Bounds of the selected program's OutputSpec on case k (null when not derived).
+  function witnessBounds(record, k) {
+    var info = contentFirstInfo(record); if (!info) return null;
+    var w = info.witnesses[k]; if (!w || !w.derived) return null;
+    return { rect: boundsRect(w.spec.witness.bounds), dims: w.spec.witness.dims, dims_source: w.spec.witness.dims_source, content_kind: w.spec.witness.content_kind,
+             selection: w.spec.witness.selection, pixel_sources: w.spec.witness.pixel_sources, emitted: w.spec.emitted, grid: w.spec.grid, exact: w.exact };
+  }
+  // Bounds recorded for a content-first candidate on case k (from its evaluated case record).
+  function candidateBounds(c, k) {
+    if (!c || c.scope !== 'ContentFirst') return null;
+    var x = (c.cases || []).filter(function (q) { return q.case_index === k; })[0];
+    if (!x || !x.output_spec) return null;
+    return { rect: boundsRect(x.output_spec.bounds), dims: x.output_spec.dims, dims_source: x.output_spec.dims_source, content_kind: x.output_spec.content_kind, selection: x.output_spec.selection, pixel_sources: x.output_spec.pixel_sources, outcome: x.outcome, reason: x.reason };
+  }
+  // Two-branch timeline (sequence axis): Size-first scopes vs the content-first scope.
+  function branchTimeline(funnel) {
+    var legacy = ['Size', 'Alignment', 'Scalar/Typed', 'Referent/VSA', 'Shape', 'Relation', 'Unified/Typed', 'Extension', 'JointForward', 'Execution', 'Render'];
+    function span(names) {
+      var f = (funnel || []).filter(function (x) { return names.indexOf(x.stage) >= 0 && x.first_sequence != null; });
+      if (!f.length) return { entered: false, first: null, last: null, events: 0 };
+      return { entered: true, first: Math.min.apply(null, f.map(function (x) { return x.first_sequence; })), last: Math.max.apply(null, f.map(function (x) { return x.last_sequence; })), events: f.reduce(function (a, x) { return a + x.events; }, 0) };
+    }
+    return { size_first: span(legacy), content_first: span(['ContentFirst']) };
+  }
   return { ARC: ARC, expandBundle: expandBundle, dims: dims, gridDiff: gridDiff, filterCandidates: filterCandidates, filterEvents: filterEvents, uniq: uniq,
-           validateBundle: validateBundle, deadLinks: deadLinks, statusChip: statusChip, paintObjects: paintObjects };
+           validateBundle: validateBundle, deadLinks: deadLinks, statusChip: statusChip, paintObjects: paintObjects,
+           contentFirstInfo: contentFirstInfo, boundsRect: boundsRect, witnessBounds: witnessBounds, candidateBounds: candidateBounds, branchTimeline: branchTimeline };
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = LATIS;
 
@@ -223,6 +258,23 @@ if (typeof document !== 'undefined') (function () {
       table(['候选', '选择原因', '核对'], (t.replay_overview || []).map(function (r) { return [candLink(r.candidate_id), r.reason, chip(r.verdict)]; })),
       h('h3', { text: '选中程序 witness 的独立 Python 检查' }),
       t.witness_checks.length ? table(['pair', '结果', 'error'], t.witness_checks.map(function (w) { return [w.pair_index, chip(w.independent_checks), w.error || '']; })) : h('div', { class: 'muted', text: '无（没有精确程序时不存在 witness）' })));
+    var cfi = LATIS.contentFirstInfo(D.record);
+    if (cfi) {
+      var diag = null;
+      if (cfi.classification && cfi.classification.indexOf('content_first_unavailable_due_to_representation') === 0)
+        diag = h('div', { class: 'banner warn', text: '诊断：Content-first 已打开，但没有任何输入侧 selector 在每个训练 case 上给出合法的唯一/非空选择（例如多色 Region、分隔区域、含有条件的选择都不在当前 selector 语言内）。这是表示不足（selection / region unavailable），不是尺寸入口阻塞。' });
+      else if (cfi.classification && cfi.classification.indexOf('content_first_no_train_exact') === 0)
+        diag = h('div', { class: 'banner warn', text: '诊断：Content-first 已打开并派生了 OutputSpec，但没有任何候选整格匹配训练目标' + (cfi.classification.indexOf('budget') >= 0 ? '（预算截断，未穷尽该有限 plan 宇宙）' : '（该任务的有限 plan 宇宙已访问完）') + '。' });
+      else if (cfi.classification === 'content_first_deferred_legacy_first_solution')
+        diag = h('div', { class: 'banner ok', text: 'Size-first 先得到首解；Content-first 的 plan 宇宙被记录为 deferred，未展开（ExploreAlternatives 关闭）。' });
+      else if (cfi.classification === 'content_first_not_entered')
+        diag = h('div', { class: 'muted', text: 'Content-first 未进入（配置关闭，或 Size-first 已解且未配置 deferred 记录）。' });
+      out.push(card('Content-first OutputSpec（Input → Selection → Bounds → Dimensions → Render）', diag,
+        kv([['size_first_status', cfi.size_first_status || (D.record.size_rule && D.record.size_rule.exact ? 'fit' : 'unknown')], ['content_first_trigger', cfi.trigger || 'none'], ['最终分类', cfi.classification], ['选中 plan', cfi.selected_plan_text || '无'],
+            ['plan 宇宙 / 已访问', val(cfi.metrics.cf_plan_universe) + ' / ' + val(cfi.metrics.cf_plans_tried)], ['每 case 均合法的 selection plan 数', cfi.metrics.cf_selection_legal_plans], ['OutputSpec 派生 / 渲染 / train-exact（case 单位/plan 单位）', val(cfi.metrics.cf_specs_derived) + ' / ' + val(cfi.metrics.cf_rendered) + ' / ' + val(cfi.metrics.cf_fits)],
+            ['预算截断', cfi.metrics.cf_truncated], ['deferred plans（未展开）', cfi.metrics.cf_deferred_plans], ['alternative fits（explore）', cfi.metrics.cf_alternative_fits]]),
+        cfi.runs.length ? h('div', { class: 'scroll' }, table(['trigger', 'size-first', 'role', '分类', '宇宙', '已访问', '合法 selection', 'specs', '渲染', 'fits', '截断'], cfi.runs.map(function (r) { return [r.trigger, r.size_first_status, r.role, r.classification, r.plan_universe, r.plans_tried, r.selection_legal_plans, r.specs_derived, r.rendered, r.fits, String(r.truncated) + (r.truncation_reason ? '：' + r.truncation_reason : '')]; }))) : null));
+    }
     out.push(card('尚未插桩的内部子项（not_instrumented）', table(['scope', '内容', '源码位置'], t.not_instrumented.map(function (n) { return [n.scope, n.detail, h('span', { class: 'mono', text: n.source })]; }))));
     return out;
   }
@@ -259,11 +311,22 @@ if (typeof document !== 'undefined') (function () {
     var diff = LATIS.gridDiff(pred, p.output);
     var objs = state.encoding === 'search' ? p.encoding.search_objects : p.encoding.connectivity_objects;
     var hiObj = objs.filter(function (o) { return o.id === state.hiObject; })[0];
+    // Content-first overlay: the selection bounds = crop window / own canvas of the selected program (or of the current ContentFirst candidate).
+    var cfw = (c && c.scope === 'ContentFirst' && state.predSource !== 'program') ? LATIS.candidateBounds(c, p.case_index) : LATIS.witnessBounds(D.record, p.case_index);
+    var overlayRect = state.cfOverlay === false ? null : (cfw ? cfw.rect : null);
     out.push(card('Input / Target / Predicted / Diff',
-      gpanel('Input pair ' + p.pair_index + ' ' + p.input_dims.join('×'), p.input, { highlight: hiObj ? hiObj.bbox : null }),
+      gpanel('Input pair ' + p.pair_index + ' ' + p.input_dims.join('×'), p.input, { highlight: overlayRect || (hiObj ? hiObj.bbox : null) }, overlayRect ? ('覆盖层：选中 bbox / 裁剪窗口 (x,y,w,h)=' + overlayRect.join(',') + ' → ' + cfw.dims_source) : null),
       gpanel('Target ' + p.output_dims.join('×') + '（训练目标）', p.output),
       gpanel('Predicted', pred, { na: 'not_available' }, predNote),
       gpanel('Diff', pred ? p.output : null, { diff: diff.cells, na: 'not_available' }, pred ? (diff.comparable ? diff.count + ' 个像素不同' + (diff.count ? '：' + diff.cells.slice(0, 40).map(function (q) { return '(' + q[0] + ',' + q[1] + ')'; }).join(' ') + (diff.count > 40 ? ' …' : '') : '') : '尺寸不同，不能逐格比较（' + (LATIS.dims(pred) || []).join('×') + ' vs ' + p.output_dims.join('×') + '）') : null)));
+    if (cfw) {
+      out.push(card('Content-first OutputSpec 覆盖层与像素来源（case ' + p.case_index + '）',
+        h('div', { class: 'filters' }, h('label', null, h('input', { type: 'checkbox', checked: state.cfOverlay === false ? null : 'checked', onchange: function (e) { state.cfOverlay = e.target.checked; render(); } }), ' 在 Input 上显示选中 bbox / 裁剪窗口')),
+        kv([['Size 依赖来源', cfw.dims_source], ['Dimensions', (cfw.dims || []).join('×')], ['内容构造', cfw.content_kind], ['selection', cfw.selection ? cfw.selection.text + ' · matched ' + JSON.stringify(cfw.selection.matched_ids) + ' · ' + cfw.selection.evidence : 'unknown'],
+            ['case 结果', cfw.outcome ? cfw.outcome + (cfw.reason ? '：' + cfw.reason : '') : (cfw.exact == null ? 'unknown' : (cfw.exact ? 'exact' : 'mismatch'))]]),
+        cfw.pixel_sources ? table(['输入对象 id', '像素数', '是否选中成员（crop 窗口中的非选中像素来自输入 grid 本身）'], cfw.pixel_sources.map(function (q) { return [q.source, q.pixels, q.selected_member ? '选中' : '非选中（窗口内其它颜色）']; })) : null,
+        cfw.grid ? h('div', { class: 'row' }, gpanel('OutputSpec 渲染（' + cfw.content_kind.split(':')[0] + '）', cfw.grid), gpanel('Target', p.output), gpanel('Diff', p.output, { diff: LATIS.gridDiff(cfw.grid, p.output).cells })) : null));
+    }
     var encSel = h('select', { onchange: function (e) { state.encoding = e.target.value; render(); } },
       h('option', { value: 'search', text: '搜索实际使用的对象（含对角视图/置换）', selected: state.encoding === 'search' ? 'selected' : null }),
       h('option', { value: 'connectivity', text: '纯 4 连通编码', selected: state.encoding === 'connectivity' ? 'selected' : null }));
@@ -308,7 +371,12 @@ if (typeof document !== 'undefined') (function () {
         h('button', { class: 'chip', text: '查看该阶段事件', onclick: function () { state.tab = 'events'; state.ef = { scopes: f.scopes }; state.evPage = 0; render(); } }));
       return det;
     });
-    out.push(card('Grounding → Size → Alignment → Scalar/Typed → Referent/VSA → Relation → Unified/Joint → Render → Verify', rows,
+    var bt = LATIS.branchTimeline(t.funnel);
+    out.push(card('分支时间线：Legacy Size-first 与 Content-first（事件序号轴）', table(['分支', '进入', '首序号', '末序号', '事件数'], [
+      ['Size-first（SizeRule → Alignment/Relation/Unified/Joint → Execution/Render）', chip(bt.size_first.entered ? 'entered' : 'not_entered'), bt.size_first.first, bt.size_first.last, bt.size_first.events],
+      ['Content-first（Selection → Bounds → Dimensions → Render）', chip(bt.content_first.entered ? 'entered' : 'not_entered'), bt.content_first.first, bt.content_first.last, bt.content_first.events]]),
+      h('div', { class: 'muted', text: 'Content-first 只在 Size-first 失败（size_failed / downstream_failed）或 ExploreAlternatives 触发后出现；触发前候选数为 0。' })));
+    out.push(card('Grounding → Size → Alignment → Scalar/Typed → Referent/VSA → Relation → Unified/Joint → ContentFirst → Render → Verify', rows,
       h('p', { class: 'muted', text: 'not_entered：运行正常结束而该阶段没有任何检查点；unknown：进程未正常结束，无法区分。not_entered 不是 failed。' })));
     return out;
   }
@@ -339,6 +407,14 @@ if (typeof document !== 'undefined') (function () {
   }
   function astTree(ast) {
     if (!ast) return h('div', { class: 'muted', text: 'AST 未记录' });
+    if (ast.kind === 'ContentFirst') {
+      var sel = ast.selection || {};
+      return h('div', { class: 'ast' }, h('ul', null,
+        h('li', null, h('b', { text: 'OutputSpec' }), ' ' + (ast.text || '')),
+        h('li', null, h('b', { text: 'Dimensions ← Bounds(' + (sel.mode || '') + '(' + JSON.stringify(sel.selector) + '))' }), h('span', { class: 'muted', text: '  输入侧选择决定输出尺寸（inclusive bbox，+1/轴）' })),
+        h('li', null, h('b', { text: 'Content: ' + ast.construction }), h('span', { class: 'muted', text: ast.construction === 'CropInputWindow' ? '  从输入 grid 的窗口裁剪全部像素' : '  只绘制选中成员，平移到局部原点' }))),
+        h('div', { class: 'muted', text: 'cost ' + ast.cost + ' · plan id ' + ast.plan_id }));
+    }
     function expr(e) {
       if (e.leaf) return h('li', null, h('b', { text: e.leaf }), e.gap != null ? '(gap ' + e.gap + ')' : '', h('span', { class: 'muted', text: '  Feature 叶子' }));
       if (e.const != null) return h('li', null, String(e.const), h('span', { class: 'muted', text: '  常数 ' + e.type }));
@@ -413,6 +489,19 @@ if (typeof document !== 'undefined') (function () {
   function viewDerivation() {
     var w = (D.witnesses || {}).execution_witnesses, out = [];
     out.push(card('选中程序', kv([['程序结构 ID', summary().program_transform_id], ['类型', summary().program_kind]]), D.record.program_transform_ast ? astTree(D.record.program_transform_ast) : h('pre', { text: (D.record.program || '无程序').slice(0, 3000) })));
+    var cfi2 = LATIS.contentFirstInfo(D.record);
+    if (cfi2 && cfi2.selected_plan) {
+      out.push(card('Content-first 推导：Input → Selection → Bounds → Dimensions → Content → Render', h('div', { class: 'ast' }, h('ul', null, cfi2.witnesses.map(function (x, i) {
+        if (!x.derived) return h('li', { text: 'pair ' + i + '：未能派生 OutputSpec：' + x.error });
+        var wt = x.spec.witness;
+        return h('li', null, h('b', { text: 'pair ' + i + ' ' }), chip(x.exact ? 'exact' : 'mismatch'), h('ul', null,
+          h('li', { text: 'Selection: ' + wt.selection.text + ' → matched ' + JSON.stringify(wt.selection.matched_ids) + '（' + wt.selection.evidence + '）' }),
+          h('li', { text: 'Bounds (inclusive): x ' + wt.bounds.min_x + '..' + wt.bounds.max_x + ', y ' + wt.bounds.min_y + '..' + wt.bounds.max_y }),
+          h('li', { text: wt.dims_source }),
+          h('li', { text: 'Content: ' + wt.content_kind + '；选中像素 ' + wt.selected_pixels + '，非选中对象像素 ' + wt.other_object_pixels + '，背景格 ' + wt.background_cells }),
+          h('li', { text: wt.input_only_dependency })));
+      })))));
+    }
     if (!Array.isArray(w) || !w.length) { out.push(card('Witness', h('div', { class: 'muted', text: '没有精确程序，因此没有 Transform/Render witness；失败分支见“候选浏览”和“搜索流程”。' }))); }
     else w.forEach(function (x, i) {
       var used = summary().pairs_used_in_search[i], dimsWH = [x.width, x.height];

@@ -26,10 +26,13 @@ import Synthesis.Collection.Parameter
 import Synthesis.Collection.Typed (TExpr(..), TVal(..), TOp(..), opName)
 import Synthesis.Collection.Shape (applyDiagonalView, maskCells, DiagonalChain(..), DiagonalRejection(..))
 import Synthesis.Collection.Unified (StageD(..))
+import Synthesis.Collection.ContentFirst (planJSON, OutputSpec, ContentFirstPlan(..), SelectionPlan(..), SelectionMode(..), ContentConstruction(..), deriveOutputSpec, renderOutputSpec, specEmitted, specWitnessJSON, planText)
+import Latent.Encode (encoderBackground)
 import qualified ARC.StageAEvaluate as SA
 import qualified ARC.StageBEvaluate as SB
 import qualified ARC.StageCEvaluate as SC
 import qualified ARC.StageDEvaluate as SD
+import qualified ARC.ContentFirstEvaluate as CFE
 import qualified Synthesis.Triggered as V4
 import qualified Synthesis.InducedR2.Learn as R2
 import Latent.Grid
@@ -182,7 +185,8 @@ runTraceIO opt=do
       record=jobj (meta++
         [("status",jstr status),("result_label",jstr status),("exact_scope",jstr (if single then "pair_exact: the single selected training pair only" else "train_exact: every training pair"))
         ,("detail",jstr detail),("wall_clock_seconds",show seconds)
-        ,("program",jmaybe (jstr . show) program),("program_kind",jstr (case program of Nothing->"none"; Just p->if isJust (F.progTransform p) then "object_transform" else "ordered_sequence_body"))
+        ,("program",jmaybe (jstr . show) program),("program_kind",jstr (case program of Nothing->"none"; Just p->if isJust (F.progContentFirst p) then "content_first_output_spec" else if isJust (F.progTransform p) then "object_transform" else "ordered_sequence_body"))
+        ,("content_first_plan",jmaybe planJSON (program >>= F.progContentFirst))
         ,("program_transform_ast",transformAst),("program_transform_id",maybe "null" (jstr . DG.stableHash . show) (program >>= F.progTransform))
         ,("search_work",if isJust front then show (m "search_work") else "null")
         ,("counters",case g of Just gr->jobj [(key,show v) | (key,v)<-M.toAscList (F.counters gr)]; Nothing->"null")
@@ -193,8 +197,9 @@ runTraceIO opt=do
             ,("hole_bindings",jarr (maybe [] (map jstr . SA.typedBindings) program))
             ,("stage_b",SB.stageBMetricsJSON gr),("stage_c",SC.stageCMetricsJSON gr),("relations",SC.relationsJSON gr),("shapes",SC.shapesJSON gr)
             ,("stage_d",SD.stageDMetricsJSON gr),("parameter_goals",SD.goalsJSON gr)
+            ,("content_first",CFE.contentFirstJSON searchPairs gr program)
             ,("trace_lines",jarr (map jstr (F.trace gr)))]
-          _->[("failure_stage","null"),("size_rule","null"),("stage_d","null"),("parameter_goals","[]"),("trace_lines","[]")])
+          _->[("failure_stage","null"),("size_rule","null"),("stage_d","null"),("parameter_goals","[]"),("content_first","null"),("trace_lines","[]")])
   writeFile (out </> "solver_record.json") (record++"\n")
   -- Grids and encodings; Predicted only where the selected program executed.
   gridsOut<-forM (zip [0::Int ..] pairs) $ \(j,(x,y))->do
@@ -237,6 +242,16 @@ decodeTransform j=do
   others<-field "others" j >>= str >>= \s->case s of "DropOthers"->Right DropOthers; "KeepOthers"->Right KeepOthers; _->Left ("unknown others "++s)
   body<-field "body" j >>= decodeBody
   Right (ObjectTransform sel others body)
+-- Content-first plan AST (planJSON): {"kind":"ContentFirst","selection":{"mode","selector"},"construction"}.
+decodeContentFirst :: JSON -> Either String ContentFirstPlan
+decodeContentFirst j=do
+  selection<-field "selection" j
+  mode<-field "mode" selection >>= str >>= \m->case m of "SelectUnique"->Right SelectUnique; "SelectNonEmpty"->Right SelectNonEmpty; _->Left ("unknown selection mode "++m)
+  sel<-field "selector" selection >>= decodeSelector
+  construction<-field "construction" j >>= str >>= \c->case c of "CropInputWindow"->Right CropInputWindow; "EmitSelectedWithOwnCanvas"->Right EmitSelectedWithOwnCanvas; _->Left ("unknown construction "++c)
+  Right (ContentFirstPlan (SelectionPlan mode sel) construction)
+isContentFirstAst :: JSON -> Bool
+isContentFirstAst j=either (const False) (=="ContentFirst") (field "kind" j >>= str)
 str :: JSON -> Either String String
 str (JString s)=Right s
 str _=Left "expected JSON string"
@@ -329,7 +344,8 @@ replayOne :: F.Config -> [(Grid,Grid)] -> JSON -> IO String
 replayOne conf pairs req=do
   let rid=either (const "null") jstr (field "request_id" req >>= str)
       cid=either (const "null") jstr (field "candidate_id" req >>= str)
-  case field "ast" req >>= decodeTransform of
+  if either (const False) isContentFirstAst (field "ast" req) then replayContentFirst conf pairs req rid cid else
+   case field "ast" req >>= decodeTransform of
     Left e->pure (jobj [("request_id",rid),("candidate_id",cid),("decode_ok","false"),("decode_error",jstr e),("verdict",jstr "unverifiable")])
     Right t->do
       cases<-either (const (pure [])) pure (field "pairs" req >>= asArray)
@@ -371,6 +387,31 @@ replayOne conf pairs req=do
       rw<-either (\e->Left ("render_invalid",e)) Right (renderWitness dims (O.background scene) es)
       _<-either (\e->Left ("render_invalid",e)) Right (render (O.Scene dims (O.background scene) (map eoObject es)))
       Right (Nothing,es,rw)
+
+-- Content-first replay: the plan is executed on the saved training INPUT only
+-- (selection -> bounds -> dimensions -> content); the target is compared
+-- afterwards. output_dims of the request are ignored (they are derived).
+replayContentFirst :: F.Config -> [(Grid,Grid)] -> JSON -> String -> String -> IO String
+replayContentFirst conf pairs req rid cid=case field "ast" req >>= decodeContentFirst of
+  Left e->pure (jobj [("request_id",rid),("candidate_id",cid),("decode_ok","false"),("decode_error",jstr e),("verdict",jstr "unverifiable")])
+  Right plan->do
+    cases<-either (const (pure [])) pure (field "pairs" req >>= asArray)
+    let bg=encoderBackground (encoderOf conf)
+    results<-forM cases $ \c->do
+      let pj=either (const (-1)) id (intF "pair_index" c)
+      if pj<0 || pj>=length pairs then pure (jobj [("pair_index",show pj),("outcome",jstr "unverifiable"),("reason",jstr "pair index outside the task")]) else do
+        let (x,y)=pairs!!pj
+            (scene,_,_)=sceneOf conf x
+        r<-try (evaluate (let v=deriveOutputSpec plan bg x scene >>= \sp->fmap (\g->(sp,g)) (renderOutputSpec bg sp) in length (show v) `seq` v)) :: IO (Either SomeException (Either String (OutputSpec,Grid)))
+        pure $ case r of
+          Left e->jobj [("pair_index",show pj),("outcome",jstr "runtime_error"),("reason",jstr (take 300 (show e)))]
+          Right (Left e)->jobj [("pair_index",show pj),("outcome",jstr (if "selection" `isPrefixOf` e then "selection_failed" else "execution_invalid")),("reason",jstr e),("grid","null"),("grid_hash","null")]
+          Right (Right (sp,gr))->jobj ([("pair_index",show pj),("outcome",jstr (if gr==y then "exact" else "render_mismatch")),("reason",jstr "")
+            ,("grid",gridJ gr),("grid_hash",jstr (DG.stableHash (show (rows gr)))),("output_dims",dimsJ (dimensions gr)),("output_dims_source",jstr "derived from the input-side selection (content-first)")
+            ,("output_spec",specWitnessJSON sp),("emitted_objects",jarr (map emissionJ (specEmitted sp)))
+            ,("reencoded_objects",jarr (map objectFullJ (O.objects (encode (encoderOf conf) gr))))
+            ,("input_objects",jarr (map objectFullJ (O.objects scene)))]++diffJ gr y)
+    pure (jobj [("request_id",rid),("candidate_id",cid),("decode_ok","true"),("decoded_id",jstr (DG.stableHash (show plan))),("decoded_text",jstr (planText plan)),("decoded_kind",jstr "ContentFirst"),("cases",jarr results)])
 
 runTraceReplay :: (String -> String -> String) -> IO ()
 runTraceReplay opt=do

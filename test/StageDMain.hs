@@ -30,7 +30,7 @@ color=must . checkedParam ArcColor
 ob :: Int -> Int -> Int -> Int -> Int -> O.Object
 ob i x y w c=O.Object i (Coord x y) (M.fromList [(Coord j 0,c) | j<-[0..w-1]]) 0
 prog :: ObjectTransform -> F.Program
-prog t=F.Program defaultEncoder (F.Inline (F.Definition scanKey (F.Body (Lit 0,Lit 0) (Lit 0,Lit 0)) True)) M.empty M.empty True Nothing Nothing (Just t) False
+prog t=F.Program defaultEncoder (F.Inline (F.Definition scanKey (F.Body (Lit 0,Lit 0) (Lit 0,Lit 0)) True)) M.empty M.empty True Nothing Nothing (Just t) False Nothing
 scanKey :: KeyExpr
 scanKey=Lex (Anchor TL AY) (Anchor TL AX)
 pipeline :: [TransformStep] -> ObjectTransform

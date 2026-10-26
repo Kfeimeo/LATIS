@@ -103,3 +103,10 @@ python -I scripts/trace_io.py oracle-replay --record results/trace_io/examples/a
 ## 7. 未插桩（not_instrumented）
 
 `Typed.synthesizeTyped` 逐模板与常数赋值（Size、Stage A 标量 hole、D 参数 goal 内部）；`Front.legalKey` 逐 key 拒绝；`Referent.buildGraph` 节点级；`Shape.decompose` 内部；旧 alignment `realize` 的逐 case 网格。页面概览列出源码位置。这些层只有 D+ 汇总事件，不能据此推断内部尝试了哪些候选。
+
+## 附：Content-first OutputSpec 的观测（2026-10-26 新增）
+
+- 漏斗新增阶段 `ContentFirst`（scope `ContentFirst`，位于 JointForward 之后）：`kind=grammar`（plan 宇宙、预算、依赖顺序）、`kind=evaluated`（逐 plan 的结构 AST、逐 case 的 selection 结论与 OutputSpec witness：bounds、dims、dims_source、matched ids、像素来源）、`kind=budget`（截断）；D+ 事件 `entered/completed` 携带 `content_first_trigger`、`size_first_status`、`classification`、`exhaustiveness_scope`。SizeRule 的 completed 事件新增 `size_first_status`。
+- 页面：概览新增 Content-first 卡片（触发、分类、宇宙/访问/合法 selection/派生/渲染/fit，表示不足时显示诊断横幅而不是空白候选页）；搜索流程新增“分支时间线：Size-first 与 Content-first”；网格检查器在 Input 上叠加选中 bbox / 裁剪窗口，并列出像素来源（选中成员 vs 窗口内非选中对象）与 OutputSpec 渲染/Target/Diff；推导页显示 `Dimensions <- Bounds(Selection)` 链。
+- `trace-replay` / `oracle-replay` 接受 `kind: "ContentFirst"` 的 AST（`planJSON` 结构），只在训练输入上执行 selection → bounds → dimensions → content；输出尺寸由输入派生，请求里的 `output_dims` 被忽略。oracle 结果仍标 `oracle_diagnostic_only`。
+- 展示不改变求解语义；单对匹配仍只标 `pair-exact`。

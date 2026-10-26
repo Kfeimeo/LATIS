@@ -30,7 +30,13 @@ namedConfigsD=
     [("D0_Frozen",1,2,2,True),("D0_Off",1,2,2,False),("Budget4x",4,2,2,True)
     ,("Compose3",1,3,2,True),("Param3",1,2,3,True),("Combined3_4x",4,3,3,True)
     ,("Extended4_8x",8,4,3,True)]]
+  -- Content-first OutputSpec configurations (ARC.ContentFirstEvaluate reads them
+  -- back): FrozenD is D0_Frozen (content-first off), ContentFirstOnly adds the
+  -- content-first fallback only, ContentFirstExploreAlternatives also records the
+  -- content-first representatives after a Size-first first solution.
+  ++[("FrozenD",d0),("ContentFirstOnly",d0 {contentFirst=contentFirstOn}),("ContentFirstExploreAlternatives",d0 {contentFirst=contentFirstOn {cfExploreAlternatives=True}})]
   where
+    d0=scaling 1 2 2 True
     scaling m cd pd diag=fullD
       { alignmentBudget=alignmentBudget fullD*m,scalarBudget=scalarBudget fullD*m
       , stageA=(stageA fullD) {saHoleBudget=saHoleBudget (stageA fullD)*m,saTotalHoleBudget=saTotalHoleBudget (stageA fullD)*m}

@@ -28,6 +28,7 @@ import qualified ARC.StageAEvaluate as SA
 import qualified ARC.StageBEvaluate as SB
 import qualified ARC.StageCEvaluate as SC
 import qualified ARC.StageDEvaluate as SD
+import qualified ARC.ContentFirstEvaluate as CFE
 import qualified Synthesis.Triggered as V4
 import qualified Synthesis.InducedR2.Learn as R2
 import Language.Induced.Base (exprText)
@@ -174,7 +175,8 @@ runConfigured conf stageB stageC ms pairs=settle <$> timed ms (do
     ++(if stageC then [("stage_c",SC.stageCMetricsJSON g),("relations",SC.relationsJSON g),("shapes",SC.shapesJSON g)
                       ,("object_transform",maybe "null" (jsonString . F.transformText) (F.program f >>= F.progTransform))
                       ,("object_count_exact",boolJSON (m "c_object_count_exact">0)),("object_transform_exact",boolJSON (m "c_object_transform_exact">0))] else [])
-    ++[("stage_d",SD.stageDMetricsJSON g),("parameter_goals",SD.goalsJSON g),("execution_witnesses",SD.witnessesJSON pairs (F.program f))]++mem})
+    ++[("stage_d",SD.stageDMetricsJSON g),("parameter_goals",SD.goalsJSON g),("execution_witnesses",SD.witnessesJSON pairs (F.program f))
+       ,("content_first",CFE.contentFirstJSON pairs g (F.program f))]++mem})
 runV04 :: Int -> [(Grid,Grid)] -> IO Outcome
 runV04 ms pairs=settle <$> timed ms (do
   let f=V4.frontSearch V4.Full v04Config pairs

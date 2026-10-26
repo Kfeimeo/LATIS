@@ -41,6 +41,7 @@ STAGES = [
     ('Unified/Typed', ['Composition', 'TypedParameter@unified'], 'Stage D 逆向 typed 参数计划'),
     ('Extension', ['Extension'], 'Stage D+ 3/4 槽 forward 扩展'),
     ('JointForward', ['JointForward'], 'Stage D 联合 forward 回退'),
+    ('ContentFirst', ['ContentFirst'], 'Content-first OutputSpec：Input → Selection → Bounds → Dimensions → Render'),
     ('Execution', ['Execution'], 'Pipeline 执行'),
     ('Render', ['Render'], '渲染与整格比对'),
     ('Verify', ['Run@terminal'], '终止与训练校验（驱动终止记录）'),
@@ -53,6 +54,7 @@ NOT_INSTRUMENTED = [
     {'scope': 'ShapeDecomposition', 'detail': 'Shape 分解内部候选', 'source': 'src/Synthesis/Collection/Shape.hs:170 decompose'},
     {'scope': 'TypedParameter@unified', 'detail': 'D 参数模板内部逐模板 fit / 类型过滤计数', 'source': 'src/Synthesis/Collection/Unified.hs goal → Typed.synthesizeTyped'},
     {'scope': 'Render', 'detail': '旧 alignment 序列体 realize 的逐 case 网格', 'source': 'src/Synthesis/Collection/Front.hs realize'},
+    {'scope': 'ContentFirst', 'detail': '逐 case 的 selector 谓词求值（每个 plan 只记录 selection 结论与 bounds）', 'source': 'src/Synthesis/Collection/ContentFirst.hs selectWith / searchContentFirst'},
 ]
 VOLATILE = {'timestamp_monotonic_ns', 'wall_seconds', 'task_file', 'sink_seconds', 'monotonic_seconds', 'elapsed_seconds'}
 
@@ -173,7 +175,7 @@ def build_candidates(events):
                                    'status': 'unknown', 'reason_code': None, 'cases': [], 'sequences': [], 'duplicates': 0,
                                    'executed': False, 'rendered': False, 'truncation': None})
         c['sequences'].append(e['sequence'])
-        c['scope'] = c['scope'] or ('LegacyRelation' if e['scope'] == 'LegacyRelation' else 'Execution')
+        c['scope'] = c['scope'] or ('LegacyRelation' if e['scope'] == 'LegacyRelation' else 'ContentFirst' if e['scope'] == 'ContentFirst' else 'Execution')
         c['entry'] = c['entry'] or e.get('entry')
         c['parent_branch_id'] = c['parent_branch_id'] or e.get('parent_branch_id')
         if e.get('candidate_ast') and not c['ast']:
@@ -641,7 +643,7 @@ def render(record_path, out_html, focus_candidate=None, focus_branch=None, max_e
             'grids': b['grids'], 'witnesses': b['witnesses'], 'replays': b['replays'],
             'record': {k: record.get(k) for k in ('task_id', 'mode', 'pair_index', 'config', 'status', 'exact_scope', 'detail', 'program_kind', 'program_transform_ast',
                                                  'program_transform_id', 'search_work', 'posthoc_validation', 'size_rule', 'parameter_goals', 'relations', 'trace_lines',
-                                                 'failure_stage', 'pairs_used_in_search', 'diagnostics_forced_on', 'trace_level', 'stage_d')},
+                                                 'failure_stage', 'pairs_used_in_search', 'diagnostics_forced_on', 'trace_level', 'stage_d', 'content_first', 'content_first_plan')},
             'events': objs, 'event_columns': EVENT_COLS, 'event_rows': rows, 'events_total': len(b['events']), 'events_embedded': len(events),
             'focus': {'candidate': focus_candidate, 'branch': focus_branch}}
     data['record']['program'] = (record.get('program') or '')[:6000] or None

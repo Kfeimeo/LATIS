@@ -20,6 +20,7 @@ module Synthesis.Collection.Front
   , scSlotName, scRepTexts, scSelectedText
   , StageC(..), stageCOff, RelationRecord(..), ShapeRecord(..), ObjectTransform, transformText
   , StageD(..), stageDOff, stageDFull
+  , ContentFirst(..), contentFirstOff, contentFirstOn, ContentFirstPlan(..), CFRun(..)
   ) where
 
 import Latent.Grid
@@ -37,6 +38,7 @@ import Synthesis.Collection.Referent
 import Synthesis.Collection.Relation
 import Synthesis.Collection.Shape
 import Synthesis.Collection.Unified
+import Synthesis.Collection.ContentFirst
 import Debug.Trace (traceEvent)
 import qualified Synthesis.Collection.Diagnostics as DG
 import qualified Data.Map.Strict as M
@@ -44,7 +46,7 @@ import qualified Data.Set as S
 import Control.Monad (forM, forM_, when, unless, filterM)
 import Data.List (sortOn, nub, intercalate, sort)
 import Data.Maybe (fromMaybe, isNothing)
-import Data.Either (isRight)
+import Data.Either (isRight, isLeft)
 
 data Mode = Full | NoCounterfactual | CollapseByTrainingDenotation | NoIntensionalityPrior | FixedAlignmentKeys
   | NoAlignmentExplanation | NoOnlineAbstraction | PostHocOnly | NoDependentIndex | DirectSetIndexing | R2FallbackOnly
@@ -74,7 +76,9 @@ data Graph = Graph
   , alignmentEvidence :: [[Alignment]], keyCandidates :: [KeyCandidate], classes :: [SemanticClass]
   , counterfactuals :: [Counterfactual], rejectedCounterfactuals :: [Counterfactual], refinements :: [RNode], highLevelView :: [String]
   , deferred :: [Deferred], referents :: [RefSummary]
-  , relations :: [RelationRecord], shapes :: [ShapeRecord], dGoals :: [GoalAudit] } deriving (Eq,Show)
+  , relations :: [RelationRecord], shapes :: [ShapeRecord], dGoals :: [GoalAudit]
+  -- Content-first runs (solution run and/or recorded alternatives); empty when the path never opened.
+  , contentFirstRuns :: [CFRun] } deriving (Eq,Show)
 -- Stage C audit records: every training-exact object transformation (the
 -- selected one carries the relation witnesses) and the canonical Shape
 -- decomposition of every distinct object mask of the training scenes.
@@ -88,10 +92,14 @@ data Front = Front { program :: Maybe Program, graph :: Graph, failure :: String
 -- with it off the behaviour is exactly Stage A.
 -- stageC (Stage C: Shape algebra, diagonal view, object-set transformations,
 -- object-level size features, goal-directed snapshot) is all off by default.
+-- contentFirst (Content-first OutputSpec: Input -> Selection -> Bounds ->
+-- Dimensions -> Render, opened when the Size-first path fails) is off by
+-- default; with it off the Size-first behaviour is exactly Stage D.
 data Config = Config { alignmentBudget :: Int, scalarBudget :: Int, synthesisDepth :: Int, synthesisCostBound :: Int, promotionThreshold :: Int
-  , reusePolicy :: ReusePolicy, enumerationSeed :: Maybe Int, legacyConfig :: V4.Config, stageA :: StageA, stageB :: StageB, stageC :: StageC, stageD :: StageD } deriving (Eq,Show)
+  , reusePolicy :: ReusePolicy, enumerationSeed :: Maybe Int, legacyConfig :: V4.Config, stageA :: StageA, stageB :: StageB, stageC :: StageC, stageD :: StageD
+  , contentFirst :: ContentFirst } deriving (Eq,Show)
 defaultConfig :: Config
-defaultConfig=Config 400 2000 2 5 4 ExclusiveReuse Nothing V4.defaultConfig stageAOff stageBOff stageCOff stageDOff
+defaultConfig=Config 400 2000 2 5 4 ExclusiveReuse Nothing V4.defaultConfig stageAOff stageBOff stageCOff stageDOff contentFirstOff
 -- Candidate source of a slot: the v0.6.1 scalar grammar, the Stage B referent
 -- hierarchy (frozen per-axis snapshot, class lookup under a schedule) and the
 -- typed N-ary hole search; the latter two are unlocked only after the grammar
@@ -115,7 +123,7 @@ safePolicy SafeOnline _=True
 safePolicy ExclusiveReuseLegacy _=False
 safePolicy _ conf=reusePolicy conf==SafeReuse
 metricNames :: [String]
-metricNames=words "b_goal_queries b_goal_leaves_dropped b_goal_cache_hits b_goal_level1_hits b_goal_level2_builds c_relation_triggered c_relation_trigger_cardinality c_relation_trigger_fallback c_relation_candidates c_relation_tried c_relation_executions c_relation_fits c_relation_truncated c_relation_selected_cost c_relation_shape_used c_object_count_exact c_object_transform_exact c_shape_masks c_shape_decomposed c_shape_decomposed_truncated c_shape_unrepresentable c_shape_truncated c_shape_ast_total c_shape_ties c_shape_work c_diagonal_chains_accepted c_diagonal_chains_rejected c_view_pixels_merged c_size_object_features b_snapshots_built b_snapshot_work b_graph_nodes b_graph_classes b_graph_templates b_graph_closed_terms b_graph_truncations b_constant_only_dropped b_edges_confirmed b_edges_pending b_edges_not_supported b_type_edges b_closure_edges b_sccs b_layers b_substitutions_tried b_outside_universe b_edge_truncations b_vsa_nodes b_vsa_unions b_vsa_expanded b_vsa_expansion_mismatch b_sharing_avg_x100 b_sharing_max_x100 b_dag_evaluations b_reference_evaluations b_witness_full b_hierarchy_slots b_hierarchy_fits b_class_checks b_row_lookups b_flat_row_evaluations b_candidates_covered b_fitting_classes b_layer_exposed b_layer_searched b_layer_truncated b_slot_truncations b_global_truncations b_hierarchy_fallbacks b_hierarchy_solved_slots typed_hole_global_truncations size_rule_templates size_rule_evaluations size_rule_candidates size_rule_truncations size_rule_exact canvas_changes_entering_search typed_hole_slots_triggered typed_hole_templates typed_hole_evaluations typed_hole_fits typed_hole_constant_fits typed_hole_feature_fits typed_hole_truncations grid_realizations_attempted grid_realization_ok realization_render_errors realization_mismatches UntriggeredExpansionCount ConcreteCrossItemEdgeCount_high_level expanded_frozen_features alignment_attempts alignment_rejections equality_attempts rejected_size_comparisons unexplained_equalities alignment_lift_attempts alignment_lift_successes accepted_abstractions construction_triggers fallback_count semantic_classes representatives max_representatives_per_class counterfactual_contexts_generated counterfactual_contexts_rejected counterfactual_evaluations counterfactual_splits canonical_merges premature_collapses dropped_by_collapse intensional_candidates literal_candidates alignment_key_candidates synthesized_keys_accepted ordering_ties_rejected alignment_witnesses online_abstractions_proposed online_abstractions_accepted online_abstraction_reuses refinement_expansions_saved operator_applications refinement_expansions active_frontier_size visibility_size visibility_keys search_work alignment_failure_triggers posthoc_abstractions_accepted reuse_attempts reuse_hits call_attempts call_legality_checks call_legality_rejections deferred_candidates resumed_candidates resume_events resume_retries recovered_solutions reselected_after_completion exclusive_reuse_missed_candidates exclusive_reuse_missed_solutions diagnostic_operator_applications first_solution_work total_work_to_exhaustion completion_work alignment_candidates_remaining rank_reuse_witnesses_verified"
+metricNames=cfMetricNames++words "b_goal_queries b_goal_leaves_dropped b_goal_cache_hits b_goal_level1_hits b_goal_level2_builds c_relation_triggered c_relation_trigger_cardinality c_relation_trigger_fallback c_relation_candidates c_relation_tried c_relation_executions c_relation_fits c_relation_truncated c_relation_selected_cost c_relation_shape_used c_object_count_exact c_object_transform_exact c_shape_masks c_shape_decomposed c_shape_decomposed_truncated c_shape_unrepresentable c_shape_truncated c_shape_ast_total c_shape_ties c_shape_work c_diagonal_chains_accepted c_diagonal_chains_rejected c_view_pixels_merged c_size_object_features b_snapshots_built b_snapshot_work b_graph_nodes b_graph_classes b_graph_templates b_graph_closed_terms b_graph_truncations b_constant_only_dropped b_edges_confirmed b_edges_pending b_edges_not_supported b_type_edges b_closure_edges b_sccs b_layers b_substitutions_tried b_outside_universe b_edge_truncations b_vsa_nodes b_vsa_unions b_vsa_expanded b_vsa_expansion_mismatch b_sharing_avg_x100 b_sharing_max_x100 b_dag_evaluations b_reference_evaluations b_witness_full b_hierarchy_slots b_hierarchy_fits b_class_checks b_row_lookups b_flat_row_evaluations b_candidates_covered b_fitting_classes b_layer_exposed b_layer_searched b_layer_truncated b_slot_truncations b_global_truncations b_hierarchy_fallbacks b_hierarchy_solved_slots typed_hole_global_truncations size_rule_templates size_rule_evaluations size_rule_candidates size_rule_truncations size_rule_exact canvas_changes_entering_search typed_hole_slots_triggered typed_hole_templates typed_hole_evaluations typed_hole_fits typed_hole_constant_fits typed_hole_feature_fits typed_hole_truncations grid_realizations_attempted grid_realization_ok realization_render_errors realization_mismatches UntriggeredExpansionCount ConcreteCrossItemEdgeCount_high_level expanded_frozen_features alignment_attempts alignment_rejections equality_attempts rejected_size_comparisons unexplained_equalities alignment_lift_attempts alignment_lift_successes accepted_abstractions construction_triggers fallback_count semantic_classes representatives max_representatives_per_class counterfactual_contexts_generated counterfactual_contexts_rejected counterfactual_evaluations counterfactual_splits canonical_merges premature_collapses dropped_by_collapse intensional_candidates literal_candidates alignment_key_candidates synthesized_keys_accepted ordering_ties_rejected alignment_witnesses online_abstractions_proposed online_abstractions_accepted online_abstraction_reuses refinement_expansions_saved operator_applications refinement_expansions active_frontier_size visibility_size visibility_keys search_work alignment_failure_triggers posthoc_abstractions_accepted reuse_attempts reuse_hits call_attempts call_legality_checks call_legality_rejections deferred_candidates resumed_candidates resume_events resume_retries recovered_solutions reselected_after_completion exclusive_reuse_missed_candidates exclusive_reuse_missed_solutions diagnostic_operator_applications first_solution_work total_work_to_exhaustion completion_work alignment_candidates_remaining rank_reuse_witnesses_verified"
 
 -- Stage B leaf meta-information of the object-slot language. Previous leaves
 -- and set aggregates are partial (rank 0 / empty set); Ext Current is fixed
@@ -182,9 +190,13 @@ data Execution = Inline Definition | CallTop String deriving (Eq,Show)
 -- progTransform (Stage C): when present the output objects are produced by the
 -- Set[Object] -> Set[Object] transformation instead of the sequence-local body;
 -- progView: the local diagonal-bar view is applied to the encoded input.
+-- progContentFirst (Content-first OutputSpec): when present the output canvas
+-- AND content are derived from the input-side selection of the plan
+-- (Input -> Selection -> Bounds -> Dimensions -> Render); progSize and
+-- progTransform are not consulted. Nothing keeps the Size-first semantics.
 data Program = Program { progEncoder :: EncoderConfig, progExec :: Execution, progDefs :: M.Map String Definition
   , progLibrary :: Library, progDependent :: Bool, progPermutation :: Maybe Int, progSize :: Maybe SizeRule
-  , progTransform :: Maybe ObjectTransform, progView :: Bool } deriving (Eq,Show)
+  , progTransform :: Maybe ObjectTransform, progView :: Bool, progContentFirst :: Maybe ContentFirstPlan } deriving (Eq,Show)
 -- Realization order: encode the input, compute the output canvas from the size
 -- rule (input features and shared constants only), order the input objects,
 -- place every object by the sequence-local body, then render on the output
@@ -205,11 +217,23 @@ runProgramEvidence p grid=do
     else Left "render witness failed independent replay"
 
 runProgramObjects :: Program -> Grid -> Either String (O.Scene,Dimensions,[EmittedObject])
-runProgramObjects (Program enc ex defs lib dep perm size tr view) grid=do
+runProgramObjects p@(Program enc _ _ _ _ perm _ _ view cfp) grid=do
   let scene0=encode enc grid
       scene1=if view then let (os,_,_)=applyDiagonalView (O.objects scene0) in scene0 {O.objects=os} else scene0
       scene=scene1 {O.objects=permuteObjects perm (O.objects scene1)}
-      objs=O.objects scene
+  case cfp of
+    -- Content-first: no SizeRule is consulted; the canvas is the bounds of the
+    -- input-side selection and the content comes from the same selection.
+    Just plan->do
+      spec<-either (\e->Left ("content-first: "++e)) Right (deriveOutputSpec plan (encoderBackground enc) grid scene)
+      Right (scene,osDims spec,specEmitted spec)
+    Nothing->sizeFirstObjects p scene
+
+-- Size-first realization (semantics unchanged): the SizeRule canvas, then the
+-- object transformation or the sequence-local body.
+sizeFirstObjects :: Program -> O.Scene -> Either String (O.Scene,Dimensions,[EmittedObject])
+sizeFirstObjects (Program _ ex defs lib dep _ size tr _ _) scene=do
+  let objs=O.objects scene
       set=objectSet objs
       sourcesByPlaced=M.fromListWith (++) [(placedFromObject o,[O.objectId o]) | o<-objs]
   outDims <- maybe (Right (O.canvas scene)) (\r->outputSize dep r scene) size
@@ -285,7 +309,7 @@ currentWork :: Search Int
 currentWork=gets (\s->metric "operator_applications" (stGraph s)+length (refinements (stGraph s)))
 
 seedGraph :: [(O.Scene,O.Scene)] -> Graph
-seedGraph pairs=Graph fs [] [] (M.fromList [(k,0) | k<-metricNames]) [] [] [] [] [] [] [] [] [] [] [] [] []
+seedGraph pairs=Graph fs [] [] (M.fromList [(k,0) | k<-metricNames]) [] [] [] [] [] [] [] [] [] [] [] [] [] []
   where fs=[Feature (SetT ExistsPlacedT) (map (show . count . objectSet . O.objects . side) pairs) (show origin)
               ["Objects(Scene)","existential size-index packaging"] Nothing 0 Unmatched
            | (origin,side)<-[(InputSet,fst),(OutputSet,snd)]]
@@ -379,7 +403,7 @@ frontSearch mode conf examples
     tag c=("case"++show c++":")
     defaultWhy="alignment: no unique common ordering"
     axisOf name=if take 2 (reverse name)=="YA" then AY else AX
-    mkProgram ex defs lib=Program enc ex defs lib dep (enumerationSeed conf) sizeRule Nothing (scDiagonalView sc)
+    mkProgram ex defs lib=Program enc ex defs lib dep (enumerationSeed conf) sizeRule Nothing (scDiagonalView sc) Nothing
     emit fields=do
       w<-currentWork
       Search (\s->DG.diagnostic (sdDiagnostics (stageD conf))
@@ -402,15 +426,23 @@ frontSearch mode conf examples
       when (scObjectSizeFeatures sc) (setMetric "c_size_object_features" 1)
       emit [("scope",DG.jstr "SizeRule"),("branch_id",DG.jstr "size"),("event",DG.jstr "entered"),("trigger",DG.jstr "input-output-size-constraint")]
       sized<-sizeStep
-      emit [("scope",DG.jstr "SizeRule"),("branch_id",DG.jstr "size"),("event",DG.jstr "completed"),("stop_reason",DG.jstr (either (const "NoFitYet") (const "FoundFit") sized)),("exhaustiveness",DG.jstr "Unknown")]
+      emit [("scope",DG.jstr "SizeRule"),("branch_id",DG.jstr "size"),("event",DG.jstr "completed"),("stop_reason",DG.jstr (either (const "NoFitYet") (const "FoundFit") sized)),("exhaustiveness",DG.jstr "Unknown")
+           ,("size_first_status",DG.jstr (sizeFirstStatusText sizeStatus))]
       groundingTrace
-      case sized of
+      -- Size-first first (cheap, unchanged); its failure is recorded and no
+      -- longer ends the task when the content-first path is enabled.
+      legacy<-case sized of
         Left err->pure (Left err)
-        Right ()->
-          -- The sequence-local object path requires equal cardinality. Stage C
-          -- opens the Set[Object] transformation search on a cardinality
-          -- mismatch (and, with the fallback trigger, after the equal-count
-          -- path has failed); without it the v0.6.1 rejection is unchanged.
+        Right ()->sizeFirstPaths
+      contentFirstGate sized legacy
+
+    -- The Size-first object paths (unchanged). The sequence-local object path
+    -- requires equal cardinality. Stage C opens the Set[Object] transformation
+    -- search on a cardinality mismatch (and, with the fallback trigger, after
+    -- the equal-count path has failed); without it the v0.6.1 rejection is
+    -- unchanged.
+    sizeFirstPaths :: Search (Either String Program)
+    sizeFirstPaths=
           if any (\(a,b)->count a/=count b) sets then
             (if scRelations sc then relationPath "cardinality mismatch" Nothing else pure (Left "RankAlign: unequal input/output cardinality"))
           else do
@@ -422,6 +454,100 @@ frontSearch mode conf examples
             case r of
               Left err | scRelations sc && scFallbackTrigger sc->relationPath "equal-count path failed" (Just err)
               _->pure r
+
+    -- Content-first OutputSpec (Input -> Selection -> Bounds -> Dimensions ->
+    -- Render). Gate: the Size-first first solution is kept (early stop) unless
+    -- ExploreAlternatives asks for the alternative representatives; a
+    -- Size-first failure (no size rule, or size rule fit but every object path
+    -- failed) opens the new path with the original failure preserved.
+    cf=contentFirst conf
+    sizeStatus=case sizeOutcome of
+      Nothing->SizeNotEntered
+      Just (Right _,_)->SizeFit
+      Just (Left _,st)->if trTruncated (ssWidth st) || trTruncated (ssHeight st) then SizeTruncated else SizeNoFit
+    -- Colour constants of the selectors come from the INPUT scenes only.
+    cfUniverse=enumeratePlans (sort (nub [c | (a,_)<-scenes, o<-O.objects a, Just c<-[objColor o]])) (scShape sc) (scDiagonalView sc)
+    contentFirstGate :: Either String () -> Either String Program -> Search (Either String Program)
+    contentFirstGate sized legacy=case legacy of
+      Right p
+        | cfEnabled cf && cfExploreAlternatives cf->do _<-contentFirstPath TriggerExploreAlternatives "None"; pure (Right p)
+        | cfEnabled cf->do deferContentFirst; pure (Right p)
+        | otherwise->pure (Right p)
+      Left err
+        | cfEnabled cf && isLeft sized && cfOnSizeFailure cf->contentFirstPath TriggerSizeFailed err
+        | cfEnabled cf && isRight sized && cfOnDownstreamFailure cf->contentFirstPath TriggerDownstreamFailed err
+        | otherwise->pure (Left err)
+    -- Trigger before expansion: without a trigger no plan is evaluated; the
+    -- untouched plan universe is recorded as a deferred range.
+    deferContentFirst :: Search ()
+    deferContentFirst=do
+      step<-tick
+      let n=length cfUniverse
+      inc "cf_deferred_plans" n
+      onGraph (\g->g {deferred=deferred g++[Deferred "content-first" (0,n) "legacy-first-solution" step step "deferred"
+        ("Size-first path returned the first solution; the "++show n++" content-first plans of the same training signature were not enumerated (ExploreAlternatives off)") Nothing 0 0 0 "" "" False]})
+      traceMsg ("content-first deferred: "++show n++" plans not expanded (legacy first solution; ExploreAlternatives off)")
+    contentFirstPath :: CFTrigger -> String -> Search (Either String Program)
+    contentFirstPath trig prior=do
+      let trigName=triggerText trig
+          sfText=sizeFirstStatusText sizeStatus
+          explore=trig==TriggerExploreAlternatives
+      emit [("scope",DG.jstr "ContentFirst"),("branch_id",DG.jstr "content_first"),("parent_id",DG.jstr "task"),("event",DG.jstr "entered"),("trigger",DG.jstr trigName)
+           ,("content_first_trigger",DG.jstr trigName),("size_first_status",DG.jstr sfText),("prior_failure",DG.jstr prior)]
+      inc "cf_triggered" 1
+      inc ("cf_trigger_"++trigName) 1
+      startWork<-currentWork
+      traceMsg ("ContentFirst trigger ("++trigName++"; size-first "++sfText++"): Input -> Selection -> Bounds -> Dimensions -> Render search unlocked")
+      let cfCases=[CFCase (fst (examples !! c)) (fst (scenes !! c)) (snd (examples !! c)) | c<-cases]
+          res=searchContentFirst cf (encoderBackground enc) cfUniverse cfCases
+          classification=classifyResult trig res
+          work=crSelectionEvaluations res+crExecutions res
+          summary=show (crTried res)++"/"++show (crUniverse res)++" plans, "++show (crSelectionLegalPlans res)++" with a legal selection on every case, "
+            ++show (crSpecsDerived res)++" output specs derived, "++show (crRendered res)++" rendered, "++show (crExecutions res)++" case executions, "++show (length (crFits res))++" train-exact"
+            ++maybe "" ("; "++) (crTruncationReason res)
+      traceS DG.levelBranches [("scope",DG.jstr "ContentFirst"),("kind",DG.jstr "grammar"),("stage",DG.jstr "content_first"),("branch_id",DG.jstr "content_first"),("parent_branch_id",DG.jstr "task")
+        ,("trigger",DG.jstr trigName),("size_first_status",DG.jstr sfText),("prior_failure",DG.jstr prior)
+        ,("plan_universe",show (crUniverse res)),("selection_modes",DG.jarr [DG.jstr "SelectUnique",DG.jstr "SelectNonEmpty"]),("constructions",DG.jarr [DG.jstr "CropInputWindow",DG.jstr "EmitSelectedWithOwnCanvas"])
+        ,("colours_from",DG.jstr "input scenes only")
+        ,("budget",DG.jobj [("plans",DG.jobj [("limit",show (cfPlanBudget cf)),("used",show (crTried res))]),("case_executions",DG.jobj [("limit",show (cfExecutionBudget cf)),("used",show (crExecutions res))]),("representatives",DG.jobj [("limit",show (cfMaxFits cf)),("used",show (length (crFits res)))])])
+        ,("dependency_order",DG.jstr "Input -> Selection -> Bounds -> Dimensions -> Render (no feedback)")]
+      mapM_ (uncurry inc) [("cf_plan_universe",crUniverse res),("cf_plans_tried",crTried res),("cf_selection_evaluations",crSelectionEvaluations res),("cf_selection_legal_plans",crSelectionLegalPlans res)
+        ,("cf_case_executions",crExecutions res),("cf_specs_derived",crSpecsDerived res),("cf_rendered",crRendered res),("cf_truncated",if crTruncated res then 1 else 0)
+        ,("cf_representation_unavailable",if crSelectionLegalPlans res==0 then 1 else 0),("operator_applications",work)]
+      if explore then inc "cf_alternative_fits" (length (crFits res)) else inc "cf_fits" (length (crFits res))
+      let selected=case crFits res of (c:_) | not explore->Just (ccPlan c); _->Nothing
+      onGraph (\g->g {contentFirstRuns=contentFirstRuns g++[CFRun trig sizeStatus prior res classification selected (if explore then "alternatives" else "solution")]})
+      emit [("scope",DG.jstr "ContentFirst"),("branch_id",DG.jstr "content_first"),("parent_id",DG.jstr "task"),("event",DG.jstr "completed"),("trigger",DG.jstr trigName)
+        ,("attempted",show (crTried res)),("evaluated",show (crExecutions res)),("train_exact_candidates",show (length (crFits res))),("classification",DG.jstr classification)
+        ,("budgets",DG.jobj [("plans",DG.jobj [("limit",show (cfPlanBudget cf)),("used",show (crTried res)),("hit",DG.jbool (crUniverse res>cfPlanBudget cf))])
+                            ,("case_executions",DG.jobj [("limit",show (cfExecutionBudget cf)),("used",show (crExecutions res)),("hit",DG.jbool (crExecutions res>=cfExecutionBudget cf))])
+                            ,("fit_representatives",DG.jobj [("limit",show (cfMaxFits cf)),("used",show (length (crFits res))),("hit",DG.jbool (length (crFits res)>=cfMaxFits cf))])])
+        ,("stop_reason",DG.jstr (if crTruncated res then "BudgetCut" else if null (crFits res) then "NoFitYet" else "FoundFit"))
+        ,("exhaustiveness",DG.jstr (show (DG.finiteEvidence (Just (crUniverse res)) (crTried res) 0 0 (crTruncated res))))
+        ,("exhaustiveness_scope",DG.jstr "the finite content-first plan universe of this task only (selectors x modes x constructions); not the whole DSL")]
+      traceMsg ("content-first search: "++summary++"; "++classification)
+      case crFits res of
+        _ | explore->pure (Left "explore: content-first alternatives recorded; the Size-first first solution is kept")
+        []->pure (Left (prior++"; content-first: "++classification++" ("++summary++")"))
+        (cand:_)->do
+          let plan=ccPlan cand
+              p=(mkProgram (Inline (Definition scanKey (Body (Lit 0,Lit 0) (Lit 0,Lit 0)) True)) M.empty M.empty) {progContentFirst=Just plan,progSize=Nothing}
+              specs=[s | t<-ccCases cand, Just s<-[cftSpec t]]
+          setMetric "cf_selected_cost" (planCost plan)
+          setMetric "cf_first_fit_executions" (maybe 0 id (crFirstFitExecutions res))
+          setMetric "first_solution_work" (startWork+crSelectionEvaluations res+maybe (crExecutions res) id (crFirstFitExecutions res))
+          let nodes=[RNode (tag c++"output-spec") "OutputSpec" [PConcept (planText plan)] ["set:Input","selection:"++selectionText (cfpSelection plan)] "realization" | c<-cases]
+          addNodes nodes
+          mapM_ (addResult . rnId) nodes
+          addFeature (Feature Size2T [show (gridWidth (osDims s),gridHeight (osDims s)) | s<-specs] ("Dimensions <- Bounds("++selectionText (cfpSelection plan)++")")
+            (["content-first: the output canvas is the inclusive bounding box of the input-side selection (+1 per axis)","no SizeRule; the training output size was a verification target only"]
+             ++[oswDimsSource (osWitness s) | s<-take 1 specs]) (Just NeedCanvas) (planCost plan) Frozen)
+          addFeature (Feature (ConceptT (SetT ExistsPlacedT)) [show (length (specEmitted s)) | s<-specs] ("OutputContent: "++constructionText (cfpConstruction plan))
+            ([planText plan,show (length (crFits res))++" training-exact content-first plans survive as representatives; selected by (structural cost, enumeration order)"
+             ,"whole-grid exact on every training case"]
+             ++[oswContentKind (osWitness s)++"; selected pixels "++show (oswSelectedPixels (osWitness s))++", other-object pixels "++show (oswOtherPixels (osWitness s))++", background cells "++show (oswBackgroundCells (osWitness s)) | s<-specs]) (Just NeedConstruct) (planCost plan) Frozen)
+          traceMsg ("ContentFirst selected: "++planText plan++" (cost "++show (planCost plan)++", "++show (length (crFits res))++" representatives)")
+          if all (\(x,y)->runProgram p x==Right y) examples then pure (Right p) else pure (Left (prior++"; content-first: selected plan diverged on re-execution"))
 
     -- Single-IO trace (level-gated observation of the scenes the search uses:
     -- encoder, permutation and diagonal view already applied).

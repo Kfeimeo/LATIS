@@ -209,13 +209,14 @@ sizeRuleJSON g p=
 -- Hole bindings of the executed program: size rule leaves and typed slot expressions.
 typedBindings :: Program -> [String]
 typedBindings p=
-  let Program _ ex defs _ _ _ size tr _=p
+  let Program _ ex defs _ _ _ size tr _ cfp=p
       defsOf=case ex of Inline d->[d]; CallTop n->maybe [] (:[]) (M.lookup n defs)
       slots=concat [[("first-AX",fst (bodyFirst b)),("first-AY",snd (bodyFirst b)),("following-AX",fst (bodyNext b)),("following-AY",snd (bodyNext b))] | Definition _ b _<-defsOf]
   in [ "size.width = "++renderT gridFeatureName (srWidth r) | Just r<-[size]]
      ++[ "size.height = "++renderT gridFeatureName (srHeight r) | Just r<-[size]]
      ++[ "objects = "++transformText t | Just t<-[tr]]
-     ++[ s++" = "++renderT slotLeafName e | (s,Typed e)<-slots, tr==Nothing]
+     ++[ "output_spec = "++show c | Just c<-[cfp]]
+     ++[ s++" = "++renderT slotLeafName e | (s,Typed e)<-slots, tr==Nothing, cfp==Nothing]
 
 stageAFeaturesJSON :: Graph -> String
 stageAFeaturesJSON g=arrayJSON [objectJSON [("slot",jsonString (expression f)),("type",jsonString (show (featureType f))),("provenance",arrayJSON (map jsonString (provenance f)))]
