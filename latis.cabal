@@ -22,7 +22,8 @@ library
     Synthesis.Collection.Referent ARC.StageBEvaluate
     Synthesis.Collection.Shape Synthesis.Collection.Relation ARC.StageCEvaluate
     Synthesis.Collection.Parameter
-    Synthesis.Collection.Unified ARC.StageDEvaluate ARC.StageDMechanism
+    Synthesis.Collection.Unified Synthesis.Collection.Diagnostics ARC.StageDEvaluate ARC.StageDMechanism
+    ARC.TraceIO
     Synthesis.Triggered.Parallel
     ARC.TriggeredEvaluate ARC.TriggeredStress
     ARC.Dataset ARC.Evaluate ARC.JointEvaluate
@@ -197,6 +198,14 @@ test-suite stage-a-tests
   build-depends: base, latis, containers
   default-language: GHC2021
   ghc-options: -Wall -O1
+
+test-suite stage-d-plus-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: StageDPlusMain.hs
+  build-depends: base, latis, containers
+  default-language: GHC2021
+  ghc-options: -Wall -O1 -rtsopts -eventlog
 
 test-suite collection-v61-tests
   type: exitcode-stdio-1.0

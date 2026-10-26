@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__TITLE__</title>
+<style>
+:root{--bg:#fbfbfa;--panel:#ffffff;--ink:#1d1d1f;--muted:#6b6b70;--line:#d9d9de;--accent:#2457c5;--ok:#1e7f3c;--bad:#b42318;--warn:#a15c00;--chip:#eef0f4;--sel:#fff4c2;--mono:ui-monospace,SFMono-Regular,Consolas,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#16171a;--panel:#1f2125;--ink:#ececef;--muted:#a0a0a8;--line:#3a3c42;--accent:#7aa2ff;--ok:#5cc98a;--bad:#ff7b6e;--warn:#f0b04f;--chip:#2a2d33;--sel:#4a4220}}
+:root[data-theme="dark"]{--bg:#16171a;--panel:#1f2125;--ink:#ececef;--muted:#a0a0a8;--line:#3a3c42;--accent:#7aa2ff;--ok:#5cc98a;--bad:#ff7b6e;--warn:#f0b04f;--chip:#2a2d33;--sel:#4a4220}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+header{padding:12px 16px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:5}
+header h1{font-size:17px;margin:0 0 4px}
+nav{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+nav button{border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:5px 10px;border-radius:6px;cursor:pointer;font:inherit}
+nav button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+main{padding:12px 16px;max-width:1500px}
+section{display:none}section.on{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:0 0 12px}
+.card h2{font-size:15px;margin:0 0 8px}.card h3{font-size:14px;margin:10px 0 6px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:2px 12px}.kv div:nth-child(odd){color:var(--muted)}
+.chip{display:inline-block;padding:1px 7px;border-radius:10px;background:var(--chip);font-size:12px;margin:1px 2px;white-space:nowrap}
+.chip.ok{background:color-mix(in srgb,var(--ok) 20%,transparent);color:var(--ok)}
+.chip.bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
+.muted{color:var(--muted)}.mono{font-family:var(--mono);font-size:12px}
+.banner{padding:8px 12px;border-radius:6px;margin:0 0 10px;border:1px solid}
+.banner.bad{border-color:var(--bad);color:var(--bad)}.banner.warn{border-color:var(--warn);color:var(--warn)}.banner.ok{border-color:var(--ok);color:var(--ok)}
+table{border-collapse:collapse;width:100%}th,td{border-bottom:1px solid var(--line);padding:3px 6px;text-align:left;vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:12px}
+tr.click{cursor:pointer}tr.click:hover{background:var(--chip)}tr.selected{background:var(--sel)}
+.scroll{overflow:auto;max-height:520px}
+.grid{display:inline-grid;gap:0;font-size:9px;font-family:var(--mono);position:relative;user-select:none}
+.grid .h{color:var(--muted);text-align:center;line-height:1}
+.grid .c{border:1px solid rgba(128,128,128,.35);position:relative}
+.grid .c.diff{outline:2px solid var(--bad);outline-offset:-2px;z-index:1}
+.grid .c.hi{box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 3px #000}
+.gpanel{display:inline-block;margin:0 14px 8px 0;vertical-align:top}
+.gpanel .t{font-weight:600;font-size:13px;margin-bottom:3px}
+.na{display:inline-block;padding:20px;border:1px dashed var(--line);color:var(--muted);min-width:160px}
+details{margin:2px 0}summary{cursor:pointer}
+.ast ul{margin:0;padding-left:18px}.ast li{margin:1px 0}
+.edge-confirmed{border-left:3px solid var(--ok);padding-left:6px}
+.edge-pending{border-left:3px dashed var(--warn);padding-left:6px}
+.edge-other{border-left:3px dotted var(--muted);padding-left:6px}
+input,select{font:inherit;padding:3px 6px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--ink)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+.bar{position:relative;height:18px;background:var(--chip);border-radius:4px;margin:2px 0}
+.bar span{position:absolute;top:0;bottom:0;background:var(--accent);opacity:.75;border-radius:3px}
+.bar i{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--bad)}
+pre{white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:12px;margin:0}
+@media (max-width:700px){main,header{padding-left:16px;padding-right:16px}.kv{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">LATIS 单 IO 搜索诊断器</h1>
+  <div id="subtitle" class="muted"></div>
+  <nav id="tabs"></nav>
+</header>
+<main id="main"><noscript>需要启用 JavaScript；数据已内嵌在本文件中，无需网络。</noscript></main>
+<script id="trace-data" type="application/json">__DATA__</script>
+<script>
+__SCRIPT__
+</script>
+</body>
+</html>

@@ -20,7 +20,7 @@ module Synthesis.Collection.Typed
   , TOp(..), opName, opSignature, opArity, baseOps, parityOps, boolOps, enumeratedBoolOps, applyOp, invertOp, commutative
   , TExpr(..), tLength, tConstants, tFeatures, tLeaves, tDepth, tCost, renderT, evalT, fillHoles, substHoles, holeCount
   , ArgPolicy(..), StageA(..), stageAOff, HoleConfig(..), holeConfig, holeConfigB
-  , Template(..), enumerateTemplates, fixedTemplates
+  , Template(..), enumerateTemplates, extendedTemplates, fixedTemplates
   , ConstantSource(..), Binding(..), Candidate(..), TypedResult(..), synthesizeTyped, bindingText
   ) where
 
@@ -248,6 +248,32 @@ enumerateTemplates hc leaves target=renumber (sortOn (\t->(tmHoles t,tmDepth t,p
     number k (THole _)=(THole k,k+1)
     number k (TApp op as)=let (as',k')=foldl' (\(acc,i) a->let (a',i')=number i a in (acc++[a'],i')) ([],k) as in (TApp op as',k')
     number k e=(e,k)
+
+-- D+ appends deeper, lazily generated spine layers to the exact old depth-2
+-- prefix. No global sorting/materialization of the depth-3 universe.
+extendedTemplates :: Ord l => HoleConfig -> [(l,TTy)] -> TTy -> [Template l]
+extendedTemplates hc leaves target
+  | hcDepth hc<=2=enumerateTemplates hc leaves target
+  | otherwise=enumerateTemplates hc {hcDepth=2} leaves target++concat [layer d target | d<-[3..hcDepth hc]]
+  where
+    zero ty=[TLeaf l | (l,t)<-leaves,t==ty]++[THole 0 | ty==TyInt,hcPolicy hc/=FeatureOnly]
+    exact d ty | d<=2=[tmExpr t | t<-enumerateTemplates hc {hcDepth=d} leaves ty,tmDepth t==d]
+               | otherwise=map tmExpr (layer d ty)
+    layer d ty=[Template (fst (number 0 e)) h (tFeatures e) d
+      | holes<-[0..hcMaxHoles hc],op<-hcOps hc,snd (opSignature op)==ty
+      ,let ts=fst (opSignature op)
+      ,k<-[0..if op `elem` [OpAnd,OpOr] then 0 else length ts-1]
+      ,args<-sequence [if i==k || op `elem` [OpAnd,OpOr] then exact (d-1) t else zero t | (i,t)<-zip [0..] ts]
+      ,let e=TApp op args; h=holeCount e
+      ,h==holes,tFeatures e>0
+      ,hcPolicy hc/=ConstantOnly || tFeatures e<=1
+      ,not (commutative op && length args==2 && head args>args!!1)
+      ,not (op `elem` [OpSub,OpMod,OpLt,OpGt,OpEq] && length args==2 && head args==args!!1)
+      ,not (op==OpIf && tFeatures (head args)==0)
+      ,not (op `elem` [OpLt,OpGt,OpEq] && all ((==0) . tFeatures) args)]
+    number n (THole _)=(THole n,n+1)
+    number n (TApp op as)=let (bs,m)=foldl' (\(acc,i) a->let (b,j)=number i a in (acc++[b],j)) ([],n) as in (TApp op bs,m)
+    number n e=(e,n)
 
 -- The fixed template list of the GridSizeOnly ablation (no hole search):
 -- a feature, a feature +-1, the sum of two features, or a constant target.

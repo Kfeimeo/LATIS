@@ -1,0 +1,528 @@
+'use strict';
+// LATIS single-IO trace viewer. Pure helpers (LATIS) are shared with the Node
+// tests; the UI part runs only in a browser. The embedded record is never
+// mutated: every view derives new arrays from it.
+var LATIS = (function () {
+  var ARC = ['#000000', '#0074D9', '#FF4136', '#2ECC40', '#FFDC00', '#AAAAAA', '#F012BE', '#FF851B', '#7FDBFF', '#870C25'];
+  function dims(g) { return (g && g.length && g[0] && g[0].length) ? [g[0].length, g.length] : null; }
+  // Pixel diff of two grids. Different sizes are not comparable cell by cell.
+  function gridDiff(a, b) {
+    var da = dims(a), db = dims(b);
+    if (!da || !db) return { comparable: false, dims_match: null, count: null, cells: [] };
+    if (da[0] !== db[0] || da[1] !== db[1]) return { comparable: false, dims_match: false, count: null, cells: [] };
+    var cells = [];
+    for (var y = 0; y < da[1]; y++) for (var x = 0; x < da[0]; x++) if (a[y][x] !== b[y][x]) cells.push([x, y]);
+    return { comparable: true, dims_match: true, count: cells.length, cells: cells };
+  }
+  function contains(hay, needle) { return String(hay == null ? '' : hay).toLowerCase().indexOf(String(needle).toLowerCase()) >= 0; }
+  // Filters return a new array; the input list and its items are untouched.
+  function filterCandidates(list, f) {
+    f = f || {};
+    return (list || []).filter(function (c) {
+      if (f.scope && c.scope !== f.scope) return false;
+      if (f.entry && c.entry !== f.entry) return false;
+      if (f.status && c.status !== f.status) return false;
+      if (f.reason && c.reason_code !== f.reason) return false;
+      if (f.slots != null && f.slots !== '' && String(c.pipeline_slots) !== String(f.slots)) return false;
+      if (f.depth != null && f.depth !== '' && String(c.max_param_depth) !== String(f.depth)) return false;
+      if (f.branch && !(contains(c.candidate_id, f.branch) || contains(c.parent_branch_id, f.branch))) return false;
+      if (f.text && !(contains(c.text, f.text) || contains(c.candidate_id, f.text))) return false;
+      if (f.executedOnly && !c.executed) return false;
+      return true;
+    });
+  }
+  function filterEvents(list, f) {
+    f = f || {};
+    return (list || []).filter(function (e) {
+      if (f.scope && e.scope !== f.scope) return false;
+      if (f.source && e.event_source !== f.source) return false;
+      if (f.kind && (e.kind || e.event) !== f.kind) return false;
+      if (f.branch && !(contains(e.branch_id, f.branch) || contains(e.parent_branch_id, f.branch) || contains(e.parent_id, f.branch) || contains(e.candidate_id, f.branch))) return false;
+      if (f.text && !contains(JSON.stringify(e), f.text)) return false;
+      return true;
+    });
+  }
+  function uniq(xs) { var s = {}, out = []; xs.forEach(function (x) { if (x != null && !s[x]) { s[x] = 1; out.push(x); } }); return out; }
+  // Structural checks: missing parts become errors/unknown, never defaults.
+  function validateBundle(d) {
+    var errors = [], warnings = [];
+    if (!d || typeof d !== 'object') return { errors: ['数据不是 JSON 对象'], warnings: [] };
+    if (!d.trace || !d.trace.summary) errors.push('缺少 trace.summary');
+    if (!d.trace || !Array.isArray(d.trace.funnel)) errors.push('缺少 trace.funnel');
+    if (!d.candidates || !Array.isArray(d.candidates.candidates)) warnings.push('缺少 candidates.json：候选浏览器为 unknown');
+    if (!d.grids || !Array.isArray(d.grids.pairs)) warnings.push('缺少 grids.json：网格检查器为 unknown');
+    if (!Array.isArray(d.events)) warnings.push('缺少事件流');
+    if (d.candidates && d.candidates.details_complete === false) warnings.push('候选详细记录只内嵌 ' + d.candidates.details_embedded + ' / ' + d.candidates.total + ' 个（确定性优先级：选中程序、fit、replay、焦点、再按搜索顺序的已执行候选）；其余候选只有摘要行，完整记录见 ' + d.candidates.details_file);
+    if (d.events_total != null && d.events_embedded != null && d.events_total > d.events_embedded) warnings.push('只内嵌了前 ' + d.events_embedded + ' / ' + d.events_total + ' 个事件；完整事件在 search_events.jsonl.gz');
+    var ids = {};
+    ((d.candidates || {}).candidates || []).forEach(function (c) { ids[c.candidate_id] = 1; });
+    var sel = d.trace && d.trace.summary && d.trace.summary.program_transform_id;
+    ((d.trace || {}).replay_overview || []).forEach(function (r) {
+      if (!ids[r.candidate_id] && r.candidate_id !== sel) warnings.push('replay 引用了不在候选表中的 ID ' + r.candidate_id);
+    });
+    var branches = {};
+    ((d.trace || {}).branches || []).forEach(function (b) { branches[b.branch_id] = 1; });
+    return { errors: errors, warnings: warnings, candidate_ids: ids, branch_ids: branches };
+  }
+  // Dead cross references: candidate -> parent branch, replay -> candidate.
+  function deadLinks(d) {
+    var v = validateBundle(d), dead = [];
+    var roots = { task: 1, unified: 1, legacy: 1, 'unified.joint': 1, 'unified.extension': 1, alignment: 1, size: 1, shape: 1 };
+    ((d.candidates || {}).candidates || []).forEach(function (c) {
+      if (c.parent_branch_id && !v.branch_ids[c.parent_branch_id] && !roots[c.parent_branch_id]) dead.push({ from: c.candidate_id, to: c.parent_branch_id });
+    });
+    var sel = d.trace && d.trace.summary && d.trace.summary.program_transform_id;
+    ((d.replays || {}).results || []).forEach(function (r) { if (!v.candidate_ids[r.candidate_id] && r.candidate_id !== sel) dead.push({ from: 'replay', to: r.candidate_id }); });
+    return dead;
+  }
+  function statusChip(s) {
+    if (s === 'fit' || s === 'train_exact' || s === 'pair_exact' || s === 'exact' || s === 'match' || s === 'entered' || s === 'passed') return 'ok';
+    if (s === 'invalid' || s === 'no_fit' || s === 'render_mismatch' || s === 'mismatch' || s === 'execution_invalid' || s === 'render_invalid' || s === 'failed' || s === 'no_solution') return 'bad';
+    if (s === 'truncated' || s === 'unknown' || s === 'unverifiable' || s === 'timeout' || s === 'killed' || s === 'partial_match') return 'warn';
+    return '';
+  }
+  // Paint emitted objects in order on a background canvas (later wins), as
+  // the renderer does; used only to display replayed intermediate sets.
+  function paintObjects(objs, w, h, bg) {
+    var g = [], over = 0, outside = 0;
+    for (var y = 0; y < h; y++) { g.push([]); for (var x = 0; x < w; x++) g[y].push(bg); }
+    var owner = {};
+    (objs || []).forEach(function (o, i) {
+      (o.object ? o.object.pixels : o.pixels).forEach(function (p) {
+        if (p[0] < 0 || p[1] < 0 || p[0] >= w || p[1] >= h) { outside++; return; }
+        var k = p[0] + ',' + p[1];
+        if (owner[k] != null && owner[k] !== i) over++;
+        owner[k] = i; g[p[1]][p[0]] = p[2];
+      });
+    });
+    return { grid: g, overwritten: over, outside: outside };
+  }
+  // Rows + bounded details -> one candidate list and one event list. New
+  // objects are created; the embedded record is not modified.
+  function expandBundle(raw) {
+    var out = {};
+    Object.keys(raw || {}).forEach(function (k) { out[k] = raw[k]; });
+    var c = raw && raw.candidates;
+    if (c && Array.isArray(c.rows)) {
+      var list = c.rows.map(function (r) {
+        var o = {}; c.columns.forEach(function (k, i) { o[k] = r[i]; });
+        var d = c.details && c.details[o.candidate_id];
+        if (d) { var x = {}; Object.keys(d).forEach(function (k) { x[k] = d[k]; }); x.first_sequence = o.first_sequence; x.detail_embedded = true; return x; }
+        o.detail_embedded = false; o.cases = []; o.ast = null; return o;
+      });
+      out.candidates = { candidates: list, parameter_goals: c.parameter_goals || [], total: c.total, details_embedded: c.details_embedded, details_complete: c.details_complete, details_file: c.details_file, note: c.note };
+    }
+    if (raw && Array.isArray(raw.event_rows)) {
+      var ev = (raw.events || []).slice();
+      raw.event_rows.forEach(function (r) { var o = { _row: true }; raw.event_columns.forEach(function (k, i) { if (r[i] != null) o[k] = r[i]; }); ev.push(o); });
+      ev.sort(function (a, b) { return a.sequence - b.sequence; });
+      out.events = ev;
+    }
+    return out;
+  }
+  return { ARC: ARC, expandBundle: expandBundle, dims: dims, gridDiff: gridDiff, filterCandidates: filterCandidates, filterEvents: filterEvents, uniq: uniq,
+           validateBundle: validateBundle, deadLinks: deadLinks, statusChip: statusChip, paintObjects: paintObjects };
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = LATIS;
+
+if (typeof document !== 'undefined') (function () {
+  var D, V, state = { tab: 'overview', pair: 0, candidate: null, predSource: 'program', encoding: 'search', hiObject: null, page: 0, evPage: 0, cf: {}, ef: {} };
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      var v = attrs[k];
+      if (v == null || v === false) return;
+      if (k === 'class') el.className = v; else if (k === 'text') el.textContent = v;
+      else if (k.slice(0, 2) === 'on') el.addEventListener(k.slice(2), v); else if (k === 'style') el.style.cssText = v; else el.setAttribute(k, v);
+    });
+    for (var i = 2; i < arguments.length; i++) add(el, arguments[i]);
+    return el;
+  }
+  function add(el, c) {
+    if (c == null || c === false) return;
+    if (Array.isArray(c)) { c.forEach(function (x) { add(el, x); }); return; }
+    el.appendChild(typeof c === 'object' ? c : document.createTextNode(String(c)));
+  }
+  function chip(text, cls) { return h('span', { class: 'chip ' + (cls == null ? LATIS.statusChip(text) : cls), text: text == null ? 'unknown' : String(text) }); }
+  function val(v) { return v == null ? 'unknown' : (typeof v === 'object' ? JSON.stringify(v) : String(v)); }
+  function kv(pairs) { var d = h('div', { class: 'kv' }); pairs.forEach(function (p) { add(d, h('div', { text: p[0] })); add(d, h('div', null, p[1] instanceof Node ? p[1] : val(p[1]))); }); return d; }
+  function card(title) { var c = h('div', { class: 'card' }, title ? h('h2', { text: title }) : null); for (var i = 1; i < arguments.length; i++) add(c, arguments[i]); return c; }
+  function table(headers, rows, onclick, selectedIdx) {
+    var t = h('table', null, h('tr', null, headers.map(function (x) { return h('th', { text: x }); })));
+    rows.forEach(function (r, i) { var tr = h('tr', { class: (onclick ? 'click' : '') + (selectedIdx === i ? ' selected' : ''), onclick: onclick ? function () { onclick(i); } : null }, r.map(function (c) { return h('td', null, c instanceof Node ? c : val(c)); })); add(t, tr); });
+    return t;
+  }
+  function pre(o) { return h('pre', { text: typeof o === 'string' ? o : JSON.stringify(o, null, 1) }); }
+
+  // ---- grid drawing
+  function drawGrid(g, opts) {
+    opts = opts || {};
+    if (!g) return h('div', { class: 'na', text: opts.na || 'not_available' });
+    var d = LATIS.dims(g), w = d[0], hh = d[1], size = Math.max(7, Math.min(22, Math.floor(300 / Math.max(w, hh))));
+    var el = h('div', { class: 'grid', style: 'grid-template-columns:14px repeat(' + w + ',' + size + 'px);grid-auto-rows:' + size + 'px' });
+    var diff = {}; (opts.diff || []).forEach(function (c) { diff[c[0] + ',' + c[1]] = 1; });
+    var hi = opts.highlight;
+    add(el, h('div', { class: 'h' }));
+    for (var x = 0; x < w; x++) add(el, h('div', { class: 'h', text: x % 5 === 0 ? String(x) : '' }));
+    for (var y = 0; y < hh; y++) {
+      add(el, h('div', { class: 'h', text: y % 5 === 0 ? String(y) : '' }));
+      for (x = 0; x < w; x++) {
+        var inHi = hi && x >= hi[0] && x < hi[0] + hi[2] && y >= hi[1] && y < hi[1] + hi[3];
+        var v = g[y][x];
+        add(el, h('div', { class: 'c' + (diff[x + ',' + y] ? ' diff' : '') + (inHi ? ' hi' : ''), title: '(' + x + ',' + y + ') = ' + v, style: 'background:' + (LATIS.ARC[v] || '#fff') }));
+      }
+    }
+    return el;
+  }
+  function gpanel(title, g, opts, note) { return h('div', { class: 'gpanel' }, h('div', { class: 't', text: title }), drawGrid(g, opts), note ? h('div', { class: 'muted', style: 'font-size:12px;max-width:320px' }, note) : null); }
+
+  // ---- data access
+  function cands() { return ((D.candidates || {}).candidates) || []; }
+  function goals() { return ((D.candidates || {}).parameter_goals) || []; }
+  function pairs() { return ((D.grids || {}).pairs) || []; }
+  function replayOf(cid) { return (((D.replays || {}).results) || []).filter(function (r) { return r.candidate_id === cid; })[0]; }
+  function candById(cid) { return cands().filter(function (c) { return c.candidate_id === cid; })[0]; }
+  function summary() { return D.trace.summary; }
+
+  var TABS = [['overview', '概览'], ['grid', '网格/对象'], ['pipeline', '搜索流程'], ['candidates', '候选浏览'], ['params', '参数目标'], ['derivation', '推导/Witness'], ['events', '原始事件']];
+  function render() {
+    var nav = document.getElementById('tabs'); nav.innerHTML = '';
+    TABS.forEach(function (t) { add(nav, h('button', { class: state.tab === t[0] ? 'on' : '', text: t[1], onclick: function () { state.tab = t[0]; render(); } })); });
+    var main = document.getElementById('main'); main.innerHTML = '';
+    V.errors.forEach(function (e) { add(main, h('div', { class: 'banner bad', text: '数据错误：' + e })); });
+    V.warnings.forEach(function (e) { add(main, h('div', { class: 'banner warn', text: e })); });
+    if (V.errors.length) return;
+    var fn = { overview: viewOverview, grid: viewGrid, pipeline: viewPipeline, candidates: viewCandidates, params: viewParams, derivation: viewDerivation, events: viewEvents }[state.tab];
+    add(main, fn());
+  }
+
+  // ---- overview
+  function viewOverview() {
+    var s = summary(), t = D.trace, out = [];
+    var label = s.status === 'pair_exact' ? 'pair_exact：只对所选单个训练对整格精确；不是原任务 train_exact，更不是 ARC solved'
+      : s.status === 'train_exact' ? 'train_exact：所有训练对整格精确（仍不等于 test 泛化/ARC solved）' : '未得到精确程序';
+    out.push(card('运行结果', kv([['任务', s.task_id], ['模式', s.mode], ['pair-index', s.pair_index], ['参与搜索的训练对', JSON.stringify(s.pairs_used_in_search) + ' / 共 ' + s.train_pairs_in_task],
+      ['配置', s.config + (D.record.diagnostics_forced_on ? '（D+ 诊断强制开启，搜索语义同 D0）' : '')], ['状态', chip(s.status)], ['含义', label], ['detail', s.detail],
+      ['程序类型', s.program_kind], ['程序结构 ID', s.program_transform_id], ['search_work', s.search_work], ['first_solution_work', s.first_solution_work],
+      ['墙钟秒数（含诊断）', s.wall_clock_seconds], ['首次 train-exact 秒（eventlog 标记）', s.first_train_exact_seconds],
+      ['D+ 诊断区间秒（上界）', s.diagnostic_overhead && s.diagnostic_overhead.serialization_and_emit_seconds], ['trace sink 写出秒', s.trace_sink && s.trace_sink.sink_seconds],
+      ['事件数', s.events_parsed], ['结构候选数', s.candidates], ['结构 trace hash', h('span', { class: 'mono', text: s.structural_trace_hash })], ['binary sha256', h('span', { class: 'mono', text: s.binary_sha256 })]])));
+    var comp = s.trace_incomplete ? h('div', { class: 'banner warn' }, 'trace_incomplete=true：', s.trace_incomplete_reasons.join('；')) : h('div', { class: 'banner ok', text: '记录完整：无丢弃、无采样、无损坏行，进程正常结束。' });
+    out.push(card('记录完整性', comp, kv([['终止事件', s.terminal_event ? JSON.stringify(s.terminal_event) : (s.terminal_note || 'unknown')], ['全任务穷尽性', s.whole_task_exhaustiveness + '：' + s.exhaustiveness_note]])));
+    if (s.posthoc_validation) {
+      var ph = s.posthoc_validation;
+      out.push(card('事后只读验证（未参与合成/排序/选择）', ph.performed ? kv([['其它训练对', ph.other_pairs], ['匹配', ph.matching_other_pairs], ['全部匹配', String(ph.all_other_pairs_match)], ['说明', ph.note]]) : h('div', { text: ph.reason }),
+        ph.pairs ? table(['pair', '结果', 'diff_cells', 'reason'], ph.pairs.map(function (p) { return [p.pair_index, chip(p.outcome === 'match' ? 'match' : p.outcome === 'mismatch' ? 'mismatch' : p.outcome), p.diff_cells, p.reason]; })) : null));
+    }
+    var b = t.blockers;
+    out.push(card('阻断证据', kv([['first_rejection', b.first_rejection ? evLink(b.first_rejection) : '无'], ['terminal_blocker', b.terminal_blocker ? evLink(b.terminal_blocker) : (s.status.indexOf('exact') >= 0 ? '已求得精确程序' : '无')], ['说明', b.terminal_blocker_note]]),
+      h('h3', { text: 'all_blockers（按首次出现排序，不被后续失败覆盖）' }),
+      h('div', { class: 'scroll' }, table(['阶段', '类别', '原因', '次数', '首个序号', '分支'], b.all_blockers.map(function (g) { return [g.stage, chip(g.kind, 'warn'), g.reason, g.count, g.first_sequence, g.branches.join(' ')]; })))));
+    if (t.dplus_view) out.push(card('D+ 兼容标签（run_stage_d_plus.failure_evidence）', kv([['labels', t.dplus_view.labels.join(', ')], ['primary', t.dplus_view.primary_label], ['参数 fit 但无完整解', String(t.dplus_view.parameters_fit_without_solution)], ['组合执行但像素不符', String(t.dplus_view.composition_executes_but_pixels_fail)], ['说明', t.dplus_view.note]])));
+    out.push(card('独立复核', h('h3', { text: 'Replay（只执行保存的 AST，不重跑搜索）' }),
+      table(['候选', '选择原因', '核对'], (t.replay_overview || []).map(function (r) { return [candLink(r.candidate_id), r.reason, chip(r.verdict)]; })),
+      h('h3', { text: '选中程序 witness 的独立 Python 检查' }),
+      t.witness_checks.length ? table(['pair', '结果', 'error'], t.witness_checks.map(function (w) { return [w.pair_index, chip(w.independent_checks), w.error || '']; })) : h('div', { class: 'muted', text: '无（没有精确程序时不存在 witness）' })));
+    out.push(card('尚未插桩的内部子项（not_instrumented）', table(['scope', '内容', '源码位置'], t.not_instrumented.map(function (n) { return [n.scope, n.detail, h('span', { class: 'mono', text: n.source })]; }))));
+    return out;
+  }
+  function evLink(e) { return h('a', { href: '#', onclick: function (ev) { ev.preventDefault(); state.tab = 'events'; state.ef = { text: '"sequence": ' + e.sequence }; state.ef = { seq: e.sequence }; state.evPage = 0; render(); } , text: '#' + e.sequence + ' ' + [e.scope, e.kind || e.event, e.stop_reason || e.outcome, e.reason_code || e.reason || ''].filter(Boolean).join(' · ') }); }
+  function candLink(cid) { return h('a', { href: '#', class: 'mono', onclick: function (ev) { ev.preventDefault(); state.tab = 'candidates'; state.candidate = cid; render(); }, text: cid }); }
+
+  // ---- grid inspector
+  function viewGrid() {
+    var ps = pairs(); if (!ps.length) return card('网格', h('div', { class: 'na', text: 'grids.json 缺失：unknown' }));
+    var p = ps[state.pair] || ps[0], out = [];
+    var sel = h('div', { class: 'filters' }, '训练对：', ps.map(function (q, i) {
+      return h('button', { class: 'chip ' + (i === state.pair ? 'ok' : ''), onclick: function () { state.pair = i; state.hiObject = null; render(); }, text: 'pair ' + q.pair_index + (q.used_in_search ? ' (case ' + q.case_index + ')' : ' (未参与搜索)') });
+    }));
+    var c = state.candidate ? candById(state.candidate) : null;
+    var srcSel = h('select', { onchange: function (e) { state.predSource = e.target.value; render(); } },
+      h('option', { value: 'program', text: '选中程序（runProgramEvidence）', selected: state.predSource === 'program' ? 'selected' : null }),
+      h('option', { value: 'search', text: '当前候选：搜索时渲染值', selected: state.predSource === 'search' ? 'selected' : null }),
+      h('option', { value: 'replay', text: '当前候选：独立 replay', selected: state.predSource === 'replay' ? 'selected' : null }));
+    add(sel, ['  Predicted 来源：', srcSel, c ? h('span', { class: 'mono', text: ' 当前候选 ' + c.candidate_id }) : h('span', { class: 'muted', text: ' （未选候选：在“候选浏览”中点击一行）' })]);
+    out.push(sel);
+    var pred = null, predNote = '', emitted = null, reenc = null;
+    if (state.predSource === 'program') {
+      if (p.predicted && p.predicted.available) { pred = p.predicted.grid; predNote = p.predicted.source; emitted = p.predicted.emitted_objects; reenc = p.predicted.reencoded_objects; }
+      else predNote = (p.predicted && p.predicted.reason) || 'not_available';
+    } else if (c && state.predSource === 'search') {
+      var sc = (c.cases || []).filter(function (x) { return x.case_index === p.case_index; })[0];
+      if (sc && sc.predicted) { pred = sc.predicted; predNote = '搜索时该候选在 case ' + p.case_index + ' 上真实渲染的网格（trace level full）'; }
+      else predNote = sc ? ('搜索时 outcome=' + sc.outcome + '；' + (sc.grid_hash ? '只记录了 grid hash ' + sc.grid_hash + '（level < full）' : '没有渲染网格')) : '该候选在搜索中没有执行这个 case（提前退出/预算/未参与搜索）';
+    } else if (c && state.predSource === 'replay') {
+      var r = replayOf(c.candidate_id), rc = r && (r.replay.cases || []).filter(function (x) { return x.pair_index === p.pair_index; })[0];
+      if (rc && rc.grid) { pred = rc.grid; predNote = '独立 replay（executor only），核对：' + r.verdict; emitted = rc.emitted_objects; reenc = rc.reencoded_objects; }
+      else predNote = rc ? ('replay outcome=' + rc.outcome + '：' + rc.reason) : '该候选没有 replay 记录（可用 trace_io.py replay --candidate 生成）';
+    } else predNote = '未选择候选';
+    var diff = LATIS.gridDiff(pred, p.output);
+    var objs = state.encoding === 'search' ? p.encoding.search_objects : p.encoding.connectivity_objects;
+    var hiObj = objs.filter(function (o) { return o.id === state.hiObject; })[0];
+    out.push(card('Input / Target / Predicted / Diff',
+      gpanel('Input pair ' + p.pair_index + ' ' + p.input_dims.join('×'), p.input, { highlight: hiObj ? hiObj.bbox : null }),
+      gpanel('Target ' + p.output_dims.join('×') + '（训练目标）', p.output),
+      gpanel('Predicted', pred, { na: 'not_available' }, predNote),
+      gpanel('Diff', pred ? p.output : null, { diff: diff.cells, na: 'not_available' }, pred ? (diff.comparable ? diff.count + ' 个像素不同' + (diff.count ? '：' + diff.cells.slice(0, 40).map(function (q) { return '(' + q[0] + ',' + q[1] + ')'; }).join(' ') + (diff.count > 40 ? ' …' : '') : '') : '尺寸不同，不能逐格比较（' + (LATIS.dims(pred) || []).join('×') + ' vs ' + p.output_dims.join('×') + '）') : null)));
+    var encSel = h('select', { onchange: function (e) { state.encoding = e.target.value; render(); } },
+      h('option', { value: 'search', text: '搜索实际使用的对象（含对角视图/置换）', selected: state.encoding === 'search' ? 'selected' : null }),
+      h('option', { value: 'connectivity', text: '纯 4 连通编码', selected: state.encoding === 'connectivity' ? 'selected' : null }));
+    var plain = {}, viewIds = {};
+    p.encoding.connectivity_objects.forEach(function (o) { plain[o.id + ':' + o.mask_hash + ':' + o.bbox] = 1; });
+    var changed = p.encoding.search_objects.filter(function (o) { return !plain[o.id + ':' + o.mask_hash + ':' + o.bbox]; });
+    out.push(card('输入对象（' + p.encoding.encoder + '，背景 ' + p.encoding.background + '）', h('div', { class: 'filters' }, '编码：', encSel,
+      h('span', { class: 'muted', text: ' 对角视图：' + (p.encoding.diagonal_view_enabled ? '启用；与 4 连通不同的对象 ' + changed.length + ' 个；接受链 ' + p.encoding.diagonal_chains.length + '，拒绝 ' + p.encoding.diagonal_rejections.length : '未启用') })),
+      h('div', { class: 'scroll' }, table(['id', '颜色', 'bbox (x,y,w,h)', 'SizeSig', '像素', 'ShapeMask(局部)', 'mask hash'], objs.map(function (o) {
+        return [o.id, o.color == null ? JSON.stringify(o.colors) : chip(String(o.color), ''), o.bbox.join(','), o.size_sig.join('×'), o.pixel_count, maskPic(o), h('span', { class: 'mono', text: o.mask_hash })];
+      }), function (i) { state.hiObject = objs[i].id; render(); }, objs.indexOf(hiObj))),
+      p.encoding.diagonal_rejections.length ? h('details', null, h('summary', { text: '对角链拒绝原因' }), table(['颜色', '原因'], p.encoding.diagonal_rejections.map(function (r) { return [r.color, r.reason]; }))) : null));
+    out.push(card('目标对象（训练目标编码，仅用于训练匹配，绝不作为程序输入）', h('div', { class: 'scroll' }, table(['id', '颜色', 'bbox', 'SizeSig', '像素'], p.output_encoding.search_objects.map(function (o) { return [o.id, o.color, o.bbox.join(','), o.size_sig.join('×'), o.pixel_count]; })))));
+    if (emitted) out.push(card('渲染前 EmittedObject 与重新编码后的 Object', h('div', { class: 'row' },
+      h('div', { style: 'flex:1;min-width:300px' }, h('h3', { text: 'EmittedObject（按绘制顺序，后绘覆盖先绘）' }), table(['#', 'sources', 'origin', 'bbox', '颜色'], emitted.map(function (e, i) { return [i, JSON.stringify(e.sources), e.origin, e.object.bbox.join(','), e.object.color]; }))),
+      h('div', { style: 'flex:1;min-width:300px' }, h('h3', { text: '对渲染结果重新 4 连通编码' }), table(['id', 'bbox', '颜色', '像素'], (reenc || []).map(function (o) { return [o.id, o.bbox.join(','), o.color, o.pixel_count]; }))))));
+    return out;
+  }
+  function maskPic(o) {
+    var w = o.size_sig[0], hh = o.size_sig[1]; if (w * hh > 400) return w + '×' + hh;
+    var g = []; for (var y = 0; y < hh; y++) { g.push([]); for (var x = 0; x < w; x++) g[y].push(0); }
+    o.mask.forEach(function (m) { if (g[m[1]]) g[m[1]][m[0]] = o.color == null ? 5 : o.color; });
+    var el = h('div', { class: 'grid', style: 'grid-template-columns:repeat(' + w + ',6px);grid-auto-rows:6px' });
+    g.forEach(function (r) { r.forEach(function (v) { add(el, h('div', { style: 'background:' + LATIS.ARC[v] })); }); });
+    return el;
+  }
+
+  // ---- pipeline funnel
+  function viewPipeline() {
+    var t = D.trace, s = summary(), maxSeq = Math.max.apply(null, [1].concat((D.events || []).map(function (e) { return e.sequence; })));
+    var firstFit = (D.events || []).filter(function (e) { return e.event_source === 'trace' && (e.kind === 'completed' || e.kind === 'evaluated') && e.outcome === 'fit'; })[0];
+    var out = [card('时间口径', kv([['首个 fit 事件序号', firstFit ? '#' + firstFit.sequence : '无'], ['首次 train-exact 秒', s.first_train_exact_seconds == null ? '无可靠时间点' : s.first_train_exact_seconds],
+      ['搜索结束秒', s.total_to_budget_seconds == null ? '无可靠时间点' : s.total_to_budget_seconds], ['最后检查点', s.terminal_event ? '#' + s.terminal_event.sequence + ' terminal' : '#' + maxSeq + '（无终止事件：之后状态 unknown）'],
+      ['说明', '下方条带按事件序号排布（不是时间轴）；不同计数单位不相加。']]))];
+    var rows = t.funnel.map(function (f) {
+      var bar = h('div', { class: 'bar' });
+      if (f.first_sequence != null) add(bar, h('span', { style: 'left:' + (100 * f.first_sequence / maxSeq) + '%;width:' + Math.max(0.4, 100 * (f.last_sequence - f.first_sequence) / maxSeq) + '%' }));
+      if (firstFit) add(bar, h('i', { style: 'left:' + (100 * firstFit.sequence / maxSeq) + '%', title: 'first fit' }));
+      var det = h('details', null, h('summary', null, chip(f.state), ' ', h('b', { text: f.stage }), ' ', h('span', { class: 'muted', text: f.label + ' · 事件 ' + f.events })), bar,
+        kv(Object.keys(f.counts).map(function (k) { return [k, f.counts[k].value + '  [' + f.counts[k].unit + ']']; }).concat([['预算命中', f.budget_hit_count], ['首个阻断', f.first_blocker ? evLink(f.first_blocker) : '无']])),
+        f.budget_hits.length ? h('div', { class: 'scroll' }, table(['序号', '分支', '预算'], f.budget_hits.map(function (b) { return [b.sequence, b.branch_id, JSON.stringify(b.budget || b.budgets || { kind: b.budget_kind, limit: b.limit, used: b.used })]; }))) : null,
+        h('button', { class: 'chip', text: '查看该阶段事件', onclick: function () { state.tab = 'events'; state.ef = { scopes: f.scopes }; state.evPage = 0; render(); } }));
+      return det;
+    });
+    out.push(card('Grounding → Size → Alignment → Scalar/Typed → Referent/VSA → Relation → Unified/Joint → Render → Verify', rows,
+      h('p', { class: 'muted', text: 'not_entered：运行正常结束而该阶段没有任何检查点；unknown：进程未正常结束，无法区分。not_entered 不是 failed。' })));
+    return out;
+  }
+
+  // ---- candidate explorer
+  function viewCandidates() {
+    var all = cands(), f = state.cf, out = [];
+    function sel(key, values, label) {
+      return h('select', { onchange: function (e) { f[key] = e.target.value || null; state.page = 0; render(); } }, h('option', { value: '', text: label + '：全部' }), values.map(function (v) { return h('option', { value: v, text: String(v), selected: String(f[key]) === String(v) ? 'selected' : null }); }));
+    }
+    var bar = h('div', { class: 'filters' }, sel('scope', LATIS.uniq(all.map(function (c) { return c.scope; })), '层'), sel('entry', LATIS.uniq(all.map(function (c) { return c.entry; })), '入口'),
+      sel('status', LATIS.uniq(all.map(function (c) { return c.status; })), '状态'), sel('reason', LATIS.uniq(all.map(function (c) { return c.reason_code; })), '原因'),
+      sel('slots', LATIS.uniq(all.map(function (c) { return c.pipeline_slots; })).sort(), '槽数'), sel('depth', LATIS.uniq(all.map(function (c) { return c.max_param_depth; })).sort(), '参数深度'),
+      h('input', { placeholder: 'Branch/候选 ID', value: f.branch || '', onchange: function (e) { f.branch = e.target.value; state.page = 0; render(); } }),
+      h('input', { placeholder: '搜索 AST 文本', value: f.text || '', onchange: function (e) { f.text = e.target.value; state.page = 0; render(); } }),
+      h('label', null, h('input', { type: 'checkbox', checked: f.executedOnly ? 'checked' : null, onchange: function (e) { f.executedOnly = e.target.checked; state.page = 0; render(); } }), ' 只看实际执行'));
+    var list = LATIS.filterCandidates(all, f), per = 100, pages = Math.max(1, Math.ceil(list.length / per));
+    state.page = Math.min(state.page, pages - 1);
+    var slice = list.slice(state.page * per, state.page * per + per);
+    var pager = h('div', { class: 'filters' }, list.length + ' / ' + all.length + ' 个结构候选', h('button', { class: 'chip', text: '‹', onclick: function () { state.page = Math.max(0, state.page - 1); render(); } }), ' 第 ' + (state.page + 1) + '/' + pages + ' 页 ', h('button', { class: 'chip', text: '›', onclick: function () { state.page = Math.min(pages - 1, state.page + 1); render(); } }));
+    out.push(card('Candidate Explorer', bar, pager, h('div', { class: 'scroll' }, table(['ID', '层/入口', '状态', '原因', '槽', '参数深度', 'cost', '执行', '渲染', '文本'], slice.map(function (c) {
+      return [h('span', { class: 'mono', text: c.candidate_id }), c.entry, chip(c.status), c.reason_code, c.pipeline_slots == null ? (c.scope === 'LegacyRelation' ? 'n/a（旧 C）' : '—') : c.pipeline_slots, c.max_param_depth == null ? '—' : c.max_param_depth, c.cost, c.executed ? '是' : '否', c.rendered ? '是' : '否', (c.text || '（AST 未记录：level < full 的截断提案）').slice(0, 140)];
+    }), function (i) { state.candidate = slice[i].candidate_id; render(); }, slice.map(function (c) { return c.candidate_id; }).indexOf(state.candidate)))));
+    var c = state.candidate ? candById(state.candidate) : null;
+    if (state.candidate && !c && state.candidate === summary().program_transform_id) c = { candidate_id: state.candidate, ast: D.record.program_transform_ast, status: 'selected', cases: [], entry: 'selected program' };
+    if (c) out.push(candidateDetail(c));
+    return out;
+  }
+  function astTree(ast) {
+    if (!ast) return h('div', { class: 'muted', text: 'AST 未记录' });
+    function expr(e) {
+      if (e.leaf) return h('li', null, h('b', { text: e.leaf }), e.gap != null ? '(gap ' + e.gap + ')' : '', h('span', { class: 'muted', text: '  Feature 叶子' }));
+      if (e.const != null) return h('li', null, String(e.const), h('span', { class: 'muted', text: '  常数 ' + e.type }));
+      if (e.hole != null) return h('li', { text: '?c' + e.hole });
+      return h('li', null, h('b', { text: e.op }), h('ul', null, (e.args || []).map(expr)));
+    }
+    function param(p) { return h('li', null, h('span', { class: 'mono', text: p.text }), h('span', { class: 'muted', text: '  ' + p.refinement + ' · depth ' + p.depth + ' · nodes ' + p.ast_nodes + ' · cost ' + p.cost }), h('ul', null, expr(p.expr))); }
+    function body(b) {
+      if (b.kind === 'Pipeline' || b.kind === 'MigratedBody') return h('li', null, h('b', { text: b.kind }), b.legacy ? h('ul', null, h('li', null, 'legacy: ', body(b.legacy))) : null,
+        h('ul', null, b.steps.map(function (s, i) { return h('li', null, h('b', { text: 'step ' + i + ': ' + s.op }), s.per_object ? ' ' + JSON.stringify(s.per_object) : '', s.mode ? ' ' + s.mode : '', s.params ? h('ul', null, s.params.map(param)) : null); })));
+      return h('li', null, h('b', { text: b.kind }), ' ', b.per_object ? JSON.stringify(b.per_object) : (b.mode || ''));
+    }
+    return h('div', { class: 'ast' }, h('ul', null, h('li', null, h('b', { text: 'Select ' }), JSON.stringify(ast.selector), ' · others ', ast.others), body(ast.body)),
+      h('div', { class: 'muted', text: 'cost ' + ast.cost + ' · pipeline slots ' + ast.pipeline_slots + ' · max param depth ' + ast.max_param_depth }));
+  }
+  function stepGrid(objs, dimsWH, bg) { var p = LATIS.paintObjects(objs, dimsWH[0], dimsWH[1], bg || 0); return h('div', null, drawGrid(p.grid), h('div', { class: 'muted', style: 'font-size:11px', text: objs.length + ' 个对象' + (p.overwritten ? '，覆盖像素 ' + p.overwritten : '') + (p.outside ? '，越界像素 ' + p.outside : '') })); }
+  function candidateDetail(c) {
+    var r = replayOf(c.candidate_id), g = goals().filter(function (x) { return x.plan_id === c.parent_branch_id; });
+    var sib = cands().filter(function (x) { return x.parent_branch_id === c.parent_branch_id; });
+    var stat = {}; sib.forEach(function (x) { stat[x.status] = (stat[x.status] || 0) + 1; });
+    var parts = [kv([['候选结构 ID', h('span', { class: 'mono', text: c.candidate_id })], ['入口', c.entry], ['父分支', c.parent_branch_id], ['状态', chip(c.status)], ['原因', c.reason_code],
+      ['首个失败 case', c.first_failing_case == null ? '无' : c.first_failing_case + '：' + (c.first_failure_reason || '')], ['截断预算', c.truncation ? JSON.stringify(c.truncation) : '无'],
+      ['重复提出次数', c.duplicates], ['实际执行', c.executed ? '是' : '否（只被提出或被截断）'], ['真正 Render', c.rendered ? '是' : '否'], ['事件序号', (c.sequences || []).slice(0, 30).join(' ')]]),
+      h('h3', { text: '结构化 AST' }), astTree(c.ast),
+      h('h3', { text: '搜索时逐 case 结果（真实执行值）' }),
+      !c.detail_embedded && c.detail_embedded !== undefined ? h('div', { class: 'banner warn', text: '此候选的详细记录（AST、逐 case 结果）未内嵌；见 candidates.json 中 candidate_id=' + c.candidate_id + '。摘要：首个失败 case ' + val(c.first_failing_case) }) :
+      (c.cases || []).length ? table(['case', 'outcome', 'reason', 'emitted', 'grid hash', 'diff cells', '网格'], c.cases.map(function (x) { return [x.case_index, chip(x.outcome), x.reason, x.emitted_objects, h('span', { class: 'mono', text: x.grid_hash || '' }), x.diff_cells, x.predicted ? drawGrid(x.predicted) : (x.grid_hash ? 'level < full：只记 hash' : '—')]; })) : h('div', { class: 'muted', text: '搜索中没有执行任何 case（被截断/重复，或 trace level 低于 candidates）' })];
+    if (g.length) parts.push(h('h3', { text: '同一逆向计划的参数目标（为何参数 fit 却未构成完整程序？）' }), table(['角色', '代表数', '匹配全部标签', 'deferred', '状态'], g.map(function (x) { return [x.role, x.representatives.length, x.representatives.filter(function (q) { return q.matches_all_labels; }).length, x.deferred.length, x.status]; })),
+      h('div', { class: 'muted', text: '同计划候选结果统计：' + JSON.stringify(stat) }));
+    parts.push(h('h3', { text: '独立 replay（executor only）' }));
+    if (!r) parts.push(h('div', { class: 'muted', text: '未 replay。运行：python -I scripts/trace_io.py replay --record <trace.json> --candidate ' + c.candidate_id }));
+    else {
+      parts.push(kv([['核对结论', chip(r.verdict)], ['选择原因', r.reason], ['解码 ID 等于候选 ID', String(r.decoded_id_equals_candidate_id)]]),
+        table(['pair', 'case', '核对', '说明'], r.checks.map(function (k) { return [k.pair_index, k.case_index, chip(k.verdict), k.note]; })));
+      (r.replay.cases || []).forEach(function (rc) {
+        var pr = pairs().filter(function (q) { return q.pair_index === rc.pair_index; })[0];
+        var det = h('details', null, h('summary', null, 'pair ' + rc.pair_index + ' replay：', chip(rc.outcome), ' ', rc.reason || ''));
+        if (rc.steps) rc.steps.forEach(function (s) {
+          add(det, h('div', { class: 'card' }, h('b', { text: 'step ' + s.ordinal }), ' bindings ' + JSON.stringify(s.bindings).slice(0, 300),
+            h('div', { class: 'row' }, h('div', null, h('div', { class: 't', text: '输入对象集' }), stepGrid(s.input, rc.output_dims, 0)), h('div', null, h('div', { class: 't', text: '输出对象集' }), stepGrid(s.output, rc.output_dims, 0)))));
+        });
+        if (rc.grid && pr) { var d = LATIS.gridDiff(rc.grid, pr.output); add(det, h('div', { class: 'row' }, gpanel('Replay 最终网格', rc.grid), gpanel('Target', pr.output), gpanel('Diff', pr.output, { diff: d.cells }, d.comparable ? d.count + ' 个像素不同' : '尺寸不同'))); }
+        if (rc.emitted_objects) add(det, h('div', { class: 'row' }, h('div', null, h('h3', { text: 'EmittedObject（渲染前）' }), table(['#', 'sources', 'origin', 'bbox'], rc.emitted_objects.map(function (e, i) { return [i, JSON.stringify(e.sources), e.origin, e.object.bbox.join(',')]; }))),
+          h('div', null, h('h3', { text: '重新编码 Object（渲染后）' }), table(['id', 'bbox', '颜色'], (rc.reencoded_objects || []).map(function (o) { return [o.id, o.bbox.join(','), o.color]; })))));
+        parts.push(det);
+      });
+    }
+    parts.push(h('button', { class: 'chip', text: '在原始事件中查看此候选', onclick: function () { state.tab = 'events'; state.ef = { branch: c.candidate_id }; state.evPage = 0; render(); } }),
+      h('button', { class: 'chip', text: '在网格检查器中查看', onclick: function () { state.tab = 'grid'; state.predSource = r ? 'replay' : 'search'; render(); } }));
+    return card('候选详情', parts);
+  }
+
+  // ---- parameter goals
+  function viewParams() {
+    var gs = goals(); if (!gs.length) return card('参数目标', h('div', { class: 'muted', text: '没有 D 逆向 TypedGoal 代表记录（未进入该入口，或 trace level < branches）。' }));
+    return gs.map(function (g) {
+      return card('目标 ' + g.role + ' · ' + g.refinement + ' · 计划 ' + g.plan_id, kv([['goal id', g.goal_id], ['状态', g.status], ['可见叶子', (g.visible_leaves || []).join(', ')], ['逆向标签', (g.labels || []).map(function (l) { return 'case' + l.case_index + '=' + l.value + '(obj ' + l.current_object + ')'; }).join('  ')],
+        ['标签来源', g.label_source], ['模板', JSON.stringify(g.templates)], ['预算', JSON.stringify(g.budget)], ['VSA', JSON.stringify(g.vsa)]]),
+        h('h3', { text: 'Feature/Const → Typed AST → Param Fit（代表 ' + g.representatives.length + '，deferred ' + g.deferred.length + '）' }),
+        h('div', { class: 'scroll' }, table(['param id', 'AST', 'depth', 'cost', 'bindings', 'case 值', '匹配标签', 'case-relative 类', 'VSA root'], g.representatives.map(function (r) {
+          return [h('span', { class: 'mono', text: r.param_id }), h('span', { class: 'mono', text: r.param.text }), r.param.depth, r.param.cost, r.bindings.join('; '), r.case_values.join(','), chip(r.matches_all_labels ? 'fit' : 'no_fit'), h('span', { class: 'mono', text: r.case_relative_class }), r.vsa_root];
+        }))),
+        h('h3', { text: '训练等价但 AST 不同的组（只是 case-relative，不是全域等价）' }),
+        table(['类', '不同 AST 数', 'param ids'], g.case_relative_classes.filter(function (k) { return k.distinct_ast_count > 1; }).map(function (k) { return [h('span', { class: 'mono', text: k.class }), k.distinct_ast_count, k.param_ids.join(' ')]; })),
+        h('h3', { text: 'B 泛化边（实线 Confirmed，虚线 Pending：Pending 不是证明）' }),
+        g.edges.length ? h('div', null, g.edges.slice(0, 200).map(function (e) { return h('div', { class: e.status === 'Confirmed' ? 'edge-confirmed' : e.status === 'Pending' ? 'edge-pending' : 'edge-other', text: '[' + e.status + '] ' + e.text }); })) : h('div', { class: 'muted', text: '无保留边' }),
+        g.deferred.length ? h('details', null, h('summary', { text: 'deferred 代表（未被消费）' }), table(['param id', 'AST'], g.deferred.map(function (x) { return [x.param_id, x.text]; }))) : null);
+    });
+  }
+
+  // ---- derivation / witness graph
+  function viewDerivation() {
+    var w = (D.witnesses || {}).execution_witnesses, out = [];
+    out.push(card('选中程序', kv([['程序结构 ID', summary().program_transform_id], ['类型', summary().program_kind]]), D.record.program_transform_ast ? astTree(D.record.program_transform_ast) : h('pre', { text: (D.record.program || '无程序').slice(0, 3000) })));
+    if (!Array.isArray(w) || !w.length) { out.push(card('Witness', h('div', { class: 'muted', text: '没有精确程序，因此没有 Transform/Render witness；失败分支见“候选浏览”和“搜索流程”。' }))); }
+    else w.forEach(function (x, i) {
+      var used = summary().pairs_used_in_search[i], dimsWH = [x.width, x.height];
+      var tree = h('details', { open: i === 0 ? 'open' : null }, h('summary', null, 'pair ' + used + '：', chip(x.train_exact ? 'exact' : 'mismatch'), ' transform witness ', chip(String(x.transform_witness_valid), x.transform_witness_valid ? 'ok' : 'bad'), ' render witness ', chip(String(x.render_witness_valid), x.render_witness_valid ? 'ok' : 'bad')),
+        h('div', { class: 'ast' }, h('ul', null,
+          h('li', null, h('b', { text: '输入对象' }), ' ids ' + x.source_ids + '，背景 ' + x.background),
+          h('li', null, h('b', { text: 'Select' }), ' ' + x.selector + ' · others ' + x.others),
+          h('li', null, h('b', { text: 'Transform 步骤' }), h('ul', null, (x.derivation_steps || []).map(function (s) {
+            return h('li', null, h('details', null, h('summary', null, 'step ' + s.ordinal + '：' + (typeof s.instruction === 'string' ? s.instruction : s.instruction.operation + ' ' + (s.instruction.parameters || []).map(function (p) { return JSON.stringify(p.expression); }).join(' | ').slice(0, 200))),
+              h('div', null, 'bindings: ' + JSON.stringify(s.bindings)), h('div', { class: 'row' }, h('div', null, h('div', { class: 't', text: '输入' }), stepGrid(s.input.map(function (e) { return { pixels: e.pixels }; }), dimsWH, x.background)), h('div', null, h('div', { class: 't', text: '输出' }), stepGrid(s.output.map(function (e) { return { pixels: e.pixels }; }), dimsWH, x.background)))));
+          }))),
+          h('li', null, h('b', { text: 'EmittedObjects（绘制顺序）' }), h('ul', null, x.emissions.map(function (e) { return h('li', { text: '#' + e.ordinal + ' sources ' + e.sources + ' · ' + e.role + ' · ' + e.pixels.length + ' px' }); }))),
+          h('li', null, h('b', { text: 'RenderedPixels' }), ' ', renderNote(x)))),
+        h('div', { class: 'row' }, gpanel('渲染结果', Array.isArray(x.grid) ? x.grid : JSON.parse(String(x.grid))), gpanel('由 emissions 重绘', LATIS.paintObjects(x.emissions.map(function (e) { return { pixels: e.pixels }; }), x.width, x.height, x.background).grid)));
+      out.push(card(null, tree));
+    });
+    var gs = goals().filter(function (g) { return g.representatives.some(function (r) { return r.matches_all_labels; }); });
+    if (gs.length) out.push(card('参数推导：Feature/Const → Typed AST → Param Fit → Pipeline', gs.slice(0, 30).map(function (g) {
+      return h('details', null, h('summary', { text: g.role + ' @ 计划 ' + g.plan_id + '：' + g.representatives.filter(function (r) { return r.matches_all_labels; }).length + ' 个代表匹配全部逆向标签' }),
+        h('div', { class: 'ast' }, h('ul', null, g.representatives.filter(function (r) { return r.matches_all_labels; }).slice(0, 40).map(function (r) {
+          var leaves = []; (function walk(e) { if (e.leaf) leaves.push(e.leaf); else if (e.const != null) leaves.push('const ' + e.const); else (e.args || []).forEach(walk); })(r.param.expr);
+          return h('li', null, h('span', { class: 'muted', text: leaves.join(' + ') + ' → ' }), h('span', { class: 'mono', text: r.param.text }), ' → fit ' + r.case_values.join(','));
+        }))), g.edges.slice(0, 20).map(function (e) { return h('div', { class: e.status === 'Confirmed' ? 'edge-confirmed' : 'edge-pending', text: '[' + e.status + '] ' + e.text }); }));
+    })));
+    return out;
+  }
+  function renderNote(x) {
+    var p = LATIS.paintObjects(x.emissions.map(function (e) { return { pixels: e.pixels }; }), x.width, x.height, x.background);
+    var colours = {}; x.emissions.forEach(function (e) { var c = e.pixels.length ? e.pixels[0][2] : null; colours[c] = (colours[c] || 0) + 1; });
+    var same = Object.keys(colours).filter(function (k) { return colours[k] > 1; });
+    return '覆盖像素 ' + p.overwritten + '；同色发射物体组 ' + (same.length ? same.join(',') + '（渲染后可能同色相连，重新编码对象数可少于发射数）' : '无') + '；越界 ' + p.outside;
+  }
+
+  // ---- events
+  function viewEvents() {
+    var f = state.ef, all = D.events || [];
+    var list = all;
+    if (f.seq != null) list = all.filter(function (e) { return e.sequence === f.seq; });
+    else if (f.scopes) list = all.filter(function (e) { var st = e.scope === 'TypedParameter' ? ((e.parent_id || e.parent_branch_id) === 'alignment' ? 'TypedParameter@alignment' : 'TypedParameter@unified') : e.scope === 'Run' ? 'Run@' + e.kind : e.scope; return f.scopes.indexOf(st) >= 0; });
+    else list = LATIS.filterEvents(all, f);
+    var per = 200, pages = Math.max(1, Math.ceil(list.length / per)); state.evPage = Math.min(state.evPage, pages - 1);
+    var slice = list.slice(state.evPage * per, state.evPage * per + per), open = state.openEvent;
+    var bar = h('div', { class: 'filters' },
+      h('select', { onchange: function (e) { state.ef = { scope: e.target.value || null, source: f.source, text: f.text }; state.evPage = 0; render(); } }, h('option', { value: '', text: 'scope：全部' }), LATIS.uniq(all.map(function (e) { return e.scope; })).map(function (s) { return h('option', { value: s, text: s, selected: f.scope === s ? 'selected' : null }); })),
+      h('select', { onchange: function (e) { state.ef = { scope: f.scope, source: e.target.value || null, text: f.text }; state.evPage = 0; render(); } }, h('option', { value: '', text: '来源：全部' }), ['dplus', 'trace', 'driver'].map(function (s) { return h('option', { value: s, text: s, selected: f.source === s ? 'selected' : null }); })),
+      h('input', { placeholder: '全文/分支', value: f.text || f.branch || '', onchange: function (e) { state.ef = { scope: f.scope, source: f.source, text: e.target.value }; state.evPage = 0; render(); } }),
+      h('button', { class: 'chip', text: '清除筛选', onclick: function () { state.ef = {}; state.evPage = 0; render(); } }),
+      list.length + ' 个事件（内嵌 ' + D.events_embedded + ' / 共 ' + D.events_total + '）',
+      h('button', { class: 'chip', text: '‹', onclick: function () { state.evPage = Math.max(0, state.evPage - 1); render(); } }), ' ' + (state.evPage + 1) + '/' + pages + ' ', h('button', { class: 'chip', text: '›', onclick: function () { state.evPage = Math.min(pages - 1, state.evPage + 1); render(); } }));
+    return card('原始事件（按 sequence；dplus=原 D+ 事件，trace=本轮插桩，driver=trace-io 驱动）', bar, h('div', { class: 'scroll', style: 'max-height:700px' }, table(['#', '来源', 'scope', 'kind/event', 'branch', 'parent', 'stop/outcome', 'reason'], slice.map(function (e) {
+      return [e.sequence, e.event_source, e.scope, e.kind || e.event, h('span', { class: 'mono', text: e.branch_id || '' }), h('span', { class: 'mono', text: e.parent_branch_id || e.parent_id || '' }), chip(e.stop_reason || e.outcome || '', LATIS.statusChip(e.outcome)), (e.reason_code || e.reason || '').slice(0, 120)];
+    }), function (i) { state.openEvent = slice[i].sequence; render(); })), open != null ? (function () {
+      var e = all.filter(function (x) { return x.sequence === open; })[0] || {};
+      var note = e._row ? '候选级事件只内嵌摘要列；完整内容（AST、逐 case 网格）见候选详情、candidates.json 或 search_events.jsonl.gz 第 ' + (open + 1) + ' 行。' : e._moved_fields ? '大字段 ' + e._moved_fields.join(', ') + ' 已移至候选/参数视图；完整事件见 search_events.jsonl.gz 第 ' + (open + 1) + ' 行。' : null;
+      return h('div', { class: 'card' }, h('h3', { text: '事件 #' + open }), note ? h('div', { class: 'muted', text: note }) : null, pre(e));
+    })() : null);
+  }
+
+  function init() {
+    try { D = LATIS.expandBundle(JSON.parse(document.getElementById('trace-data').textContent)); }
+    catch (e) { document.getElementById('main').textContent = '内嵌数据无法解析：' + e.message; return; }
+    V = LATIS.validateBundle(D);
+    if (!V.errors.length) {
+      var s = D.trace.summary;
+      document.getElementById('title').textContent = 'LATIS 单 IO 诊断 · ' + s.task_id + ' · ' + s.mode + ' · pair ' + s.pair_index;
+      document.getElementById('subtitle').textContent = s.config + ' · ' + s.status + ' · schema ' + D.trace.trace_schema_version + ' · 离线页面（无网络依赖）';
+      var p = pairs().map(function (q) { return q.pair_index; }).indexOf(s.pair_index); state.pair = p < 0 ? 0 : p;
+      if (D.focus && D.focus.candidate) { state.candidate = D.focus.candidate; state.tab = 'candidates'; }
+      if (D.focus && D.focus.branch) { state.cf.branch = D.focus.branch; state.tab = 'candidates'; }
+      // Deep links: #tab=grid&candidate=<id>&source=replay (view state only).
+      location.hash.replace(/^#/, '').split('&').forEach(function (kvp) {
+        var q = kvp.split('='), k = q[0], v = decodeURIComponent(q[1] || '');
+        if (k === 'tab') state.tab = v; else if (k === 'candidate') state.candidate = v; else if (k === 'source') state.predSource = v; else if (k === 'pair') state.pair = +v;
+      });
+    }
+    render();
+    if (location.hash.indexOf('#selftest') === 0) selftest();
+  }
+  // Drives every view in this browser and writes a JSON report into the DOM
+  // (used by the headless UI test; never changes the embedded record).
+  function selftest() {
+    var report = { tabs: {}, errors: [], validation: { errors: V.errors, warnings: V.warnings }, dead_links: LATIS.deadLinks(D) };
+    var before = document.getElementById('trace-data').textContent.length;
+    function run(name, fn) { try { fn(); render(); report.tabs[name] = document.getElementById('main').getElementsByTagName('*').length; } catch (e) { report.errors.push(name + ': ' + e.message); } }
+    TABS.forEach(function (t) { run(t[0], function () { state.tab = t[0]; }); });
+    var cs = cands(), fit = cs.filter(function (c) { return c.status === 'fit'; })[0], bad = cs.filter(function (c) { return c.executed && c.status !== 'fit'; })[0];
+    [fit, bad].forEach(function (c, i) { if (c) { run('candidate_' + i, function () { state.tab = 'candidates'; state.candidate = c.candidate_id; });
+      ['program', 'search', 'replay'].forEach(function (src) { run('grid_' + i + '_' + src, function () { state.tab = 'grid'; state.predSource = src; }); }); } });
+    run('filter', function () { state.tab = 'candidates'; state.cf = { status: 'fit' }; });
+    report.filter_rows = LATIS.filterCandidates(cs, { status: 'fit' }).length;
+    run('event_detail', function () { state.tab = 'events'; state.ef = {}; state.openEvent = (D.events[0] || {}).sequence; });
+    for (var p = 0; p < pairs().length; p++) run('pair_' + p, function () { state.tab = 'grid'; state.pair = p; state.predSource = 'program'; });
+    report.predicted_panels_na = document.querySelectorAll('.na').length;
+    // Grid accuracy: drawn cells and diff markers against the pure diff.
+    report.grid_checks = [];
+    var withReplay = cs.filter(function (c) { var r = replayOf(c.candidate_id); return r && (r.replay.cases || []).some(function (x) { return x.grid; }); });
+    if (!V.errors.length) withReplay.slice(0, 6).forEach(function (c) { try {
+      var r = replayOf(c.candidate_id), rc = r.replay.cases.filter(function (x) { return x.grid; })[0];
+      var pi = pairs().map(function (q) { return q.pair_index; }).indexOf(rc.pair_index); if (pi < 0) return;
+      state.tab = 'grid'; state.pair = pi; state.candidate = c.candidate_id; state.predSource = 'replay'; render();
+      var panels = document.querySelectorAll('.gpanel'), p = pairs()[pi];
+      var expected = LATIS.gridDiff(rc.grid, p.output);
+      report.grid_checks.push({ candidate: c.candidate_id, pair: rc.pair_index,
+        input_cells_drawn: panels[0].querySelectorAll('.c').length, input_cells_expected: p.input.length * p.input[0].length,
+        diff_marked: panels[3].querySelectorAll('.c.diff').length, diff_expected: expected.comparable ? expected.count : 0,
+        predicted_cells_drawn: panels[2].querySelectorAll('.c').length, predicted_cells_expected: rc.grid.length * rc.grid[0].length });
+    } catch (e) { report.errors.push('grid_check: ' + e.message); } });
+    report.embedded_unchanged = document.getElementById('trace-data').textContent.length === before;
+    report.candidates = cs.length; report.events = (D.events || []).length;
+    var pre = document.createElement('pre'); pre.id = 'selftest-result'; pre.textContent = JSON.stringify(report); document.body.appendChild(pre);
+  }
+  document.addEventListener('DOMContentLoaded', init);
+})();

@@ -25,7 +25,21 @@ namedConfigsD=
   ,("ComposeOnly",fullD {stageD=stageDFull {sdTyped=False,sdVSA=False,sdOrdering=False}})
   ,("TypedCompose",fullD {stageD=stageDFull {sdVSA=False,sdOrdering=False}})
   ,("FullD",fullD),("NoParamVSA",fullD {stageD=stageDFull {sdVSA=False,sdOrdering=False}})
-  ,("NoReferentOrdering",fullD {stageD=stageDFull {sdOrdering=False}})]
+  ,("NoReferentOrdering",fullD {stageD=stageDFull {sdOrdering=False}})]++
+  [(name, scaling mult cd pd diag) | (name,mult,cd,pd,diag)<-
+    [("D0_Frozen",1,2,2,True),("D0_Off",1,2,2,False),("Budget4x",4,2,2,True)
+    ,("Compose3",1,3,2,True),("Param3",1,2,3,True),("Combined3_4x",4,3,3,True)
+    ,("Extended4_8x",8,4,3,True)]]
+  where
+    scaling m cd pd diag=fullD
+      { alignmentBudget=alignmentBudget fullD*m,scalarBudget=scalarBudget fullD*m
+      , stageA=(stageA fullD) {saHoleBudget=saHoleBudget (stageA fullD)*m,saTotalHoleBudget=saTotalHoleBudget (stageA fullD)*m}
+      , stageC=(stageC fullD) {scRelationBudget=scRelationBudget (stageC fullD)*m,scRelationMaxCandidates=scRelationMaxCandidates (stageC fullD)*m,scRelationMaxFits=scRelationMaxFits (stageC fullD)*m}
+      , stageD=stageDFull {sdDiagnostics=diag,sdComposeDepth=cd,sdParamDepth=pd,sdBudgetMultiplier=m
+        ,sdGoalBudget=sdGoalBudget stageDFull*m,sdTotalParamBudget=sdTotalParamBudget stageDFull*m
+        ,sdCaseBudget=sdCaseBudget stageDFull*m,sdCombinationBudget=sdCombinationBudget stageDFull*m
+        ,sdSkeletonBudget=sdSkeletonBudget stageDFull*m,sdMaxFits=sdMaxFits stageDFull*m
+        ,sdParamReps=sdParamReps stageDFull*m,sdTemplateBudget=sdTemplateBudget stageDFull*m} }
 configByNameD :: String -> Maybe Config
 configByNameD n=lookup n namedConfigsD
 configNamesD :: [String]

@@ -1,4 +1,4 @@
-module ARC.Dataset (Task(..), TestPair(..), loadTask, parseTask, jsonGrid) where
+module ARC.Dataset (Task(..), TestPair(..), loadTask, parseTask, jsonGrid, JSON(..), parseJSONText, field, asArray, asInt) where
 import Latent.Grid
 import Synthesis.Verify (TrainingPair)
 import Text.ParserCombinators.ReadP
@@ -56,6 +56,11 @@ parseTask name source = do
             JObject fields -> case lookup "output" fields of Nothing -> Right Nothing; Just o -> Just <$> asGrid o
             _ -> Left "Test item must be object"
           pure (TestPair input output)
+-- The same strict reader for other JSON inputs (trace replay requests).
+parseJSONText :: String -> Either String JSON
+parseJSONText source=case [j | (j,rest) <- readP_to_S (skipSpaces *> jvalue <* eof) source, all isSpace rest] of
+  [j] -> Right j
+  _ -> Left "Invalid/ambiguous JSON"
 loadTask :: FilePath -> IO (Either String Task)
 loadTask path = parseTask path <$> readFile path
 jsonGrid :: Grid -> String

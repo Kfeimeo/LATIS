@@ -37,6 +37,7 @@ module Synthesis.Collection.Relation
   , PixelContribution(..), RenderWitness(..), renderWitness, verifyRenderWitness
   , emitObjectsInput
   , migrateTransform, migrateCount, migrateOffset
+  , transformJSON, exprJSON, paramJSON, paramLeafJSON, CaseTrace(..), caseTraceJSON, gridDiffCount
   ) where
 
 import Latent.Grid
@@ -47,7 +48,8 @@ import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import Data.List (sortOn, nub, sort, group)
 import Synthesis.Collection.Parameter
-import Synthesis.Collection.Typed (asInt, tCost, tConstants, TVal(..), TExpr(..), TOp(..))
+import Synthesis.Collection.Typed (asInt, tCost, tConstants, tDepth, tLength, renderT, opName, TVal(..), TExpr(..), TOp(..))
+import Synthesis.Collection.Diagnostics (jstr, jobj, jarr, jbool, jmaybe, stableHash, traceAt, traceCand, levelBranches, levelCandidates, levelFull)
 import Debug.Trace (traceEvent)
 
 -- Stage C configuration block (carried by the front-end Config). Everything
@@ -320,7 +322,7 @@ executePipeline _ _ _ _=Left "not a pipeline"
 
 executeSteps :: Bool -> ObjectTransform -> [TransformStep] -> Dimensions -> Dimensions -> [O.Object] -> Either String PipelineWitness
 executeSteps legacyOrder (ObjectTransform sel others _) steps inDims outDims objs=do
-  if null steps || length steps>2 then Left "pipeline depth must be 1..2" else Right ()
+  if null steps || length steps>4 then Left "pipeline depth must be 1..4" else Right ()
   if any (\n->n<1 || n>30) [gridWidth inDims,gridHeight inDims,gridWidth outDims,gridHeight outDims]
     then Left "invalid ARC SizeSig/canvas" else Right ()
   mapM_ validObject objs
@@ -496,17 +498,99 @@ searchTransforms :: Int -> Int -> [ObjectTransform] -> [SearchCase] -> SearchRes
 searchTransforms budget maxFits candidates cases=go candidates 0 0 [] Nothing
   where
     go [] tried execs fits first=SearchResult (reverse fits) (length candidates) tried execs False first
-    go (t:ts) tried execs fits first
-      | execs>=budget || length fits>=maxFits = SearchResult (reverse fits) (length candidates) tried execs True first
+    go rest@(t:ts) tried execs fits first
+      | execs>=budget || length fits>=maxFits = traceAt levelBranches
+          [("scope",jstr "LegacyRelation"),("kind",jstr "budget"),("branch_id",jstr "legacy.search"),("parent_branch_id",jstr "legacy")
+          ,("reason_code",jstr (if execs>=budget then "case_execution_budget" else "fit_representative_cap"))
+          ,("budget",jobj [("name",jstr (if execs>=budget then "scRelationBudget" else "scRelationMaxFits")),("limit",show (if execs>=budget then budget else maxFits)),("used",show (if execs>=budget then execs else length fits)),("unit",jstr (if execs>=budget then "case executions" else "train-exact representatives"))])
+          ,("unvisited_enumerated_candidates",show (length rest)),("next_candidate_id",jstr (stableHash (show t)))]
+          (SearchResult (reverse fits) (length candidates) tried execs True first)
       | otherwise =
-          let (ok,n,emitted)=runCases t cases 0 []
+          let (ok,n,emitted,outs)=runCases t cases 0 [] []
               first'=case first of Nothing | ok->Just (execs+n); _->first
-          in if ok then traceEvent "latis-train-exact" (go ts (tried+1) (execs+n) ((t,reverse emitted):fits) first')
-             else go ts (tried+1) (execs+n) fits first'
-    runCases _ [] n acc=(True,n,acc)
-    runCases t (c:cs) n acc=
+              next=if ok then traceEvent "latis-train-exact" (go ts (tried+1) (execs+n) ((t,reverse emitted):fits) first')
+                   else go ts (tried+1) (execs+n) fits first'
+          in traceCand levelCandidates (stableHash (show t)) (\level->
+               [("scope",jstr "LegacyRelation"),("kind",jstr "evaluated"),("stage",jstr "legacy_relation"),("entry",jstr "legacy_relation")
+               ,("branch_id",jstr "legacy.search"),("parent_branch_id",jstr "legacy"),("enumeration_index",show tried)
+               ,("candidate_ast",transformJSON t),("candidate_type",jstr "Set[Object] -> Set[Object]"),("cost",show (transformCost t))
+               ,("outcome",jstr (if ok then "fit" else case outs of (o:_) | ctOutcome o `elem` ["execution_invalid","render_invalid"]->"invalid"; _->"no_fit"))
+               ,("reason_code",jstr (if ok then "train_exact" else case outs of (o:_)->ctOutcome o; []->"unknown"))
+               ,("case_executions",show n),("cases",jarr (map (caseTraceJSON (level>=levelFull)) (reverse outs)))]) next
+    runCases _ [] n acc outs=(True,n,acc,outs)
+    runCases t (c:cs) n acc outs=
       case emitObjects t (scOutDims c) (scInputs c) of
-        Left _->(False,n+1,acc)
+        Left e->(False,n+1,acc,CaseTrace n "execution_invalid" e Nothing (scTarget c) 0:outs)
         Right es->case render (O.Scene (scOutDims c) (scBackground c) (map eoObject es)) of
-          Right gr | gr==scTarget c->runCases t cs (n+1) (es:acc)
-          _->(False,n+1,acc)
+          Right gr | gr==scTarget c->runCases t cs (n+1) (es:acc) (CaseTrace n "exact" "" (Just gr) (scTarget c) (length es):outs)
+          Right gr->(False,n+1,acc,CaseTrace n "render_mismatch" "rendered grid differs from the training target" (Just gr) (scTarget c) (length es):outs)
+          Left e->(False,n+1,acc,CaseTrace n "render_invalid" e Nothing (scTarget c) (length es):outs)
+
+-- Per-case execution record of a candidate, kept for the single-IO trace.
+-- The predicted grid is the value the search itself rendered.
+data CaseTrace = CaseTrace { ctIndex :: Int, ctOutcome, ctReason :: String, ctGrid :: Maybe Grid, ctTarget :: Grid, ctEmitted :: Int } deriving (Eq,Show)
+gridDiffCount :: Grid -> Grid -> Maybe Int
+gridDiffCount g t
+  | dimensions g/=dimensions t=Nothing
+  | otherwise=Just (length [() | (a,b)<-zip (concat (rows g)) (concat (rows t)), a/=b])
+caseTraceJSON :: Bool -> CaseTrace -> String
+caseTraceJSON full c=jobj
+  ([("case_index",show (ctIndex c)),("outcome",jstr (ctOutcome c)),("reason",jstr (ctReason c)),("emitted_objects",show (ctEmitted c))
+   ,("grid_hash",jmaybe (jstr . stableHash . show . rows) (ctGrid c))
+   ,("grid_dims",jmaybe (\g->let Dimensions w h=dimensions g in jarr [show w,show h]) (ctGrid c))
+   ,("target_dims",let Dimensions w h=dimensions (ctTarget c) in jarr [show w,show h])
+   ,("diff_cells",maybe "null" (jmaybe show . (`gridDiffCount` ctTarget c)) (ctGrid c))]
+   ++[("predicted",jmaybe (\g->jarr [jarr (map show r) | r<-rows g]) (ctGrid c)) | full])
+
+-- Structured AST of an object transformation (trace and replay only; the
+-- solver never reads it back).
+transformJSON :: ObjectTransform -> String
+transformJSON t@(ObjectTransform sel others body)=jobj
+  [("selector",selector sel),("others",jstr (show others)),("body",bodyJ body)
+  ,("cost",show (transformCost t)),("pipeline_slots",case body of Pipeline ss->show (length ss); MigratedBody _ ss->show (length ss); _->"null")
+  ,("max_param_depth",show (maximum (0:[tDepth (paramExpr p) | s<-steps body,p<-stepParams s])))
+  ,("text",jstr (transformText t))]
+  where
+    steps (Pipeline ss)=ss
+    steps (MigratedBody _ ss)=ss
+    steps _=[]
+    selector AllObjects=jobj [("kind",jstr "AllObjects")]
+    selector (FilterBy p)=jobj [("kind",jstr "FilterBy"),("pred",pred' p)]
+    pred' (ColorIs c)=jobj [("kind",jstr "ColorIs"),("color",show c)]
+    pred' (NotP q)=jobj [("kind",jstr "NotP"),("pred",pred' q)]
+    pred' p=jobj [("kind",jstr (show p))]
+    bodyJ (MapEach p)=jobj [("kind",jstr "MapEach"),("per_object",perJ p)]
+    bodyJ (MergeSelected m)=jobj [("kind",jstr "MergeSelected"),("mode",jstr (show m))]
+    bodyJ CropSelected=jobj [("kind",jstr "CropSelected")]
+    bodyJ (Pipeline ss)=jobj [("kind",jstr "Pipeline"),("steps",jarr (map stepJ ss))]
+    bodyJ (MigratedBody b ss)=jobj [("kind",jstr "MigratedBody"),("legacy",bodyJ b),("steps",jarr (map stepJ ss))]
+    perJ (RecolorTo c)=jobj [("kind",jstr "RecolorTo"),("color",show c)]
+    perJ (Hollow k)=jobj [("kind",jstr "Hollow"),("thickness",show k)]
+    perJ (Replicate k o)=jobj [("kind",jstr "Replicate"),("count",countJ k),("offset",offJ o)]
+    perJ p=jobj [("kind",jstr (show p))]
+    countJ (KConst n)=jobj [("kind",jstr "KConst"),("n",show n)]
+    countJ (KFitAcross g)=jobj [("kind",jstr "KFitAcross"),("gap",show g)]
+    countJ (KFitDown g)=jobj [("kind",jstr "KFitDown"),("gap",show g)]
+    countJ k=jobj [("kind",jstr (show k))]
+    offJ o=let (name,g)=case o of StepRight x->("StepRight",x); StepDown x->("StepDown",x); StepLeft x->("StepLeft",x); StepUp x->("StepUp",x); StepDiagonal x->("StepDiagonal",x)
+           in jobj [("kind",jstr name),("gap",show g)]
+    stepJ s=case s of
+      MapPosition x y->jobj [("op",jstr "MapPosition"),("params",jarr [paramJSON x,paramJSON y])]
+      MapColor c->jobj [("op",jstr "MapColor"),("params",jarr [paramJSON c])]
+      Copies n x y->jobj [("op",jstr "Copies"),("params",jarr [paramJSON n,paramJSON x,paramJSON y])]
+      LegacyStep p->jobj [("op",jstr "LegacyStep"),("per_object",perJ p)]
+      SetMerge m->jobj [("op",jstr "SetMerge"),("mode",jstr (show m))]
+      SetCrop->jobj [("op",jstr "SetCrop")]
+paramJSON :: Param -> String
+paramJSON p=jobj [("refinement",jstr (show (paramRefinement p))),("expr",exprJSON paramLeafJSON (paramExpr p))
+  ,("text",jstr (renderT show (paramExpr p))),("depth",show (tDepth (paramExpr p))),("ast_nodes",show (tLength (paramExpr p))),("cost",show (tCost (paramExpr p)))]
+paramLeafJSON :: ParamLeaf -> [(String,String)]
+paramLeafJSON (LegacyFitAcross g)=[("leaf",jstr "LegacyFitAcross"),("gap",show g)]
+paramLeafJSON (LegacyFitDown g)=[("leaf",jstr "LegacyFitDown"),("gap",show g)]
+paramLeafJSON l=[("leaf",jstr (show l))]
+exprJSON :: (l -> [(String,String)]) -> TExpr l -> String
+exprJSON leaf (TLeaf l)=jobj (leaf l)
+exprJSON _ (TConst (VI n))=jobj [("const",show n),("type",jstr "Int")]
+exprJSON _ (TConst (VB b))=jobj [("const",jbool b),("type",jstr "Bool")]
+exprJSON _ (THole i)=jobj [("hole",show i)]
+exprJSON leaf (TApp op as)=jobj [("op",jstr (opName op)),("args",jarr (map (exprJSON leaf) as))]

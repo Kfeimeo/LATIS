@@ -44,6 +44,7 @@ import System.Directory (createDirectoryIfMissing)
 import System.FilePath ((</>), takeBaseName)
 import System.Exit (exitWith, ExitCode(..))
 import Debug.Trace (traceEventIO)
+import qualified Synthesis.Collection.Diagnostics as DG
 
 --   stage-b-<C>  Stage B front end under configuration C (ARC.StageBEvaluate:
 --                BaselineA | B0Only | NoStructuralGeneralization | NoSharedVSA |
@@ -226,6 +227,7 @@ configText (StageDStage c)=maybe "unknown" show (SD.configByNameD c)
 
 runStage :: Stage -> FilePath -> FilePath -> Int -> IO ()
 runStage stage taskPath out ms=do
+  DG.resetDiagnostics
   createDirectoryIfMissing True out
   let file=out </> (stageName stage++".json")
       base status detail extra seconds=objectJSON ([("stage",jsonString (stageName stage)),("task_file",jsonString taskPath)
@@ -247,10 +249,12 @@ runStage stage taskPath out ms=do
           start<-getMonotonicTimeNSec
           o<-case stage of FeatureStage->runFeature ms pairs; FeatureV04Stage->runV04 ms pairs; R2Stage->runR2 ms pairs; StageAStage c->runStageA c ms pairs; StageBStage c->runStageB c ms pairs; StageCStage c->runStageC c ms pairs; StageDStage c->runStageD c ms pairs
           end<-getMonotonicTimeNSec
+          diagCost<-DG.diagnosticStats
           let seconds=fromIntegral (end-start)/1e9 :: Double
           writeFile file (base (oStatus o) (oDetail o)
-            ([("task",jsonString (taskId task)),("program",maybe "null" jsonString (oProgram o)),("search_work",show (oWork o))
-             ,("counters",objectJSON [(k,show v) | (k,v)<-M.toAscList (oCounters o)]),("diagnostics",diag)]++oExtra o) seconds)
+            ([("task",jsonString (taskId task)),("program",maybe "null" jsonString (oProgram o)),("search_work",if oStatus o `elem` ["timeout","runtime_error"] then "null" else show (oWork o))
+             ,("counters",if oStatus o `elem` ["timeout","runtime_error"] then "null" else objectJSON [(k,show v) | (k,v)<-M.toAscList (oCounters o)])
+             ,("diagnostics",diag),("diagnostic_overhead",diagCost)]++oExtra o) seconds)
           -- Every outcome (including runtime_error) is a normal exit with the
           -- status in the JSON; only the leak guard uses a non-zero exit code.
           putStrLn (taskId task++" "++stageName stage++" "++oStatus o++" work="++show (oWork o)++" seconds="++show seconds++" "++take 120 (oDetail o))

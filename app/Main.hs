@@ -27,6 +27,7 @@ import qualified ARC.StageBEvaluate as SB
 import qualified ARC.StageCEvaluate as SC
 import qualified ARC.StageDMechanism as SDM
 import qualified ARC.StageDEvaluate as SD
+import qualified ARC.TraceIO as TIO
 import Control.Concurrent (getNumCapabilities)
 import Control.Exception (evaluate)
 import GHC.Clock (getMonotonicTimeNSec)
@@ -60,6 +61,8 @@ usage = unlines
   ,"latis collection-v61-experiment --out results/v061 [--repeats 5] (SafeOnline reuse, misleading/paired tasks, nine ablations)"
   ,"latis collection-v61-battery --out results/v061/battery [--seed-base 2000] [--per-family 20] (seeded metamorphic battery, front-end only)"
   ,"latis arc-train-only-stage --stage feature|feature-v04|r2|stage-a-<Config> --task TRAIN_ONLY.json --out DIR [--timeout-ms N] (one stage, one task; train-only file required)"
+  ,"latis trace-io --task TRAIN_ONLY.json --pair-index K --mode inspect-pair|solve-single-pair --config FullD --out DIR [--trace-level summary|branches|candidates|full] [--timeout-ms N] [--max-events N] [--max-bytes N] [--sample-candidates K] [--posthoc on|off]"
+  ,"latis trace-replay --task TRAIN_ONLY.json --config FullD --requests REQUESTS.json --out RESULT.json (read-only AST execution; no search)"
   ,"latis stage-a-mechanism --out results/stage_a/mechanism [--per-family 3] (Stage A synthetic mechanism tasks x ablation configs + v0.6.1 regression rows)"
   ,"latis stage-a-solve --task PATH --out DIR --config FullA (one task, one Stage A configuration; writes solution.json/derivation_graph.json/trace.txt)"
   ,"latis stage-b-mechanism --out results/stage_b/mechanism [--per-family 3] (Stage B synthetic mechanism tasks x ablation configs + Stage A regression rows)"
@@ -226,6 +229,8 @@ main = do
       writeFile (out </> "derivation_graph.json") (V6.graphJSON (V6.graph f)++"\n")
       writeFile (out </> "trace.txt") (unlines (V6.trace (V6.graph f)++[V6.failure f]))
       putStrLn (taskId task++" "++cfgName++" train="++show (SA.trainExactOf task f)++" held="++show (SA.heldExactOf task f)++" "++V6.failure f)
+    "trace-io":rest -> TIO.runTraceIO (\k d -> option k d rest)
+    "trace-replay":rest -> TIO.runTraceReplay (\k d -> option k d rest)
     "arc-train-only-stage":rest -> do
       stage <- maybe (die "Invalid --stage (feature|feature-v04|r2|stage-a-<Config>|stage-b-<Config>|stage-c-<Config>)") pure (ATO.parseStage (option "--stage" "feature" rest))
       ms <- number "--timeout-ms" 60000 rest

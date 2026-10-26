@@ -38,6 +38,7 @@ import Synthesis.Collection.Relation
 import Synthesis.Collection.Shape
 import Synthesis.Collection.Unified
 import Debug.Trace (traceEvent)
+import qualified Synthesis.Collection.Diagnostics as DG
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import Control.Monad (forM, forM_, when, unless, filterM)
@@ -252,7 +253,7 @@ instance Functor Search where fmap f (Search g)=Search (\s->let (a,s')=g s in (f
 instance Applicative Search where
   pure a=Search (\s->(a,s))
   Search f <*> Search g=Search (\s->let (h,s1)=f s; (a,s2)=g s1 in (h a,s2))
-instance Monad Search where Search g >>= k=Search (\s->let (a,s1)=g s in runSearch (k a) s1)
+instance Monad Search where Search g >>= k=Search (\s->case g s of (a,s1)->runSearch (k a) s1)
 gets :: (St -> a) -> Search a
 gets f=Search (\s->(f s,s))
 modify :: (St -> St) -> Search ()
@@ -379,6 +380,10 @@ frontSearch mode conf examples
     defaultWhy="alignment: no unique common ordering"
     axisOf name=if take 2 (reverse name)=="YA" then AY else AX
     mkProgram ex defs lib=Program enc ex defs lib dep (enumerationSeed conf) sizeRule Nothing (scDiagonalView sc)
+    emit fields=do
+      w<-currentWork
+      Search (\s->DG.diagnostic (sdDiagnostics (stageD conf))
+        ([("partial_work",show w),("compose_depth",show (sdComposeDepth (stageD conf))),("param_depth",show (sdParamDepth (stageD conf)))]++fields) ((),s))
 
     main :: Search (Either String Program)
     main=do
@@ -390,9 +395,15 @@ frontSearch mode conf examples
         inc "c_view_pixels_merged" (sum (map (length . dcPixels) viewChains))
         unless (null viewChains && null viewRejections) $ traceMsg ("diagonal view: "++show (length viewChains)++" chains merged ("++show (sum (map (length . dcPixels) viewChains))++" pixels), "++show (length viewRejections)++" candidate chains rejected"
           ++concat [" ["++drReason r++"]" | r<-take 3 viewRejections])
-      when (scShape sc) shapeAudit
+      when (scShape sc) $ do
+        emit [("scope",DG.jstr "ShapeDecomposition"),("branch_id",DG.jstr "shape"),("event",DG.jstr "entered"),("trigger",DG.jstr "distinct-mask-audit")]
+        shapeAudit
+        emit [("scope",DG.jstr "ShapeDecomposition"),("branch_id",DG.jstr "shape"),("event",DG.jstr "completed"),("exhaustiveness",DG.jstr "Unknown")]
       when (scObjectSizeFeatures sc) (setMetric "c_size_object_features" 1)
+      emit [("scope",DG.jstr "SizeRule"),("branch_id",DG.jstr "size"),("event",DG.jstr "entered"),("trigger",DG.jstr "input-output-size-constraint")]
       sized<-sizeStep
+      emit [("scope",DG.jstr "SizeRule"),("branch_id",DG.jstr "size"),("event",DG.jstr "completed"),("stop_reason",DG.jstr (either (const "NoFitYet") (const "FoundFit") sized)),("exhaustiveness",DG.jstr "Unknown")]
+      groundingTrace
       case sized of
         Left err->pure (Left err)
         Right ()->
@@ -411,6 +422,24 @@ frontSearch mode conf examples
             case r of
               Left err | scRelations sc && scFallbackTrigger sc->relationPath "equal-count path failed" (Just err)
               _->pure r
+
+    -- Single-IO trace (level-gated observation of the scenes the search uses:
+    -- encoder, permutation and diagonal view already applied).
+    traceS :: Int -> [(String,String)] -> Search ()
+    traceS lvl fields=Search (\s->DG.traceAt lvl fields ((),s))
+    objectJ o=DG.jobj [("id",show (O.objectId o)),("color",maybe "null" show (O.color o)),("colors",show (S.toList (O.colors o)))
+      ,("bbox",DG.jarr (map show [cx (O.position o),cy (O.position o),O.width o,O.height o])),("size_sig",DG.jarr [show (O.width o),show (O.height o)])
+      ,("pixel_count",show (O.size o)),("mask_hash",DG.jstr (DG.stableHash (show (maskCells (objMask o)))))]
+    groundingTrace :: Search ()
+    groundingTrace=forM_ (zip3 cases scenes viewed) $ \(c,(a,b),((_,ci,ri),(_,co,ro)))->traceS DG.levelBranches
+      [("scope",DG.jstr "Grounding"),("kind",DG.jstr "scene"),("stage",DG.jstr "grounding"),("branch_id",DG.jstr ("grounding.case"++show c)),("parent_branch_id",DG.jstr "task"),("case_index",show c)
+      ,("encoder",DG.jstr (show enc)),("diagonal_view",DG.jbool (scDiagonalView sc)),("permutation_seed",maybe "null" show (enumerationSeed conf))
+      ,("input_canvas",DG.jarr [show (gridWidth (O.canvas a)),show (gridHeight (O.canvas a))]),("realization_dims",DG.jarr [show (gridWidth (dims !! c)),show (gridHeight (dims !! c))])
+      ,("realization_dims_source",DG.jstr (if isNothing sizeRule then "input canvas (no SizeRule fit or SizeRule off)" else "SizeRule evaluated on the input"))
+      ,("background",show (O.background a)),("input_objects",DG.jarr (map objectJ (O.objects a)))
+      ,("output_objects",DG.jarr (map objectJ (O.objects b))),("output_note",DG.jstr "training target objects: used only by training matching/inverse witnesses")
+      ,("diagonal_chains",DG.jobj [("input_accepted",show (length ci)),("input_rejected",show (length ri)),("output_accepted",show (length co)),("output_rejected",show (length ro))
+         ,("rejection_reasons",DG.jarr [DG.jstr (drReason r) | r<-take 5 (ri++ro)])])]
 
     -- Stage C1 audit: canonical Shape decomposition of every distinct object
     -- mask of the training scenes (input and output sides); counted as work.
@@ -443,6 +472,7 @@ frontSearch mode conf examples
     -- representatives, the selection is by (structural cost, enumeration order).
     relationPath :: String -> Maybe String -> Search (Either String Program)
     relationPath why prior=do
+      emit [("scope",DG.jstr "LegacyRelation"),("branch_id",DG.jstr "legacy"),("event",DG.jstr "entered"),("trigger",DG.jstr why)]
       relationStartWork<-currentWork
       inc "c_relation_triggered" 1
       inc (if isNothing prior then "c_relation_trigger_cardinality" else "c_relation_trigger_fallback") 1
@@ -454,11 +484,19 @@ frontSearch mode conf examples
           res=searchTransforms (scRelationBudget sc) (scRelationMaxFits sc) cands searchCases
           failWith msg=case prior of Just e->Left (e++"; relation search: "++msg); Nothing->Left ("relation: "++msg)
           summary=show (srTried res)++"/"++show (srCandidates res)++" candidates, "++show (srExecutions res)++" case executions"++(if srTruncated res then ", budget truncated" else "")
+      traceS DG.levelBranches [("scope",DG.jstr "LegacyRelation"),("kind",DG.jstr "grammar"),("stage",DG.jstr "legacy_relation"),("branch_id",DG.jstr "legacy"),("parent_branch_id",DG.jstr "task"),("trigger",DG.jstr why)
+        ,("grammar",DG.jobj [("colors",show colors),("shape",DG.jbool (scShape sc)),("diagonal",DG.jbool (scDiagonalView sc)),("gaps",show (scGaps sc)),("counts",show (scCounts sc))])
+        ,("budget",DG.jobj [("name",DG.jstr "scRelationMaxCandidates"),("limit",show (scRelationMaxCandidates sc)),("used",show (length cands)),("unit",DG.jstr "enumerated candidates (cost-sorted prefix)")])
+        ,("case_budget",DG.jobj [("name",DG.jstr "scRelationBudget"),("limit",show (scRelationBudget sc)),("unit",DG.jstr "case executions")])
+        ,("case_output_dims",DG.jarr [DG.jarr [show (gridWidth (dims !! c)),show (gridHeight (dims !! c))] | c<-cases])]
       inc "c_relation_candidates" (srCandidates res)
       inc "c_relation_tried" (srTried res)
       inc "c_relation_executions" (srExecutions res)
       inc "operator_applications" (srExecutions res)
       when (srTruncated res) (inc "c_relation_truncated" 1)
+      emit [("scope",DG.jstr "LegacyRelation"),("branch_id",DG.jstr "legacy"),("event",DG.jstr "completed"),("attempted",show (srTried res)),("evaluated",show (srExecutions res)),("param_fit_count",show (length (srFits res)))
+        ,("budget_kind",DG.jstr "relation-cases-or-representatives"),("budget_limit",show (scRelationBudget sc)),("budget_used",show (srExecutions res)),("hit",if srTruncated res then "true" else "false")
+        ,("stop_reason",DG.jstr (if srTruncated res then "BudgetCut" else if null (srFits res) then "NoFitYet" else "FoundFit")),("exhaustiveness",DG.jstr (if srTruncated res then "ProvenNotExhausted" else "Unknown")),("exhaustiveness_evidence",DG.jstr "enumerateTransforms caps grammar before searchTransforms; no full universe certificate")]
       traceMsg ("relation search: "++summary++", "++show (length (srFits res))++" training-exact transformations")
       case srFits res of
         []->if sdEnabled (stageD conf) then unifiedPath prior else pure (failWith ("no executable object transformation fits ("++summary++")"))
@@ -530,6 +568,21 @@ frontSearch mode conf examples
         inc "operator_applications" (trEvaluations w+trEvaluations h)
         inc "size_rule_candidates" (length (trFits w)+length (trFits h))
         inc "size_rule_truncations" (length [() | trTruncated w]+length [() | trTruncated h])
+        forM_ [("width",w),("height",h)] $ \(axis,r)->emit
+          [("scope",DG.jstr "SizeRule"),("branch_id",DG.jstr ("size."++axis)),("parent_id",DG.jstr "size"),("goal_type",DG.jstr "NatPos"),("event",DG.jstr "completed")
+          ,("attempted",show (trTemplatesTried r)),("evaluated",show (trEvaluations r)),("param_fit_count",show (length (trFits r)))
+          ,("param_depth",show (saHoleDepth sa)),("max_fit_depth",show (maximum (0:map (tDepth . cExpr) (trFits r))))
+          ,("budget_kind",DG.jstr "size-row-probes-per-axis-per-round"),("budget_limit",show (saHoleBudget sa)),("budget_used",show (trEvaluations r)),("hit",if trTruncated r then "true" else "false")
+          ,("stop_reason",DG.jstr (if trTruncated r then "BudgetCut" else if null (trFits r) then "NoFitYet" else "FoundFit")),("exhaustiveness",DG.jstr "Unknown")]
+        forM_ [("width",w,fst (ssObjectRound stats),ows),("height",h,snd (ssObjectRound stats),ohs)] $ \(axis,r,second,targets)->traceS DG.levelBranches
+          [("scope",DG.jstr "SizeRule"),("kind",DG.jstr "representatives"),("stage",DG.jstr "size_rule"),("branch_id",DG.jstr ("size."++axis)),("parent_branch_id",DG.jstr "size")
+          ,("input_features",DG.jstr "GridWidth/GridHeight/object counts of the INPUT; output size is a training target only"),("training_targets",show targets)
+          ,("object_leaf_round",DG.jobj [("enabled",DG.jbool (scObjectSizeFeatures sc)),("triggered",DG.jbool second)
+             ,("why",DG.jstr (if not (scObjectSizeFeatures sc) then "object size leaves disabled in this configuration" else if second then "base grid leaves had no training-exact fit on this axis" else "base grid leaves already fit; demand-driven second round not opened"))])
+          ,("templates_tried",show (trTemplatesTried r)),("evaluations",show (trEvaluations r)),("truncated",DG.jbool (trTruncated r))
+          ,("representatives",DG.jarr [DG.jobj [("expr",exprJSON (\l->[("leaf",DG.jstr (gridFeatureName l))]) (cExpr cand)),("text",DG.jstr (renderT gridFeatureName (cExpr cand))),("cost",show (cCost cand))
+              ,("bindings",DG.jarr (map (DG.jstr . bindingText) (cBindings cand))),("denotation",DG.jarr [case v of VI n->show n; VB b->DG.jbool b | v<-cDenotation cand])
+              ,("case_relative_class",DG.jstr (DG.stableHash (show (cDenotation cand))))] | cand<-trFits r])]
         traceMsg ("size rule ("++(if ssFixedGrammar stats then "fixed templates" else "typed holes")++"): width "++show (length (trFits w))++" representatives, height "++show (length (trFits h))++" representatives, "++show (trEvaluations w+trEvaluations h)++" evaluations")
         case res of
           Left err->do traceMsg ("size: "++err); pure (Left ("size: "++err))
@@ -597,6 +650,7 @@ frontSearch mode conf examples
           budgeted=take (max 0 (alignmentBudget conf-used)) pairs
       inc "alignment_key_candidates" (length budgeted)
       when (length budgeted<length pairs) (traceMsg "alignment budget exhausted")
+      emit [("scope",DG.jstr "Alignment"),("branch_id",DG.jstr name),("event",DG.jstr "candidate-prefix"),("attempted",show (length budgeted)),("remaining_frontier_count",show (length pairs-length budgeted)),("frontier_nonempty",if length pairs>length budgeted then "true" else "false"),("budget_limit",show (alignmentBudget conf)),("budget_used",show (used+length budgeted)),("hit",if length pairs>length budgeted then "true" else "false"),("stop_reason",DG.jstr (if length pairs>length budgeted then "BudgetCut" else "NoFitYet")),("exhaustiveness",DG.jstr "Unknown")]
       loop (nub (legalIn++legalOut)) budgeted defaultWhy
     legalKey :: String -> [KeyExpr] -> Origin -> KeyExpr -> Search Bool
     legalKey name keys origin key=do
@@ -621,7 +675,10 @@ frontSearch mode conf examples
       setMetric "alignment_candidates_remaining" (length rest)
       aligned<-alignAttempt kIn kOut (length rest)
       case aligned of
-        Left err->do inc "alignment_rejections" 1; loop keys rest ("alignment: "++err)
+        Left err->do
+          emit [("scope",DG.jstr "Alignment"),("branch_id",DG.jstr (DG.stableHash (show (kIn,kOut)))),("parent_id",DG.jstr "alignment"),("stop_reason",DG.jstr "InvalidPrecondition"),("reason",DG.jstr err)]
+          inc "alignment_rejections" 1
+          loop keys rest ("alignment: "++err)
         Right (ws,resultIds)->do
           onGraph (\g->g {alignmentEvidence=alignmentEvidence g++[ws]})
           inc "alignment_witnesses" (length ws)
@@ -756,6 +813,7 @@ frontSearch mode conf examples
                   mism=length [() | (Right g,(_,y))<-zip rs examples, g/=y]
               inc "realization_render_errors" (length errs)
               inc "realization_mismatches" mism
+              emit [("scope",DG.jstr "Render"),("branch_id",DG.jstr (DG.stableHash (show expr))),("parent_id",DG.jstr "alignment"),("render_attempts",show (length rs)),("render_mismatches",show mism),("invalid_domain",show (length errs)),("stop_reason",DG.jstr (if exact m lib then "FoundFit" else "NoFitYet"))]
               when (null errs) (inc "grid_realization_ok" 1)
               pure (if exact m lib then Right m else Left (case errs of
                 (e:_)->"realization: output realization failed: "++e
@@ -954,6 +1012,7 @@ frontSearch mode conf examples
         inc "typed_hole_feature_fits" (trFeatureOnlyFits tr)
         when (trTruncated tr) (inc "typed_hole_truncations" 1)
         traceMsg (name++": typed holes: "++show (trTemplatesTried tr)++"/"++show (trTemplates tr)++" templates, "++show (trEvaluations tr)++" evaluations, "++show (length typedFits)++" fits"++(if trTruncated tr then " (budget truncated)" else ""))
+        emit [("scope",DG.jstr "TypedParameter"),("branch_id",DG.jstr (DG.stableHash (name++show (trTemplatesTried tr)))),("parent_id",DG.jstr "alignment"),("goal_type",DG.jstr name),("attempted",show (trTemplatesTried tr)),("evaluated",show (trEvaluations tr)),("param_fit_count",show (length typedFits)),("budget_limit",show (hcBudget hc)),("budget_used",show (trEvaluations tr)),("hit",if trTruncated tr then "true" else "false"),("stop_reason",DG.jstr (if trTruncated tr then "BudgetCut" else if null typedFits then "NoFitYet" else "FoundFit")),("exhaustiveness",DG.jstr "Unknown")]
         if null fits then pure (Left ("feature transformation: no uniform "++name++" expression after typed hole search ("++show (trTemplatesTried tr)++" templates)")) else do
           let (cls,evals)=buildClass pol lib name slotAxis rows' cfs fits
           recordClass cls evals

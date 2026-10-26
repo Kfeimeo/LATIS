@@ -79,7 +79,9 @@ data SizeRule = SizeRule
   { srWidth, srHeight :: TExpr GFeat
   , srWidthReps, srHeightReps :: [Candidate GFeat]   -- every training-exact representative, selected first
   , srWitness :: [String] } deriving (Eq,Show)
-data SizeStats = SizeStats { ssWidth, ssHeight :: TypedResult GFeat, ssFixedGrammar :: Bool } deriving (Eq,Show)
+-- ssObjectRound: whether the demand-driven object-leaf round ran per axis
+-- (width,height); recorded for the single-IO trace only.
+data SizeStats = SizeStats { ssWidth, ssHeight :: TypedResult GFeat, ssFixedGrammar :: Bool, ssObjectRound :: (Bool,Bool) } deriving (Eq,Show)
 sizeIdentity :: SizeRule
 sizeIdentity=SizeRule (TLeaf GWidth) (TLeaf GHeight) [] [] ["identity: unchanged canvas"]
 sizeRuleText :: SizeRule -> String
@@ -108,12 +110,14 @@ synthesizeSize sa objectFeatures dep pairs=
       extend r0 r1=r1 {trTemplates=trTemplates r0+trTemplates r1, trTemplatesTried=trTemplatesTried r0+trTemplatesTried r1, trEvaluations=trEvaluations r0+trEvaluations r1}
       withObjects own side r0 | objectFeatures && null (trFits r0) = extend r0 (synthesizeTyped hc gridFeatureName (templatesObj own) (rowsFor side))
                               | otherwise = r0
-      w=withObjects GWidth gridWidth (synthesizeTyped hc gridFeatureName (templates GWidth) (rowsFor gridWidth))
-      h=withObjects GHeight gridHeight (synthesizeTyped hc gridFeatureName (templates GHeight) (rowsFor gridHeight))
+      w0=synthesizeTyped hc gridFeatureName (templates GWidth) (rowsFor gridWidth)
+      h0=synthesizeTyped hc gridFeatureName (templates GHeight) (rowsFor gridHeight)
+      w=withObjects GWidth gridWidth w0
+      h=withObjects GHeight gridHeight h0
       pick r=case trFits r of
         []->Nothing
         cs->Just (minimumOn (\c->(cCost c,cIndex c)) cs)
-      stats=SizeStats w h (not (saTypedHoles sa))
+      stats=SizeStats w h (not (saTypedHoles sa)) (objectFeatures && null (trFits w0),objectFeatures && null (trFits h0))
       witness axis r c=axis++" = "++renderT gridFeatureName (cExpr c)++" ("++show (length (trFits r))++" representatives, "++show (trEvaluations r)++" evaluations"
         ++(if trTruncated r then ", budget truncated" else "")++"); bindings: "++unwords (map bindingText (cBindings c))
   in case (pick w,pick h) of

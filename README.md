@@ -265,3 +265,19 @@ python scripts/report_collection.py
 生成可离线打开的 HTML：输入、标准输出、原 Base 内核重放的预测、像素差异、可折叠 typed AST 和 portfolio 统计。用 `--results results/v03r2` 批量展示 Full，`--mode all` 包含消融，`--runghc` 指定 GHC 路径，`--no-predict` 只看保存数据。完整用法见 [可视化说明](docs/LATIS_VISUALIZER.md)。已生成的批量页面为 `docs/latis-explorer.html`。
 
 页面还包含用户程序积木工作台：Base/TSL 工具箱、拖放或点击插槽、常量滑块、lambda/let 作用域、即时类型检查、撤销/重做和 JSON 导入导出。类型完整的 `Scene → Scene` 程序可导出并用上述脚本重放；inventions 导出时展开回 Base。
+
+## 单 IO 搜索诊断器（Single-IO Search Trace & Visual Debugger）
+
+在 Stage D+ 求解器上观测单个训练 IO 的真实搜索：输入编码、各层真实事件、候选 AST、逐 case 执行与渲染、阻断原因、预算截断，并生成可离线打开的交互页面。不改变搜索；`inspect-pair` 用全部训练对求解（`train_exact`），`solve-single-pair` 只用一对（`pair_exact`，事后只读验证单独报告）。
+
+```powershell
+./scripts/run_trace_io.ps1 -BuildOnly
+python -I scripts/trace_io.py run --task results/stage_d_plus/dplus-20261026-v2/train_only/5168d44c.json --pair-index 0 --mode inspect-pair --config FullD --out results/trace_io/examples/5168d44c/inspect
+python -I scripts/trace_io.py run --task results/stage_d_plus/dplus-20261026-v2/train_only/ac0a08a4.json --pair-index 0 --mode solve-single-pair --config FullD --out results/trace_io/examples/ac0a08a4/single
+python -I scripts/trace_io.py render --record results/trace_io/examples/5168d44c/inspect/trace.json --out results/trace_io/examples/5168d44c/inspect/index.html
+python -I scripts/trace_io.py compare --left results/trace_io/examples/ac0a08a4/inspect/trace.json --right results/trace_io/validation/joint_forward/ac0a08a4-Combined3_4x/trace.json --out results/trace_io/validation/compare_ac0a08a4
+python -I scripts/trace_io.py replay --record results/trace_io/examples/5168d44c/inspect/trace.json --candidate f7de6c42bf9d5166
+python -I test/TraceIOValidation.py
+```
+
+说明见 [docs/LATIS_SINGLE_IO_DEBUGGER.md](docs/LATIS_SINGLE_IO_DEBUGGER.md)，开工审计见 [docs/LATIS_SINGLE_IO_DEBUGGER_AUDIT.md](docs/LATIS_SINGLE_IO_DEBUGGER_AUDIT.md)，实测与回归见 [docs/LATIS_SINGLE_IO_DEBUGGER_REPORT.md](docs/LATIS_SINGLE_IO_DEBUGGER_REPORT.md)。样例在 `results/trace_io/examples/<task>/{inspect,single}/index.html`，验证证据在 `results/trace_io/validation/`。
