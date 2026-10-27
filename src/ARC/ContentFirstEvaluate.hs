@@ -5,8 +5,11 @@
 module ARC.ContentFirstEvaluate
   ( frozenD, contentFirstOnly, contentFirstExplore, namedConfigsCF, configByNameCF, configNamesCF
   , contentFirstJSON, finalClassification, programSceneCF, programSpecsCF, planFromProgram, crossCaseOf
-  , configNamesE01, namedConfigsE01
+  , configNamesE01, namedConfigsE01, namedConfigsE23, configNamesE23, regionJSONOf
   ) where
+import Synthesis.Collection.Region.Search (regionSearchJSON)
+import Synthesis.Collection.Region.Program (programJSON, runRegionProgram, regionExecJSON, RegionExec(..))
+import Synthesis.Collection.Region.Partition (defaultPartitionBudget)
 import Synthesis.Collection.Geometry.Features (CaseBinding(..), CrossCaseWitness, crossCaseWitness, crossCaseJSON, GeometryWitness(..), RegionProvenance(..))
 import Synthesis.Collection.Geometry.Cover (BoundsE(..), Rect(..))
 import Synthesis.Collection.Front
@@ -57,6 +60,23 @@ programSpecsCF pairs p=case progContentFirst p of
 
 namedConfigsE01 :: [(String,Config)]
 namedConfigsE01=[(n,c) | n<-["FrozenCF","BackgroundViewsOnly","GeometryFeaturesOnly","FullE01"], Just c<-[configByNameD n]]
+namedConfigsE23 :: [(String,Config)]
+namedConfigsE23=[(n,c) | n<-["FrozenE01","E2Only","RegionPriority","BreadthScheduler","RegionBreadth","FullE3","FullE3_NoMDL","FullE3_NoSafePrune"], Just c<-[configByNameD n]]
+configNamesE23 :: [String]
+configNamesE23=map fst namedConfigsE23
+
+-- Region-search evidence of one run: the search record and, for a region
+-- program, its per-pair execution (read/write regions, output dims, exact).
+regionJSONOf :: [(Grid,Grid)] -> Graph -> Maybe Program -> String
+regionJSONOf pairs g p=jobj
+  [("run",jmaybe regionSearchJSON (regionRun g))
+  ,("selected_program",jmaybe programJSON (p >>= progRegion))
+  ,("executions",case p >>= progRegion of
+      Nothing->"[]"
+      Just rp->jarr [either (\e->jobj [("pair_index",show i),("error",jstr e)]) (\r->jobj [("pair_index",show i),("exec",regionExecJSON r),("exact",jbool (reOutputEq r y))]) (runRegionProgram defaultPartitionBudget rp x) | (i,(x,y))<-zip [0::Int ..] pairs])]
+  where reOutputEq r y=reOutputOf r==y
+        reOutputOf=Synthesis.Collection.Region.Program.reOutput
+
 configNamesE01 :: [String]
 configNamesE01=map fst namedConfigsE01
 

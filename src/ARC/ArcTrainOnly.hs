@@ -176,7 +176,7 @@ runConfigured conf stageB stageC ms pairs=settle <$> timed ms (do
                       ,("object_transform",maybe "null" (jsonString . F.transformText) (F.program f >>= F.progTransform))
                       ,("object_count_exact",boolJSON (m "c_object_count_exact">0)),("object_transform_exact",boolJSON (m "c_object_transform_exact">0))] else [])
     ++[("stage_d",SD.stageDMetricsJSON g),("parameter_goals",SD.goalsJSON g),("execution_witnesses",SD.witnessesJSON pairs (F.program f))
-       ,("content_first",CFE.contentFirstJSON pairs g (F.program f))]++mem})
+       ,("content_first",CFE.contentFirstJSON pairs g (F.program f)),("region_search",CFE.regionJSONOf pairs g (F.program f))]++mem})
 runV04 :: Int -> [(Grid,Grid)] -> IO Outcome
 runV04 ms pairs=settle <$> timed ms (do
   let f=V4.frontSearch V4.Full v04Config pairs

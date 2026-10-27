@@ -25,6 +25,7 @@ library
     Synthesis.Collection.Unified Synthesis.Collection.Diagnostics ARC.StageDEvaluate ARC.StageDMechanism
     Synthesis.Collection.ContentFirst ARC.ContentFirstEvaluate ARC.ContentFirstMechanism
     Synthesis.Collection.Geometry.Cover Synthesis.Collection.Geometry.View Synthesis.Collection.Geometry.Features ARC.GeometryMechanism
+    Synthesis.Collection.Region.ShapeMDL Synthesis.Collection.Region.Scene Synthesis.Collection.Region.Partition Synthesis.Collection.Region.Program Synthesis.Collection.Region.Search ARC.RegionMechanism
     ARC.TraceIO
     Synthesis.Triggered.Parallel
     ARC.TriggeredEvaluate ARC.TriggeredStress
@@ -69,6 +70,14 @@ test-suite latis-tests
   type: exitcode-stdio-1.0
   hs-source-dirs: test
   main-is: Main.hs
+  build-depends: base, latis, containers, directory
+  default-language: GHC2021
+  ghc-options: -Wall -O1
+
+test-suite region-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: RegionMain.hs
   build-depends: base, latis, containers, directory
   default-language: GHC2021
   ghc-options: -Wall -O1

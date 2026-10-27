@@ -186,7 +186,7 @@ runTraceIO opt=do
       record=jobj (meta++
         [("status",jstr status),("result_label",jstr status),("exact_scope",jstr (if single then "pair_exact: the single selected training pair only" else "train_exact: every training pair"))
         ,("detail",jstr detail),("wall_clock_seconds",show seconds)
-        ,("program",jmaybe (jstr . show) program),("program_kind",jstr (case program of Nothing->"none"; Just p->if isJust (F.progContentFirst p) then "content_first_output_spec" else if isJust (F.progTransform p) then "object_transform" else "ordered_sequence_body"))
+        ,("program",jmaybe (jstr . show) program),("program_kind",jstr (case program of Nothing->"none"; Just p->if isJust (F.progRegion p) then "region_program" else if isJust (F.progContentFirst p) then "content_first_output_spec" else if isJust (F.progTransform p) then "object_transform" else "ordered_sequence_body"))
         ,("content_first_plan",jmaybe planJSON (program >>= F.progContentFirst))
         ,("program_transform_ast",transformAst),("program_transform_id",maybe "null" (jstr . DG.stableHash . show) (program >>= F.progTransform))
         ,("search_work",if isJust front then show (m "search_work") else "null")
@@ -199,8 +199,9 @@ runTraceIO opt=do
             ,("stage_b",SB.stageBMetricsJSON gr),("stage_c",SC.stageCMetricsJSON gr),("relations",SC.relationsJSON gr),("shapes",SC.shapesJSON gr)
             ,("stage_d",SD.stageDMetricsJSON gr),("parameter_goals",SD.goalsJSON gr)
             ,("content_first",CFE.contentFirstJSON searchPairs gr program)
+            ,("region_search",CFE.regionJSONOf searchPairs gr program)
             ,("trace_lines",jarr (map jstr (F.trace gr)))]
-          _->[("failure_stage","null"),("size_rule","null"),("stage_d","null"),("parameter_goals","[]"),("content_first","null"),("trace_lines","[]")])
+          _->[("failure_stage","null"),("size_rule","null"),("stage_d","null"),("parameter_goals","[]"),("content_first","null"),("region_search","null"),("trace_lines","[]")])
   writeFile (out </> "solver_record.json") (record++"\n")
   -- Grids and encodings; Predicted only where the selected program executed.
   gridsOut<-forM (zip [0::Int ..] pairs) $ \(j,(x,y))->do

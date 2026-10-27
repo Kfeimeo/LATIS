@@ -231,8 +231,9 @@ if (typeof document !== 'undefined') (function () {
         var inHi = hi && x >= hi[0] && x < hi[0] + hi[2] && y >= hi[1] && y < hi[1] + hi[3];
         var v = g[y][x];
         var rectIdx = -1; rects.forEach(function (r, i) { if (x >= r[0] && x < r[0] + r[2] && y >= r[1] && y < r[1] + r[3]) rectIdx = i; });
-        var cls = 'c' + (diff[x + ',' + y] ? ' diff' : '') + (inHi ? ' hi' : '') + (rectIdx >= 0 ? ' rect rect' + (rectIdx % 6) : '') + (res[x + ',' + y] ? ' residual' : '');
-        add(el, h('div', { class: cls, title: '(' + x + ',' + y + ') = ' + v + (rectIdx >= 0 ? ' · rect #' + rectIdx : '') + (res[x + ',' + y] ? ' · residual' : ''), style: 'background:' + (LATIS.ARC[v] || '#fff') }));
+        var regionLabel = opts.regionOf ? opts.regionOf(x, y) : '';
+        var cls = 'c' + (diff[x + ',' + y] ? ' diff' : '') + (inHi ? ' hi' : '') + (rectIdx >= 0 ? ' rect rect' + (rectIdx % 6) : '') + (res[x + ',' + y] ? ' residual' : '') + (regionLabel ? (regionLabel === 'S' ? ' region-sep' : ' region-content') : '');
+        add(el, h('div', { class: cls, title: '(' + x + ',' + y + ') = ' + v + (rectIdx >= 0 ? ' · rect #' + rectIdx : '') + (res[x + ',' + y] ? ' · residual' : '') + (regionLabel ? ' · region ' + regionLabel : ''), style: 'background:' + (LATIS.ARC[v] || '#fff') }, regionLabel ? h('span', { class: 'rl', text: regionLabel }) : null));
       }
     }
     return el;
@@ -247,7 +248,7 @@ if (typeof document !== 'undefined') (function () {
   function candById(cid) { return cands().filter(function (c) { return c.candidate_id === cid; })[0]; }
   function summary() { return D.trace.summary; }
 
-  var TABS = [['overview', '概览'], ['grid', '网格/对象'], ['pipeline', '搜索流程'], ['candidates', '候选浏览'], ['params', '参数目标'], ['derivation', '推导/Witness'], ['events', '原始事件']];
+  var TABS = [['overview', '概览'], ['grid', '网格/对象'], ['pipeline', '搜索流程'], ['candidates', '候选浏览'], ['params', '参数目标'], ['derivation', '推导/Witness'], ['region', 'Scene/Region'], ['events', '原始事件']];
   function render() {
     var nav = document.getElementById('tabs'); nav.innerHTML = '';
     TABS.forEach(function (t) { add(nav, h('button', { class: state.tab === t[0] ? 'on' : '', text: t[1], onclick: function () { state.tab = t[0]; render(); } })); });
@@ -255,7 +256,7 @@ if (typeof document !== 'undefined') (function () {
     V.errors.forEach(function (e) { add(main, h('div', { class: 'banner bad', text: '数据错误：' + e })); });
     V.warnings.forEach(function (e) { add(main, h('div', { class: 'banner warn', text: e })); });
     if (V.errors.length) return;
-    var fn = { overview: viewOverview, grid: viewGrid, pipeline: viewPipeline, candidates: viewCandidates, params: viewParams, derivation: viewDerivation, events: viewEvents }[state.tab];
+    var fn = { overview: viewOverview, grid: viewGrid, pipeline: viewPipeline, candidates: viewCandidates, params: viewParams, derivation: viewDerivation, region: viewRegion, events: viewEvents }[state.tab];
     add(main, fn());
   }
 
@@ -451,6 +452,14 @@ if (typeof document !== 'undefined') (function () {
   }
   function astTree(ast) {
     if (!ast) return h('div', { class: 'muted', text: 'AST 未记录' });
+    if (ast.kind === 'RegionProgram') {
+      return h('div', { class: 'ast' }, h('ul', null,
+        h('li', null, h('b', { text: 'RegionProgram' }), ' ' + (ast.text || '')),
+        h('li', null, h('b', { text: 'View: ' + (ast.view && ast.view.view) })),
+        h('li', null, h('b', { text: 'Region <- ' + ast.selector }), h('span', { class: 'muted', text: '  输入侧唯一选择（平局/空失败）' })),
+        h('li', null, h('b', { text: 'Action: ' + ast.action }), h('span', { class: 'muted', text: '  effect ' + ast.effect }))),
+        h('div', { class: 'muted', text: 'cost ' + ast.cost + ' · program id ' + ast.program_id }));
+    }
     if (ast.kind === 'ContentFirst') {
       var sel = ast.selection || {};
       return h('div', { class: 'ast' }, h('ul', null,
@@ -530,6 +539,43 @@ if (typeof document !== 'undefined') (function () {
   }
 
   // ---- derivation / witness graph
+  // ---- Stage E2/E3: scene hypotheses, partition trees, goal ledger, exposures, dependency witnesses
+  function regionInfo() { var r = D.record && D.record.region_search; return (r && typeof r === 'object' && r.run) ? r : null; }
+  function viewRegion() {
+    var r = regionInfo(), out = [];
+    if (!r) return [card('Scene / Region', h('div', { class: 'muted', text: 'Region 搜索未进入（配置关闭，或 Size-first / Content-first 已解）。' }))];
+    var run = r.run;
+    out.push(card('Region 搜索摘要', kv([['合法 Scene 视图', run.views.map(function (v) { return v.view + (v.scene_cost != null ? '（scene cost ' + v.scene_cost + '）' : ''); }).join('；') || '无'],
+      ['被拒绝的视图', run.rejected_views.map(function (v) { return v.view + '：' + v.reason; }).join('；') || '无'],
+      ['程序宇宙 / 已执行 / 已剪枝 / fit', run.universe + ' / ' + run.executed + ' / ' + run.pruned + ' / ' + (run.fits || []).length], ['预算截断', String(run.budget_cut)],
+      ['首个 fit 的曝光序号', run.first_fit_exposure == null ? '无' : run.first_fit_exposure], ['各视图首次曝光序号', JSON.stringify(run.first_view_exposure)],
+      ['选中程序', r.selected_program ? r.selected_program.text + '（effect ' + r.selected_program.effect + '）' : '无']])));
+    (run.trees || []).forEach(function (t, i) {
+      var tr = t.tree, sc = tr.scene;
+      var nodes = tr.nodes.slice().sort(function (a, b) { return a.region_id - b.region_id; });
+      var pair = pairs().filter(function (q) { return q.case_index === t.case_index; })[0];
+      var gridEl = null;
+      if (pair) {
+        var cellsRegion = {};
+        nodes.forEach(function (n) { if (n.depth === 1 && !n.pixels_truncated) n.pixels.forEach(function (p) { cellsRegion[p[0] + ',' + p[1]] = n; }); });
+        gridEl = h('div', { class: 'row' }, gpanel('Input（深度 1 分区：S = Separator，C<id> = Content）', pair.input, { regionOf: function (x, y) { var n = cellsRegion[x + ',' + y]; return n ? (n.role === 'RoleSeparator' ? 'S' : 'C' + n.region_id) : ''; } }));
+      }
+      out.push(card('Scene / Region Tree · case ' + t.case_index + ' · ' + t.view, h('details', { open: i === 0 ? 'open' : null }, h('summary', null, 'Scene：' + sc.objects + ' objects，residual ' + sc.residual_cells + ' cells，background ' + JSON.stringify(sc.background) + '，reconstructed ' + sc.reconstructed + '，cost ' + sc.cost.total + '；tree expansions ' + tr.expansions + '，splits tried/legal ' + tr.splits_tried + '/' + tr.splits_legal + '，k histogram ' + JSON.stringify(tr.k_histogram) + '，deferred ' + JSON.stringify(tr.deferred) + '，truncated ' + tr.truncated + '，verified ' + tr.verified),
+        gridEl,
+        h('div', { class: 'scroll' }, table(['region', 'parent', 'depth', 'role', 'area', 'bounds', 'split object', 'children', 'leaf', 'objects'], nodes.map(function (n) { return [n.region_id, n.parent_id == null ? '—' : n.parent_id, n.depth, n.role, n.area, n.bounds ? [n.bounds.x_min, n.bounds.y_min, n.bounds.x_max, n.bounds.y_max].join(',') : 'EmptyBounds', n.split_object_id == null ? '—' : n.split_object_id, JSON.stringify(n.children), n.leaf || '', JSON.stringify(n.objects)]; }))),
+        h('h3', { text: '邻接（像素接触）与 SeparatedBy' }), table(['a', 'b', 'contacts', 'separated by'], (tr.adjacency || []).map(function (a) { return [a.a, a.b, a.contacts, a.separated_by == null ? '—' : a.separated_by]; })),
+        h('h3', { text: 'Scene 对象（Shape MDL：c_ast 与 c_rect 分别列出）' }), h('div', { class: 'scroll' }, table(['id', 'pixels', 'bounds', 'colours', 'shape expr', 'c_ast', 'status', 'c_rect'], (sc.object_list || []).map(function (o) { return [o.id, o.pixels, o.bounds ? [o.bounds.x_min, o.bounds.y_min, o.bounds.x_max, o.bounds.y_max].join(',') : '', o.colours, o.shape ? o.shape.text : '—', o.shape ? o.shape.c_ast : '—', o.shape ? o.shape.status : '—', o.shape ? o.shape.c_rect : '—']; }))))));
+    });
+    out.push(card('Goal 账本（分层公平调度：allocated / used / cursor / deferred / resumed）', h('div', { class: 'scroll' }, table(['goal', 'view', 'layer', 'total', 'cursor', 'used', 'allocated', 'deferred', 'resumed', 'status', 'fits'], (run.goals || []).map(function (g) { return [g.goal_id, g.view, g.layer, g.total, g.cursor, g.used, g.allocated, g.deferred, g.resumed, chip(g.status), g.fits]; })))));
+    out.push(card('曝光序列（执行顺序）', h('div', { class: 'scroll' }, table(['#', 'view', 'layer', 'cost', 'program', 'outcome', 'reason', 'region area'], (run.exposures || []).slice(0, 600).map(function (e) { return [e.index, e.view, e.layer, e.cost, e.program, chip(e.outcome, e.outcome === 'fit' ? 'ok' : ''), e.reason, e.region_area == null ? '—' : e.region_area]; }))), run.exposures && run.exposures.length > 600 ? h('div', { class: 'muted', text: '仅显示前 600 条；完整列表见 solver_record.json' }) : null));
+    out.push(card('DependencyWitness（安全剪枝证明）', (run.dependency_witnesses || []).map(function (d) {
+      return h('details', null, h('summary', null, d.skeleton + ' · dims preserved ' + d.dims_preserved + ' · pruned ' + d.pruned_count + ' · executed ' + d.kept_executed),
+        h('div', { class: 'muted', text: d.scope + '；' + d.note }),
+        table(['case', 'view', '变化的深度 1 区域（-1 = 根的其余像素）'], (d.changed_regions || []).map(function (c) { return [c.case_index, c.view, JSON.stringify(c.regions)]; })),
+        h('div', { class: 'scroll' }, table(['pruned program', 'reason', 'evidence'], (d.pruned || []).slice(0, 200).map(function (x) { return [x.program, x.reason, x.evidence]; }))));
+    })));
+    return out;
+  }
   function viewDerivation() {
     var w = (D.witnesses || {}).execution_witnesses, out = [];
     out.push(card('选中程序', kv([['程序结构 ID', summary().program_transform_id], ['类型', summary().program_kind]]), D.record.program_transform_ast ? astTree(D.record.program_transform_ast) : h('pre', { text: (D.record.program || '无程序').slice(0, 3000) })));

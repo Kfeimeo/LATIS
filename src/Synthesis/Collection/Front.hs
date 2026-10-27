@@ -21,6 +21,7 @@ module Synthesis.Collection.Front
   , StageC(..), stageCOff, RelationRecord(..), ShapeRecord(..), ObjectTransform, transformText
   , StageD(..), stageDOff, stageDFull
   , ContentFirst(..), contentFirstOff, contentFirstOn, ContentFirstPlan(..), CFRun(..)
+  , RegionConfig(..), regionConfigOff, regionConfigOn, RegionProgram(..), RegionSearch(..)
   ) where
 
 import Latent.Grid
@@ -40,6 +41,9 @@ import Synthesis.Collection.Shape
 import Synthesis.Collection.Unified
 import Synthesis.Collection.ContentFirst
 import Synthesis.Collection.Geometry.Features (GeometryWitness(..))
+import Synthesis.Collection.Region.Program (RegionProgram(..), runRegionProgram, RegionExec(..), programText, programCost)
+import Synthesis.Collection.Region.Search
+import Synthesis.Collection.Region.Partition (defaultPartitionBudget)
 import Debug.Trace (traceEvent)
 import qualified Synthesis.Collection.Diagnostics as DG
 import qualified Data.Map.Strict as M
@@ -79,7 +83,9 @@ data Graph = Graph
   , deferred :: [Deferred], referents :: [RefSummary]
   , relations :: [RelationRecord], shapes :: [ShapeRecord], dGoals :: [GoalAudit]
   -- Content-first runs (solution run and/or recorded alternatives); empty when the path never opened.
-  , contentFirstRuns :: [CFRun] } deriving (Eq,Show)
+  , contentFirstRuns :: [CFRun]
+  -- Stage E2/E3 region search (at most one run per task); Nothing when the path never opened.
+  , regionRun :: Maybe RegionSearch } deriving (Eq,Show)
 -- Stage C audit records: every training-exact object transformation (the
 -- selected one carries the relation witnesses) and the canonical Shape
 -- decomposition of every distinct object mask of the training scenes.
@@ -98,9 +104,9 @@ data Front = Front { program :: Maybe Program, graph :: Graph, failure :: String
 -- default; with it off the Size-first behaviour is exactly Stage D.
 data Config = Config { alignmentBudget :: Int, scalarBudget :: Int, synthesisDepth :: Int, synthesisCostBound :: Int, promotionThreshold :: Int
   , reusePolicy :: ReusePolicy, enumerationSeed :: Maybe Int, legacyConfig :: V4.Config, stageA :: StageA, stageB :: StageB, stageC :: StageC, stageD :: StageD
-  , contentFirst :: ContentFirst } deriving (Eq,Show)
+  , contentFirst :: ContentFirst, regionSearch :: RegionConfig } deriving (Eq,Show)
 defaultConfig :: Config
-defaultConfig=Config 400 2000 2 5 4 ExclusiveReuse Nothing V4.defaultConfig stageAOff stageBOff stageCOff stageDOff contentFirstOff
+defaultConfig=Config 400 2000 2 5 4 ExclusiveReuse Nothing V4.defaultConfig stageAOff stageBOff stageCOff stageDOff contentFirstOff regionConfigOff
 -- Candidate source of a slot: the v0.6.1 scalar grammar, the Stage B referent
 -- hierarchy (frozen per-axis snapshot, class lookup under a schedule) and the
 -- typed N-ary hole search; the latter two are unlocked only after the grammar
@@ -124,7 +130,7 @@ safePolicy SafeOnline _=True
 safePolicy ExclusiveReuseLegacy _=False
 safePolicy _ conf=reusePolicy conf==SafeReuse
 metricNames :: [String]
-metricNames=cfMetricNames++words "b_goal_queries b_goal_leaves_dropped b_goal_cache_hits b_goal_level1_hits b_goal_level2_builds c_relation_triggered c_relation_trigger_cardinality c_relation_trigger_fallback c_relation_candidates c_relation_tried c_relation_executions c_relation_fits c_relation_truncated c_relation_selected_cost c_relation_shape_used c_object_count_exact c_object_transform_exact c_shape_masks c_shape_decomposed c_shape_decomposed_truncated c_shape_unrepresentable c_shape_truncated c_shape_ast_total c_shape_ties c_shape_work c_diagonal_chains_accepted c_diagonal_chains_rejected c_view_pixels_merged c_size_object_features b_snapshots_built b_snapshot_work b_graph_nodes b_graph_classes b_graph_templates b_graph_closed_terms b_graph_truncations b_constant_only_dropped b_edges_confirmed b_edges_pending b_edges_not_supported b_type_edges b_closure_edges b_sccs b_layers b_substitutions_tried b_outside_universe b_edge_truncations b_vsa_nodes b_vsa_unions b_vsa_expanded b_vsa_expansion_mismatch b_sharing_avg_x100 b_sharing_max_x100 b_dag_evaluations b_reference_evaluations b_witness_full b_hierarchy_slots b_hierarchy_fits b_class_checks b_row_lookups b_flat_row_evaluations b_candidates_covered b_fitting_classes b_layer_exposed b_layer_searched b_layer_truncated b_slot_truncations b_global_truncations b_hierarchy_fallbacks b_hierarchy_solved_slots typed_hole_global_truncations size_rule_templates size_rule_evaluations size_rule_candidates size_rule_truncations size_rule_exact canvas_changes_entering_search typed_hole_slots_triggered typed_hole_templates typed_hole_evaluations typed_hole_fits typed_hole_constant_fits typed_hole_feature_fits typed_hole_truncations grid_realizations_attempted grid_realization_ok realization_render_errors realization_mismatches UntriggeredExpansionCount ConcreteCrossItemEdgeCount_high_level expanded_frozen_features alignment_attempts alignment_rejections equality_attempts rejected_size_comparisons unexplained_equalities alignment_lift_attempts alignment_lift_successes accepted_abstractions construction_triggers fallback_count semantic_classes representatives max_representatives_per_class counterfactual_contexts_generated counterfactual_contexts_rejected counterfactual_evaluations counterfactual_splits canonical_merges premature_collapses dropped_by_collapse intensional_candidates literal_candidates alignment_key_candidates synthesized_keys_accepted ordering_ties_rejected alignment_witnesses online_abstractions_proposed online_abstractions_accepted online_abstraction_reuses refinement_expansions_saved operator_applications refinement_expansions active_frontier_size visibility_size visibility_keys search_work alignment_failure_triggers posthoc_abstractions_accepted reuse_attempts reuse_hits call_attempts call_legality_checks call_legality_rejections deferred_candidates resumed_candidates resume_events resume_retries recovered_solutions reselected_after_completion exclusive_reuse_missed_candidates exclusive_reuse_missed_solutions diagnostic_operator_applications first_solution_work total_work_to_exhaustion completion_work alignment_candidates_remaining rank_reuse_witnesses_verified"
+metricNames=cfMetricNames++regionMetricNames++words "b_goal_queries b_goal_leaves_dropped b_goal_cache_hits b_goal_level1_hits b_goal_level2_builds c_relation_triggered c_relation_trigger_cardinality c_relation_trigger_fallback c_relation_candidates c_relation_tried c_relation_executions c_relation_fits c_relation_truncated c_relation_selected_cost c_relation_shape_used c_object_count_exact c_object_transform_exact c_shape_masks c_shape_decomposed c_shape_decomposed_truncated c_shape_unrepresentable c_shape_truncated c_shape_ast_total c_shape_ties c_shape_work c_diagonal_chains_accepted c_diagonal_chains_rejected c_view_pixels_merged c_size_object_features b_snapshots_built b_snapshot_work b_graph_nodes b_graph_classes b_graph_templates b_graph_closed_terms b_graph_truncations b_constant_only_dropped b_edges_confirmed b_edges_pending b_edges_not_supported b_type_edges b_closure_edges b_sccs b_layers b_substitutions_tried b_outside_universe b_edge_truncations b_vsa_nodes b_vsa_unions b_vsa_expanded b_vsa_expansion_mismatch b_sharing_avg_x100 b_sharing_max_x100 b_dag_evaluations b_reference_evaluations b_witness_full b_hierarchy_slots b_hierarchy_fits b_class_checks b_row_lookups b_flat_row_evaluations b_candidates_covered b_fitting_classes b_layer_exposed b_layer_searched b_layer_truncated b_slot_truncations b_global_truncations b_hierarchy_fallbacks b_hierarchy_solved_slots typed_hole_global_truncations size_rule_templates size_rule_evaluations size_rule_candidates size_rule_truncations size_rule_exact canvas_changes_entering_search typed_hole_slots_triggered typed_hole_templates typed_hole_evaluations typed_hole_fits typed_hole_constant_fits typed_hole_feature_fits typed_hole_truncations grid_realizations_attempted grid_realization_ok realization_render_errors realization_mismatches UntriggeredExpansionCount ConcreteCrossItemEdgeCount_high_level expanded_frozen_features alignment_attempts alignment_rejections equality_attempts rejected_size_comparisons unexplained_equalities alignment_lift_attempts alignment_lift_successes accepted_abstractions construction_triggers fallback_count semantic_classes representatives max_representatives_per_class counterfactual_contexts_generated counterfactual_contexts_rejected counterfactual_evaluations counterfactual_splits canonical_merges premature_collapses dropped_by_collapse intensional_candidates literal_candidates alignment_key_candidates synthesized_keys_accepted ordering_ties_rejected alignment_witnesses online_abstractions_proposed online_abstractions_accepted online_abstraction_reuses refinement_expansions_saved operator_applications refinement_expansions active_frontier_size visibility_size visibility_keys search_work alignment_failure_triggers posthoc_abstractions_accepted reuse_attempts reuse_hits call_attempts call_legality_checks call_legality_rejections deferred_candidates resumed_candidates resume_events resume_retries recovered_solutions reselected_after_completion exclusive_reuse_missed_candidates exclusive_reuse_missed_solutions diagnostic_operator_applications first_solution_work total_work_to_exhaustion completion_work alignment_candidates_remaining rank_reuse_witnesses_verified"
 
 -- Stage B leaf meta-information of the object-slot language. Previous leaves
 -- and set aggregates are partial (rank 0 / empty set); Ext Current is fixed
@@ -197,20 +203,31 @@ data Execution = Inline Definition | CallTop String deriving (Eq,Show)
 -- progTransform are not consulted. Nothing keeps the Size-first semantics.
 data Program = Program { progEncoder :: EncoderConfig, progExec :: Execution, progDefs :: M.Map String Definition
   , progLibrary :: Library, progDependent :: Bool, progPermutation :: Maybe Int, progSize :: Maybe SizeRule
-  , progTransform :: Maybe ObjectTransform, progView :: Bool, progContentFirst :: Maybe ContentFirstPlan } deriving (Eq,Show)
+  , progTransform :: Maybe ObjectTransform, progView :: Bool, progContentFirst :: Maybe ContentFirstPlan
+  -- progRegion (Stage E2/E3): a whole-region program on a scene view; when present it alone produces the output grid.
+  , progRegion :: Maybe RegionProgram } deriving (Eq,Show)
 -- Realization order: encode the input, compute the output canvas from the size
 -- rule (input features and shared constants only), order the input objects,
 -- place every object by the sequence-local body, then render on the output
 -- canvas. Rendering rejects any cell outside the canvas (no clipping); the
 -- background is the encoder background; later objects win on overlap.
 runProgram :: Program -> Grid -> Either String Grid
-runProgram p grid=do
-  (scene,dims,es)<-runProgramObjects p grid
-  render scene {O.canvas=dims,O.objects=map eoObject es}
+runProgram p grid=case progRegion p of
+  Just rp->either (\e->Left ("region: "++e)) (Right . reOutput) (runRegionProgram defaultPartitionBudget rp grid)
+  Nothing->do
+    (scene,dims,es)<-runProgramObjects p grid
+    render scene {O.canvas=dims,O.objects=map eoObject es}
 
 -- Evidence uses the same execution core; its independent pixel verifier does
 -- not trust the renderer's resulting grid or connected-component partition.
 runProgramEvidence :: Program -> Grid -> Either String ([EmittedObject],RenderWitness)
+runProgramEvidence p grid | progRegion p/=Nothing = do
+  -- region programs produce a grid, not emitted objects: the witness is the grid itself (its objects re-encoded)
+  g<-runProgram p grid
+  let sc=encode (progEncoder p) g
+      es=[EmittedObject o [O.objectId o] "region program output (re-encoded)" | o<-O.objects sc]
+  rw<-renderWitness (dimensions g) (O.background sc) es
+  if renderResult rw==g then Right (es,rw) else Left "region output re-encoding did not reproduce the grid"
 runProgramEvidence p grid=do
   (scene,dims,es)<-runProgramObjects p grid
   rw<-renderWitness dims (O.background scene) es
@@ -218,7 +235,7 @@ runProgramEvidence p grid=do
     else Left "render witness failed independent replay"
 
 runProgramObjects :: Program -> Grid -> Either String (O.Scene,Dimensions,[EmittedObject])
-runProgramObjects p@(Program enc _ _ _ _ perm _ _ view cfp) grid=do
+runProgramObjects p@(Program enc _ _ _ _ perm _ _ view cfp _) grid=do
   let scene0=encode enc grid
       scene1=if view then let (os,_,_)=applyDiagonalView (O.objects scene0) in scene0 {O.objects=os} else scene0
       scene=scene1 {O.objects=permuteObjects perm (O.objects scene1)}
@@ -235,7 +252,7 @@ runProgramObjects p@(Program enc _ _ _ _ perm _ _ view cfp) grid=do
 -- Size-first realization (semantics unchanged): the SizeRule canvas, then the
 -- object transformation or the sequence-local body.
 sizeFirstObjects :: Program -> O.Scene -> Either String (O.Scene,Dimensions,[EmittedObject])
-sizeFirstObjects (Program _ ex defs lib dep _ size tr _ _) scene=do
+sizeFirstObjects (Program _ ex defs lib dep _ size tr _ _ _) scene=do
   let objs=O.objects scene
       set=objectSet objs
       sourcesByPlaced=M.fromListWith (++) [(placedFromObject o,[O.objectId o]) | o<-objs]
@@ -312,7 +329,7 @@ currentWork :: Search Int
 currentWork=gets (\s->metric "operator_applications" (stGraph s)+length (refinements (stGraph s)))
 
 seedGraph :: [(O.Scene,O.Scene)] -> Graph
-seedGraph pairs=Graph fs [] [] (M.fromList [(k,0) | k<-metricNames]) [] [] [] [] [] [] [] [] [] [] [] [] [] []
+seedGraph pairs=Graph fs [] [] (M.fromList [(k,0) | k<-metricNames]) [] [] [] [] [] [] [] [] [] [] [] [] [] [] Nothing
   where fs=[Feature (SetT ExistsPlacedT) (map (show . count . objectSet . O.objects . side) pairs) (show origin)
               ["Objects(Scene)","existential size-index packaging"] Nothing 0 Unmatched
            | (origin,side)<-[(InputSet,fst),(OutputSet,snd)]]
@@ -406,7 +423,7 @@ frontSearch mode conf examples
     tag c=("case"++show c++":")
     defaultWhy="alignment: no unique common ordering"
     axisOf name=if take 2 (reverse name)=="YA" then AY else AX
-    mkProgram ex defs lib=Program enc ex defs lib dep (enumerationSeed conf) sizeRule Nothing (scDiagonalView sc) Nothing
+    mkProgram ex defs lib=Program enc ex defs lib dep (enumerationSeed conf) sizeRule Nothing (scDiagonalView sc) Nothing Nothing
     emit fields=do
       w<-currentWork
       Search (\s->DG.diagnostic (sdDiagnostics (stageD conf))
@@ -437,7 +454,46 @@ frontSearch mode conf examples
       legacy<-case sized of
         Left err->pure (Left err)
         Right ()->sizeFirstPaths
-      contentFirstGate sized legacy
+      cfResult<-contentFirstGate sized legacy
+      regionGate cfResult
+
+    -- Stage E2/E3 region search: opened only when both the Size-first and the
+    -- content-first paths failed (or, under ExploreAlternatives, recorded
+    -- after a first solution without replacing it). Trigger before expansion.
+    rg=regionSearch conf
+    regionGate :: Either String Program -> Search (Either String Program)
+    regionGate prior=case prior of
+      Right p | rcEnabled rg && cfExploreAlternatives cf->do _<-regionPath "explore_alternatives" "None"; pure (Right p)
+              | otherwise->pure (Right p)
+      Left err | rcEnabled rg->regionPath "content_first_failed" err
+               | otherwise->pure (Left err)
+    regionPath :: String -> String -> Search (Either String Program)
+    regionPath trig prior=do
+      emit [("scope",DG.jstr "RegionSearch"),("branch_id",DG.jstr "region_search"),("parent_id",DG.jstr "task"),("event",DG.jstr "entered"),("trigger",DG.jstr trig)]
+      startWork<-currentWork
+      traceMsg ("RegionSearch trigger ("++trig++"): scene views, object-induced partitions and whole-region programs unlocked")
+      let res=searchRegions rg examples
+          work=rsExecuted res*length examples+rsPruned res
+      mapM_ (uncurry inc) (regionMetrics res)
+      inc "operator_applications" work
+      onGraph (\g->g {regionRun=Just res})
+      emit [("scope",DG.jstr "RegionSearch"),("branch_id",DG.jstr "region_search"),("parent_id",DG.jstr "task"),("event",DG.jstr "completed"),("attempted",show (rsExecuted res+rsPruned res)),("evaluated",show (rsExecuted res))
+           ,("train_exact_candidates",show (length (rsFits res))),("stop_reason",DG.jstr (if rsBudgetCut res then "BudgetCut" else if null (rsFits res) then "NoFitYet" else "FoundFit"))
+           ,("exhaustiveness",DG.jstr (if rsBudgetCut res then "ProvenNotExhausted" else if null (rsFits res) then "ProvenExhausted" else "Unknown")),("exhaustiveness_scope",DG.jstr "the finite region-program universe of the legal views of this task (selectors x actions x views)")]
+      traceMsg ("region search: "++show (length (rsViews res))++" legal views, universe "++show (rsUniverse res)++", executed "++show (rsExecuted res)++", pruned "++show (rsPruned res)++", fits "++show (length (rsFits res))++(if rsBudgetCut res then ", budget cut" else ""))
+      case (trig,rsFits res) of
+        ("explore_alternatives",_)->pure (Left "explore: region alternatives recorded")
+        (_,[])->pure (Left (prior++"; region: "++(if null (rsViews res) then "no legal single-colour-residual scene view" else if rsBudgetCut res then "no train-exact region program within the budget" else "no train-exact region program in the finite universe")))
+        (_,rp:_)->do
+          let p=(mkProgram (Inline (Definition scanKey (Body (Lit 0,Lit 0) (Lit 0,Lit 0)) True)) M.empty M.empty) {progRegion=Just rp,progSize=Nothing}
+          setMetric "first_solution_work" (startWork+maybe (rsExecuted res) (+1) (rsFirstFitExposure res)*length examples)
+          let nodes=[RNode (tag c++"region-program") "RegionProgram" [PConcept (programText rp)] ["scene:"++show (rpView rp)] "realization" | c<-cases]
+          addNodes nodes
+          mapM_ (addResult . rnId) nodes
+          addFeature (Feature (ConceptT (SetT ExistsPlacedT)) (map (const "region") cases) ("RegionProgram: "++programText rp)
+            ["scene view -> object-induced partition tree -> unique region selection -> whole-region action","whole-grid exact on every training case; "++show (length (rsFits res))++" fits in the visited universe"] (Just NeedConstruct) (programCost rp) Frozen)
+          traceMsg ("RegionProgram selected: "++programText rp++" (cost "++show (programCost rp)++")")
+          if all (\(x,y)->runProgram p x==Right y) examples then pure (Right p) else pure (Left (prior++"; region: selected program diverged on re-execution"))
 
     -- The Size-first object paths (unchanged). The sequence-local object path
     -- requires equal cardinality. Stage C opens the Set[Object] transformation

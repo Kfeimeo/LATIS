@@ -117,3 +117,9 @@ python -I scripts/trace_io.py oracle-replay --record results/trace_io/examples/a
 - 网格页新增"几何叠加"卡片：Input 上按矩形描边显示选中成员的 RectCover（inclusive 坐标）、Residual（未被选中成员覆盖的格，斜线标记，明示不是背景）、成员表（像素数、矩形数、状态 proven/bounded、下/上界、备选最优数、独立重放结论）；Bounded 时显示横幅"上界不是 k*"。同一卡片并排列出 RawGrid 的各视图（LegacyView、UniformBorderColor、UniqueMostFrequentColor、NoBackground）的可用性、背景决定、证据与 Region 数。
 - 推导页新增 `CrossCaseWitness` 表：每 case 的视图/背景/选中 region/bounds/dims/矩形数状态与 target 仅用于的 exact 标记，逐字段 `ObservedCaseAgreement | Varies | Pending`。
 - `grids.json` 每对新增 `views`；`solver_record.content_first.witnesses[*].spec.witness` 新增 `view`、`canvas_fill`、`provenance`、`geometry`；`content_first.cross_case_witness`。`trace-replay`/`oracle-replay` 的 ContentFirst AST 可带 `view`（`LegacyView` 或 `BackgroundView(...)` 文本）与 `GeoRectCount` 谓词。
+
+## 附：Stage E2/E3 Scene / Region 观测（2026-10-27 新增）
+
+- 漏斗新增阶段 `RegionSearch`（D+ 事件 `entered/completed`，`exhaustiveness_scope` 为本任务 Region 程序宇宙；候选事件 `kind=evaluated` 带 `candidate_ast`（`RegionProgram` JSON：view/selector/action/effect）、`layer`、`exposure_index`、`region_area`）。
+- 新标签页"Scene/Region"：搜索摘要（合法/被拒视图及原因、宇宙/执行/剪枝/fit、首个 fit 曝光序号、各视图首次曝光）；每个 (case, view) 的 Scene（对象数、残差格数、背景 `UniformResidual c | NoResidual`、逐像素重构状态、MDL 成本分项）、Region 树表（id/parent/depth/role/area/bounds/split object/children/leaf/objects）、Input 上深度 1 分区着色（S = Separator 虚线框，C<id> = Content 点线框）、邻接与 SeparatedBy、Scene 对象的 Shape MDL（`c_ast`、状态、`c_rect` 分列）；Goal 账本（allocated/used/cursor/deferred/resumed/status）；曝光序列（执行顺序、fit 标绿）；DependencyWitness（骨架、读写范围、各 case 变化区域、被剪枝候选与证据）。
+- 数据来自 `solver_record.region_search`（`run`/`selected_program`/`executions`）；`trace-replay` 不接受 Region 程序 AST（Region 程序由 `arc-train-only-stage` 的 `region_search.executions` 逐对重放记录）。

@@ -45,8 +45,15 @@ namedConfigsD=
   -- 400/4000 of ContentFirstOnly; the Size-first budgets are unchanged).
   ++[("FrozenCF",d0 {contentFirst=contentFirstOn}),("BackgroundViewsOnly",d0 {contentFirst=contentFirstOn {cfViews=True,cfPlanBudget=1600,cfExecutionBudget=12000}})
     ,("GeometryFeaturesOnly",d0 {contentFirst=contentFirstOn {cfGeometry=True,cfPlanBudget=600,cfExecutionBudget=6000}}),("FullE01",d0 {contentFirst=contentFirstOn {cfViews=True,cfGeometry=True,cfPlanBudget=2400,cfExecutionBudget=16000}})]
+  -- Stage E2/E3: FrozenE01 = FullE01; the others add the region search after
+  -- the content-first path with the named scheduling/pruning switches.
+  ++[("FrozenE01",e01),("E2Only",e01 {regionSearch=regionConfigOn {rcRegionFirst=False,rcBreadth=False,rcSafePrune=False}})
+    ,("RegionPriority",e01 {regionSearch=regionConfigOn {rcBreadth=False,rcSafePrune=False}}),("BreadthScheduler",e01 {regionSearch=regionConfigOn {rcRegionFirst=False,rcSafePrune=False}})
+    ,("RegionBreadth",e01 {regionSearch=regionConfigOn {rcSafePrune=False}}),("FullE3",e01 {regionSearch=regionConfigOn})
+    ,("FullE3_NoMDL",e01 {regionSearch=regionConfigOn {rcMDL=False}}),("FullE3_NoSafePrune",e01 {regionSearch=regionConfigOn {rcSafePrune=False}})]
   where
     d0=scaling 1 2 2 True
+    e01=d0 {contentFirst=contentFirstOn {cfViews=True,cfGeometry=True,cfPlanBudget=2400,cfExecutionBudget=16000}}
     scaling m cd pd diag=fullD
       { alignmentBudget=alignmentBudget fullD*m,scalarBudget=scalarBudget fullD*m
       , stageA=(stageA fullD) {saHoleBudget=saHoleBudget (stageA fullD)*m,saTotalHoleBudget=saTotalHoleBudget (stageA fullD)*m}

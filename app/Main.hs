@@ -28,6 +28,7 @@ import qualified ARC.StageCEvaluate as SC
 import qualified ARC.StageDMechanism as SDM
 import qualified ARC.StageDEvaluate as SD
 import qualified ARC.ContentFirstMechanism as CFM
+import qualified ARC.RegionMechanism as RM
 import qualified ARC.GeometryMechanism as GM
 import qualified ARC.TraceIO as TIO
 import Control.Concurrent (getNumCapabilities)
@@ -221,6 +222,9 @@ main = do
     "geometry-mechanism":rest -> do
       let names=if option "--config" "" rest=="" then ["FrozenCF","BackgroundViewsOnly","GeometryFeaturesOnly","FullE01"] else splitOn ',' (option "--config" "" rest)
       GM.runMechanismG (option "--out" "results/stage_e01/mechanism" rest) names
+    "region-mechanism":rest -> do
+      let names=if option "--config" "" rest=="" then ["FrozenE01","E2Only","RegionPriority","BreadthScheduler","RegionBreadth","FullE3","FullE3_NoMDL","FullE3_NoSafePrune"] else splitOn ',' (option "--config" "" rest)
+      RM.runMechanismR (option "--out" "results/stage_e2_e3/mechanism" rest) names
     "content-first-mechanism":rest -> do
       let names=if option "--config" "" rest=="" then ["FrozenD","ContentFirstOnly","ContentFirstExploreAlternatives"] else splitOn ',' (option "--config" "" rest)
           regression=case option "--regression-ids" "" rest of ""->Nothing; f->Just (option "--arc-dir" "data/arc1-training" rest,f)
