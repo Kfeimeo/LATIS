@@ -110,3 +110,10 @@ python -I scripts/trace_io.py oracle-replay --record results/trace_io/examples/a
 - 页面：概览新增 Content-first 卡片（触发、分类、宇宙/访问/合法 selection/派生/渲染/fit，表示不足时显示诊断横幅而不是空白候选页）；搜索流程新增“分支时间线：Size-first 与 Content-first”；网格检查器在 Input 上叠加选中 bbox / 裁剪窗口，并列出像素来源（选中成员 vs 窗口内非选中对象）与 OutputSpec 渲染/Target/Diff；推导页显示 `Dimensions <- Bounds(Selection)` 链。
 - `trace-replay` / `oracle-replay` 接受 `kind: "ContentFirst"` 的 AST（`planJSON` 结构），只在训练输入上执行 selection → bounds → dimensions → content；输出尺寸由输入派生，请求里的 `output_dims` 被忽略。oracle 结果仍标 `oracle_diagnostic_only`。
 - 展示不改变求解语义；单对匹配仍只标 `pair-exact`。
+
+## 附：Stage E0/E1 几何观测（2026-10-27 新增）
+
+- 事件（scope `ContentFirst`）：`geometry-view-created` / `geometry-view-not-applicable`（每 case 每视图一次，含背景决定与证据、Region 数）、`cover-proven` / `cover-bounded`（选中成员的矩形覆盖，含下/上界与状态）、`geometry-feature-evaluated`（含 `GeoRectCount` 谓词的计划在每 case 的 selection 结论）、`content-first-branch-executed`（真正进入 derive/render 的计划）。搜索流程页列出这些事件的次数与序号；为 0 表示该运行没有执行该步骤。
+- 网格页新增"几何叠加"卡片：Input 上按矩形描边显示选中成员的 RectCover（inclusive 坐标）、Residual（未被选中成员覆盖的格，斜线标记，明示不是背景）、成员表（像素数、矩形数、状态 proven/bounded、下/上界、备选最优数、独立重放结论）；Bounded 时显示横幅"上界不是 k*"。同一卡片并排列出 RawGrid 的各视图（LegacyView、UniformBorderColor、UniqueMostFrequentColor、NoBackground）的可用性、背景决定、证据与 Region 数。
+- 推导页新增 `CrossCaseWitness` 表：每 case 的视图/背景/选中 region/bounds/dims/矩形数状态与 target 仅用于的 exact 标记，逐字段 `ObservedCaseAgreement | Varies | Pending`。
+- `grids.json` 每对新增 `views`；`solver_record.content_first.witnesses[*].spec.witness` 新增 `view`、`canvas_fill`、`provenance`、`geometry`；`content_first.cross_case_witness`。`trace-replay`/`oracle-replay` 的 ContentFirst AST 可带 `view`（`LegacyView` 或 `BackgroundView(...)` 文本）与 `GeoRectCount` 谓词。

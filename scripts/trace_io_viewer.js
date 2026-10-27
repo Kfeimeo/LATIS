@@ -154,9 +154,33 @@ var LATIS = (function () {
     }
     return { size_first: span(legacy), content_first: span(['ContentFirst']) };
   }
+  // Stage E1: rectangle covers of the selected members on case k (absolute canvas coordinates, inclusive).
+  function witnessCovers(record, k) {
+    var info = contentFirstInfo(record); if (!info) return null;
+    var w = info.witnesses[k]; if (!w || !w.derived) return null;
+    var geos = w.spec.witness.geometry; if (!geos) return null;
+    return geos.map(function (g) { return { status: g.status, lower: g.lower_bound, upper: g.upper_bound, alternatives: g.alternative_optimal_covers, replay: g.independent_replay,
+      rects: (g.rectangles || []).map(function (r) { return [r.x_min, r.y_min, r.x_max - r.x_min + 1, r.y_max - r.y_min + 1]; }), pixels: g.pixel_count }; });
+  }
+  // Cells of the input that no selected member covers (the residual of the selection): marked, never relabelled as background.
+  function residualCells(pair, record, k) {
+    var info = contentFirstInfo(record); if (!info || !pair) return null;
+    var w = info.witnesses[k]; if (!w || !w.derived) return null;
+    var sel = {}; (w.spec.emitted || []).forEach(function (e) { if (w.spec.witness.pixel_sources.some(function (q) { return q.selected_member && q.source === e.sources[0]; })) e.pixels.forEach(function (p) { sel[(p[0] + w.spec.witness.bounds.min_x) + ',' + (p[1] + w.spec.witness.bounds.min_y)] = 1; }); });
+    var cells = [];
+    for (var y = 0; y < pair.input.length; y++) for (var x = 0; x < pair.input[0].length; x++) if (!sel[x + ',' + y]) cells.push([x, y]);
+    return { cells: cells, count: cells.length, note: w.spec.witness.provenance ? w.spec.witness.provenance.residual_note : null };
+  }
+  var GEOMETRY_KINDS = ['geometry-view-created', 'geometry-view-not-applicable', 'cover-proven', 'cover-bounded', 'geometry-feature-evaluated', 'content-first-branch-executed'];
+  function geometryTimeline(events) {
+    var out = {}; GEOMETRY_KINDS.forEach(function (k) { out[k] = { count: 0, first: null, last: null }; });
+    (events || []).forEach(function (e) { var k = e.kind; if (out[k]) { out[k].count++; if (out[k].first == null) out[k].first = e.sequence; out[k].last = e.sequence; } });
+    return out;
+  }
   return { ARC: ARC, expandBundle: expandBundle, dims: dims, gridDiff: gridDiff, filterCandidates: filterCandidates, filterEvents: filterEvents, uniq: uniq,
            validateBundle: validateBundle, deadLinks: deadLinks, statusChip: statusChip, paintObjects: paintObjects,
-           contentFirstInfo: contentFirstInfo, boundsRect: boundsRect, witnessBounds: witnessBounds, candidateBounds: candidateBounds, branchTimeline: branchTimeline };
+           contentFirstInfo: contentFirstInfo, boundsRect: boundsRect, witnessBounds: witnessBounds, candidateBounds: candidateBounds, branchTimeline: branchTimeline,
+           witnessCovers: witnessCovers, residualCells: residualCells, geometryTimeline: geometryTimeline, GEOMETRY_KINDS: GEOMETRY_KINDS };
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = LATIS;
 
@@ -196,6 +220,8 @@ if (typeof document !== 'undefined') (function () {
     var d = LATIS.dims(g), w = d[0], hh = d[1], size = Math.max(7, Math.min(22, Math.floor(300 / Math.max(w, hh))));
     var el = h('div', { class: 'grid', style: 'grid-template-columns:14px repeat(' + w + ',' + size + 'px);grid-auto-rows:' + size + 'px' });
     var diff = {}; (opts.diff || []).forEach(function (c) { diff[c[0] + ',' + c[1]] = 1; });
+    var res = {}; (opts.residual || []).forEach(function (c) { res[c[0] + ',' + c[1]] = 1; });
+    var rects = opts.rects || [];
     var hi = opts.highlight;
     add(el, h('div', { class: 'h' }));
     for (var x = 0; x < w; x++) add(el, h('div', { class: 'h', text: x % 5 === 0 ? String(x) : '' }));
@@ -204,7 +230,9 @@ if (typeof document !== 'undefined') (function () {
       for (x = 0; x < w; x++) {
         var inHi = hi && x >= hi[0] && x < hi[0] + hi[2] && y >= hi[1] && y < hi[1] + hi[3];
         var v = g[y][x];
-        add(el, h('div', { class: 'c' + (diff[x + ',' + y] ? ' diff' : '') + (inHi ? ' hi' : ''), title: '(' + x + ',' + y + ') = ' + v, style: 'background:' + (LATIS.ARC[v] || '#fff') }));
+        var rectIdx = -1; rects.forEach(function (r, i) { if (x >= r[0] && x < r[0] + r[2] && y >= r[1] && y < r[1] + r[3]) rectIdx = i; });
+        var cls = 'c' + (diff[x + ',' + y] ? ' diff' : '') + (inHi ? ' hi' : '') + (rectIdx >= 0 ? ' rect rect' + (rectIdx % 6) : '') + (res[x + ',' + y] ? ' residual' : '');
+        add(el, h('div', { class: cls, title: '(' + x + ',' + y + ') = ' + v + (rectIdx >= 0 ? ' · rect #' + rectIdx : '') + (res[x + ',' + y] ? ' · residual' : ''), style: 'background:' + (LATIS.ARC[v] || '#fff') }));
       }
     }
     return el;
@@ -327,6 +355,19 @@ if (typeof document !== 'undefined') (function () {
         cfw.pixel_sources ? table(['输入对象 id', '像素数', '是否选中成员（crop 窗口中的非选中像素来自输入 grid 本身）'], cfw.pixel_sources.map(function (q) { return [q.source, q.pixels, q.selected_member ? '选中' : '非选中（窗口内其它颜色）']; })) : null,
         cfw.grid ? h('div', { class: 'row' }, gpanel('OutputSpec 渲染（' + cfw.content_kind.split(':')[0] + '）', cfw.grid), gpanel('Target', p.output), gpanel('Diff', p.output, { diff: LATIS.gridDiff(cfw.grid, p.output).cells })) : null));
     }
+    var covers = LATIS.witnessCovers(D.record, p.case_index), residual = LATIS.residualCells(p, D.record, p.case_index);
+    if (covers || residual || (p.views && p.views.length)) {
+      var coverRects = [];
+      if (covers) { var sel = state.coverAlt || {}; covers.forEach(function (g, i) { coverRects = coverRects.concat(g.rects); }); }
+      out.push(card('几何叠加：PixelSet / RectCover / Bounds / Residual（E0–E1）',
+        h('div', { class: 'row' },
+          gpanel('Input + RectCover（每个矩形不同描边；inclusive 坐标）', p.input, { rects: coverRects, highlight: overlayRect }),
+          gpanel('Input + Residual（未被选中成员覆盖的格；不是背景）', p.input, { residual: residual ? residual.cells : [] })),
+        covers ? table(['成员', '像素', '矩形数', '状态', '下界', '上界', '备选最优', '独立重放'], covers.map(function (g, i) { return [i, g.pixels, g.rects.length, chip(g.status === 'proven_minimal' ? 'proven_minimal' : g.status, g.status === 'proven_minimal' ? 'ok' : 'warn'), g.lower, g.upper, g.alternatives, chip(g.replay)]; })) : h('div', { class: 'muted', text: '没有几何 witness（配置未开启几何或程序不是 content-first）。' }),
+        covers && covers.some(function (g) { return g.status !== 'proven_minimal' && g.status !== 'empty'; }) ? h('div', { class: 'banner warn', text: '至少一个成员的覆盖只是 Bounded（预算截断）：上界不是 k*。' }) : null,
+        residual ? h('div', { class: 'muted', text: 'Residual = ' + residual.count + ' 格；' + (residual.note || '') }) : null,
+        (p.views && p.views.length) ? h('div', null, h('h3', { text: 'RawGrid 与各视图并排（颜色 0 在几何层没有特殊语义）' }), h('div', { class: 'scroll' }, table(['视图', '可用', '背景', '证据/原因', 'Region 数'], p.views.map(function (v) { var r = v.result || {}; return [v.applicable ? r.view : v.view, chip(v.applicable ? 'entered' : 'failed'), v.applicable ? (r.background == null ? '无（NoBackground）' : r.background) : '—', v.applicable ? r.evidence : v.reason, v.applicable ? r.regions : '—']; })))) : null));
+    }
     var encSel = h('select', { onchange: function (e) { state.encoding = e.target.value; render(); } },
       h('option', { value: 'search', text: '搜索实际使用的对象（含对角视图/置换）', selected: state.encoding === 'search' ? 'selected' : null }),
       h('option', { value: 'connectivity', text: '纯 4 连通编码', selected: state.encoding === 'connectivity' ? 'selected' : null }));
@@ -376,6 +417,9 @@ if (typeof document !== 'undefined') (function () {
       ['Size-first（SizeRule → Alignment/Relation/Unified/Joint → Execution/Render）', chip(bt.size_first.entered ? 'entered' : 'not_entered'), bt.size_first.first, bt.size_first.last, bt.size_first.events],
       ['Content-first（Selection → Bounds → Dimensions → Render）', chip(bt.content_first.entered ? 'entered' : 'not_entered'), bt.content_first.first, bt.content_first.last, bt.content_first.events]]),
       h('div', { class: 'muted', text: 'Content-first 只在 Size-first 失败（size_failed / downstream_failed）或 ExploreAlternatives 触发后出现；触发前候选数为 0。' })));
+    var gt = LATIS.geometryTimeline(D.events);
+    out.push(card('几何事件（Search Timeline 序号）', table(['事件', '次数', '首序号', '末序号'], LATIS.GEOMETRY_KINDS.map(function (k) { return [k, gt[k].count, gt[k].first == null ? '—' : gt[k].first, gt[k].last == null ? '—' : gt[k].last]; })),
+      h('div', { class: 'muted', text: 'geometry-view-created / cover-proven / cover-bounded / geometry-feature-evaluated / content-first-branch-executed 来自真实搜索事件；为 0 表示该运行没有执行该步骤。' })));
     out.push(card('Grounding → Size → Alignment → Scalar/Typed → Referent/VSA → Relation → Unified/Joint → ContentFirst → Render → Verify', rows,
       h('p', { class: 'muted', text: 'not_entered：运行正常结束而该阶段没有任何检查点；unknown：进程未正常结束，无法区分。not_entered 不是 failed。' })));
     return out;
@@ -502,6 +546,11 @@ if (typeof document !== 'undefined') (function () {
           h('li', { text: wt.input_only_dependency })));
       })))));
     }
+    var ccw = D.record.content_first && D.record.content_first.cross_case_witness;
+    if (ccw) out.push(card('CrossCaseWitness：同一输入侧程序在各 case 的可观测绑定（target 只用于 exact 标记）',
+      table(['case', '视图', '背景', '选中 region', 'bounds', 'dims', '矩形数', '状态', 'target exact'], (ccw.bindings || []).map(function (b) { return [b.case_index, b.view, b.background == null ? '无' : b.background, JSON.stringify(b.selected_region_ids), typeof b.bounds === 'string' ? b.bounds : (b.bounds.x_min + '..' + b.bounds.x_max + ' × ' + b.bounds.y_min + '..' + b.bounds.y_max), (b.dims || []).join('×'), b.rect_count == null ? '—' : b.rect_count, b.rect_count_status, chip(b.target_exact ? 'exact' : 'mismatch')]; })),
+      kv(Object.keys(ccw.agreement || {}).map(function (k) { return [k, chip(ccw.agreement[k], ccw.agreement[k] === 'ObservedCaseAgreement' ? 'ok' : ccw.agreement[k] === 'Pending' ? 'warn' : '')]; })),
+      h('div', { class: 'muted', text: ccw.note + '；' + ccw.target_use })));
     if (!Array.isArray(w) || !w.length) { out.push(card('Witness', h('div', { class: 'muted', text: '没有精确程序，因此没有 Transform/Render witness；失败分支见“候选浏览”和“搜索流程”。' }))); }
     else w.forEach(function (x, i) {
       var used = summary().pairs_used_in_search[i], dimsWH = [x.width, x.height];

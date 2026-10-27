@@ -44,6 +44,8 @@ import Latent.Grid
 import Latent.Render (render)
 import qualified Latent.Object as O
 import Synthesis.Collection.Shape
+import Synthesis.Collection.Geometry.Cover (pixelSetFromList, predicateCoverBudget)
+import Synthesis.Collection.Geometry.Features (shapeGeometry, rectCountStatus)
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import Data.List (sortOn, nub, sort, group)
@@ -72,7 +74,11 @@ data StageC = StageC
 stageCOff :: StageC
 stageCOff=StageC False False False False False False 200000 50 20000 [0,1,2] [2,3,4] defaultDecompBudget
 
+-- GeoRectCount k (Stage E1): the PROVEN minimal rectangle-cover count of the
+-- object's pixel set equals k; a count that the budgeted exact search could
+-- not prove is an explicit failure (never the bounded upper bound).
 data Pred = ColorIs Int | IsMaxArea | IsMinArea | IsRect | IsSquare | IsShell | IsDiagonal | IsTriangle | ColorMostFrequent | ColorLeastFrequent | NotP Pred
+  | GeoRectCount Int
   deriving (Eq,Ord,Show)
 data Selector = AllObjects | FilterBy Pred deriving (Eq,Ord,Show)
 data Others = DropOthers | KeepOthers deriving (Eq,Ord,Show)
@@ -112,6 +118,7 @@ predText p=case p of
   ColorMostFrequent->"Color == unique most frequent colour"
   ColorLeastFrequent->"Color == unique least frequent colour"
   NotP q->"Not("++predText q++")"
+  GeoRectCount k->"MinimalRectangleCount(Shape) == "++show k++" (proven)"
 countText :: CountExpr -> String
 countText k=case k of
   KConst n->show n
@@ -147,6 +154,7 @@ transformConstants (ObjectTransform sel _ body)=predK sel+bodyK body
   where predK AllObjects=0
         predK (FilterBy p)=go p
         go (ColorIs _)=1
+        go (GeoRectCount _)=1
         go (NotP q)=go q
         go _=0
         bodyK (MapEach (RecolorTo _))=1
@@ -204,6 +212,7 @@ evalPred objs p o=case p of
   ColorMostFrequent->do c<-mode (sortOn (negate . fst) counts); Right (objColor o==Just c)
   ColorLeastFrequent->do c<-mode counts; Right (objColor o==Just c)
   NotP q->not <$> evalPred objs q o
+  GeoRectCount k->do n<-rectCountStatus (shapeGeometry predicateCoverBudget (pixelSetFromList (map fst (O.absolutePixels o)))); Right (n==k)
   where
     areas=map objArea objs
     unique what m v=if length (filter (==m) areas)/=1 then Left ("selection by "++what++" is not unique") else Right (v==m)
@@ -557,6 +566,7 @@ transformJSON t@(ObjectTransform sel others body)=jobj
     selector AllObjects=jobj [("kind",jstr "AllObjects")]
     selector (FilterBy p)=jobj [("kind",jstr "FilterBy"),("pred",pred' p)]
     pred' (ColorIs c)=jobj [("kind",jstr "ColorIs"),("color",show c)]
+    pred' (GeoRectCount k)=jobj [("kind",jstr "GeoRectCount"),("k",show k)]
     pred' (NotP q)=jobj [("kind",jstr "NotP"),("pred",pred' q)]
     pred' p=jobj [("kind",jstr (show p))]
     bodyJ (MapEach p)=jobj [("kind",jstr "MapEach"),("per_object",perJ p)]

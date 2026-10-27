@@ -39,6 +39,7 @@ import Synthesis.Collection.Relation
 import Synthesis.Collection.Shape
 import Synthesis.Collection.Unified
 import Synthesis.Collection.ContentFirst
+import Synthesis.Collection.Geometry.Features (GeometryWitness(..))
 import Debug.Trace (traceEvent)
 import qualified Synthesis.Collection.Diagnostics as DG
 import qualified Data.Map.Strict as M
@@ -225,8 +226,10 @@ runProgramObjects p@(Program enc _ _ _ _ perm _ _ view cfp) grid=do
     -- Content-first: no SizeRule is consulted; the canvas is the bounds of the
     -- input-side selection and the content comes from the same selection.
     Just plan->do
-      spec<-either (\e->Left ("content-first: "++e)) Right (deriveOutputSpec plan (encoderBackground enc) grid scene)
-      Right (scene,osDims spec,specEmitted spec)
+      spec<-either (\e->Left ("content-first: "++e)) Right (deriveOutputSpec deriveQuiet plan (encoderBackground enc) grid scene)
+      -- the own canvas is filled with the plan view's background colour
+      -- (the encoder background for the legacy view)
+      Right (scene {O.background=oswCanvasFill (osWitness spec)},osDims spec,specEmitted spec)
     Nothing->sizeFirstObjects p scene
 
 -- Size-first realization (semantics unchanged): the SizeRule canvas, then the
@@ -466,7 +469,7 @@ frontSearch mode conf examples
       Just (Right _,_)->SizeFit
       Just (Left _,st)->if trTruncated (ssWidth st) || trTruncated (ssHeight st) then SizeTruncated else SizeNoFit
     -- Colour constants of the selectors come from the INPUT scenes only.
-    cfUniverse=enumeratePlans (sort (nub [c | (a,_)<-scenes, o<-O.objects a, Just c<-[objColor o]])) (scShape sc) (scDiagonalView sc)
+    cfUniverse=enumeratePlans (sort (nub [c | (a,_)<-scenes, o<-O.objects a, Just c<-[objColor o]])) (scShape sc) (scDiagonalView sc) (cfViews cf) (cfGeometry cf)
     contentFirstGate :: Either String () -> Either String Program -> Search (Either String Program)
     contentFirstGate sized legacy=case legacy of
       Right p
@@ -508,12 +511,14 @@ frontSearch mode conf examples
       traceS DG.levelBranches [("scope",DG.jstr "ContentFirst"),("kind",DG.jstr "grammar"),("stage",DG.jstr "content_first"),("branch_id",DG.jstr "content_first"),("parent_branch_id",DG.jstr "task")
         ,("trigger",DG.jstr trigName),("size_first_status",DG.jstr sfText),("prior_failure",DG.jstr prior)
         ,("plan_universe",show (crUniverse res)),("selection_modes",DG.jarr [DG.jstr "SelectUnique",DG.jstr "SelectNonEmpty"]),("constructions",DG.jarr [DG.jstr "CropInputWindow",DG.jstr "EmitSelectedWithOwnCanvas"])
+        ,("background_views",DG.jbool (cfViews cf)),("geometry_predicates",DG.jbool (cfGeometry cf))
         ,("colours_from",DG.jstr "input scenes only")
         ,("budget",DG.jobj [("plans",DG.jobj [("limit",show (cfPlanBudget cf)),("used",show (crTried res))]),("case_executions",DG.jobj [("limit",show (cfExecutionBudget cf)),("used",show (crExecutions res))]),("representatives",DG.jobj [("limit",show (cfMaxFits cf)),("used",show (length (crFits res)))])])
         ,("dependency_order",DG.jstr "Input -> Selection -> Bounds -> Dimensions -> Render (no feedback)")]
       mapM_ (uncurry inc) [("cf_plan_universe",crUniverse res),("cf_plans_tried",crTried res),("cf_selection_evaluations",crSelectionEvaluations res),("cf_selection_legal_plans",crSelectionLegalPlans res)
         ,("cf_case_executions",crExecutions res),("cf_specs_derived",crSpecsDerived res),("cf_rendered",crRendered res),("cf_truncated",if crTruncated res then 1 else 0)
-        ,("cf_representation_unavailable",if crSelectionLegalPlans res==0 then 1 else 0),("operator_applications",work)]
+        ,("cf_representation_unavailable",if crSelectionLegalPlans res==0 then 1 else 0),("operator_applications",work)
+        ,("geo_views_created",S.size (crViewsUsed res)),("geo_views_not_applicable",S.size (crViewsNotApplicable res)),("geo_feature_evaluations",crGeometryEvaluations res)]
       if explore then inc "cf_alternative_fits" (length (crFits res)) else inc "cf_fits" (length (crFits res))
       let selected=case crFits res of (c:_) | not explore->Just (ccPlan c); _->Nothing
       onGraph (\g->g {contentFirstRuns=contentFirstRuns g++[CFRun trig sizeStatus prior res classification selected (if explore then "alternatives" else "solution")]})
@@ -534,6 +539,10 @@ frontSearch mode conf examples
               p=(mkProgram (Inline (Definition scanKey (Body (Lit 0,Lit 0) (Lit 0,Lit 0)) True)) M.empty M.empty) {progContentFirst=Just plan,progSize=Nothing}
               specs=[s | t<-ccCases cand, Just s<-[cftSpec t]]
           setMetric "cf_selected_cost" (planCost plan)
+          let geos=[g | s<-specs, Just gs<-[oswGeometry (osWitness s)], g<-gs]
+          setMetric "geo_cover_proven" (length [() | g<-geos, gwStatus g/="bounded"])
+          setMetric "geo_cover_bounded" (length [() | g<-geos, gwStatus g=="bounded"])
+          setMetric "geo_selected_rect_count" (sum [length (gwRects g) | g<-geos])
           setMetric "cf_first_fit_executions" (maybe 0 id (crFirstFitExecutions res))
           setMetric "first_solution_work" (startWork+crSelectionEvaluations res+maybe (crExecutions res) id (crFirstFitExecutions res))
           let nodes=[RNode (tag c++"output-spec") "OutputSpec" [PConcept (planText plan)] ["set:Input","selection:"++selectionText (cfpSelection plan)] "realization" | c<-cases]

@@ -35,6 +35,16 @@ namedConfigsD=
   -- content-first fallback only, ContentFirstExploreAlternatives also records the
   -- content-first representatives after a Size-first first solution.
   ++[("FrozenD",d0),("ContentFirstOnly",d0 {contentFirst=contentFirstOn}),("ContentFirstExploreAlternatives",d0 {contentFirst=contentFirstOn {cfExploreAlternatives=True}})]
+  -- Stage E0/E1 (ARC.ContentFirstEvaluate reads them back): FrozenCF is
+  -- ContentFirstOnly (22/400 baseline), BackgroundViewsOnly adds the explicit
+  -- background views, GeometryFeaturesOnly the rectangle-count predicates and
+  -- geometry witnesses on the legacy view, FullE01 both.
+  -- The background views multiply the plan universe by 4 and the geometry
+  -- predicates add 6 predicates, so the three new configurations get a
+  -- larger, declared content-first plan/execution budget (FrozenCF keeps the
+  -- 400/4000 of ContentFirstOnly; the Size-first budgets are unchanged).
+  ++[("FrozenCF",d0 {contentFirst=contentFirstOn}),("BackgroundViewsOnly",d0 {contentFirst=contentFirstOn {cfViews=True,cfPlanBudget=1600,cfExecutionBudget=12000}})
+    ,("GeometryFeaturesOnly",d0 {contentFirst=contentFirstOn {cfGeometry=True,cfPlanBudget=600,cfExecutionBudget=6000}}),("FullE01",d0 {contentFirst=contentFirstOn {cfViews=True,cfGeometry=True,cfPlanBudget=2400,cfExecutionBudget=16000}})]
   where
     d0=scaling 1 2 2 True
     scaling m cd pd diag=fullD

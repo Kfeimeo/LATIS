@@ -4,8 +4,11 @@
 -- back into the search.
 module ARC.ContentFirstEvaluate
   ( frozenD, contentFirstOnly, contentFirstExplore, namedConfigsCF, configByNameCF, configNamesCF
-  , contentFirstJSON, finalClassification, programSceneCF, programSpecsCF, planFromProgram
+  , contentFirstJSON, finalClassification, programSceneCF, programSpecsCF, planFromProgram, crossCaseOf
+  , configNamesE01, namedConfigsE01
   ) where
+import Synthesis.Collection.Geometry.Features (CaseBinding(..), CrossCaseWitness, crossCaseWitness, crossCaseJSON, GeometryWitness(..), RegionProvenance(..))
+import Synthesis.Collection.Geometry.Cover (BoundsE(..), Rect(..))
 import Synthesis.Collection.Front
 import Synthesis.Collection.ContentFirst
 import Synthesis.Collection.Shape (applyDiagonalView)
@@ -13,6 +16,7 @@ import Synthesis.Collection.Diagnostics (jstr, jobj, jarr, jbool, jmaybe)
 import ARC.StageDEvaluate (configByNameD)
 import Latent.Grid
 import Latent.Encode (encode, encoderBackground)
+import Synthesis.Collection.Geometry.View (ViewId(..))
 import qualified Latent.Object as O
 import Data.Maybe (fromMaybe)
 
@@ -47,9 +51,30 @@ planFromProgram p=p >>= progContentFirst
 programSpecsCF :: [(Grid,Grid)] -> Program -> [(Either String OutputSpec,Bool)]
 programSpecsCF pairs p=case progContentFirst p of
   Nothing->[]
-  Just plan->[let r=deriveOutputSpec plan (encoderBackground (progEncoder p)) x (programSceneCF p x)
+  Just plan->[let r=deriveOutputSpec deriveWithGeometry plan (encoderBackground (progEncoder p)) x (programSceneCF p x)
                   ok=either (const False) (\s->renderOutputSpec (encoderBackground (progEncoder p)) s==Right y) r
               in (r,ok) | (x,y)<-pairs]
+
+namedConfigsE01 :: [(String,Config)]
+namedConfigsE01=[(n,c) | n<-["FrozenCF","BackgroundViewsOnly","GeometryFeaturesOnly","FullE01"], Just c<-[configByNameD n]]
+configNamesE01 :: [String]
+configNamesE01=map fst namedConfigsE01
+
+-- Cross-case witness of the selected content-first program: input-side
+-- bindings per case, the training target only for the exact flag.
+crossCaseOf :: [(Grid,Grid)] -> Program -> Maybe CrossCaseWitness
+crossCaseOf pairs p=case progContentFirst p of
+  Nothing->Nothing
+  Just plan->Just (crossCaseWitness (planText plan)
+    [CaseBinding i (oswView w) (oswBgOf w) (swMatched (oswSelection w)) (boundsE (swBounds (oswSelection w))) (osDims s) (rectCountOf w) (Just ok)
+    | (i,(Right s,ok))<-zip [0::Int ..] (programSpecsCF pairs p), let w=osWitness s])
+  where
+    boundsE (Bounds x0 y0 x1 y1)=PixelBounds (Rect x0 y0 x1 y1)
+    oswBgOf w=if oswView w==LegacyView then Just (oswCanvasFill w) else rpBackground (oswProvenance w)
+    rectCountOf w=case oswGeometry w of
+      Just gs | not (null gs) && all ((/="bounded") . gwStatus) gs->Right (sum (map (length . gwRects) gs))
+      Just _->Left "rectangle count not proven for every selected member"
+      Nothing->Left "geometry witness not computed"
 
 finalClassification :: Graph -> Maybe Program -> String
 finalClassification g p=case (planFromProgram p,[r | r<-contentFirstRuns g, cfrRole r=="solution"],contentFirstRuns g) of
@@ -91,6 +116,7 @@ contentFirstJSON pairs g p=jobj
   ,("metrics",jobj [(k,show (metric k g)) | k<-cfMetricNames])
   ,("deferred",jarr [jobj [("range",jarr [show (fst (dfRange d)),show (snd (dfRange d))]),("status",jstr (dfStatus d)),("reason",jstr (dfReason d))] | d<-deferred g, dfSlot d=="content-first"])
   ,("runs",jarr (map runJSON (contentFirstRuns g)))
+  ,("cross_case_witness",jmaybe crossCaseJSON (p >>= crossCaseOf pairs))
   ,("witnesses",case p of
       Nothing->"[]"
       Just prog->jarr [jobj ([("pair_index",show i),("exact",jbool ok)]++either (\e->[("derived",jbool False),("error",jstr e)]) (\s->[("derived",jbool True),("spec",specJSON (encoderBackground (progEncoder prog)) s)]) r)

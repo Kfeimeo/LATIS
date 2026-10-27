@@ -4,7 +4,7 @@
 -- and the Size2 rule must fit before any object search is reachable. This
 -- module adds the second, goal-coupled construction
 --
---   Input -> Selection -> Bounds/Content -> OutputDimensions -> Render
+--   Input -> [View] -> Selection -> Bounds/Content -> OutputDimensions -> Render
 --
 -- in which the output canvas is DERIVED from the content selected on the
 -- input. The dependency is one-way and acyclic: the selection reads the input
@@ -13,16 +13,24 @@
 -- the same selection; nothing downstream can feed back into the selection.
 -- Training outputs are read only by the caller when it verifies a candidate.
 --
+-- Stage E0/E1: a plan names the View that produces its objects. LegacyView is
+-- the Stage C/D encoder (background 0, 4-connected); BackgroundView h is an
+-- explicit input-side background hypothesis (Geometry.View). Selection
+-- predicates may use the proven minimal rectangle count of an object
+-- (Relation.GeoRectCount, Geometry.Cover); an unproven count is an explicit
+-- failure, never a guess.
+--
 -- Two constructions, deliberately distinct:
 --
 --   CropInputWindow            the inclusive bounding box of the selected
---                              members is a WINDOW on the input grid; every
---                              pixel inside the window (other colours,
---                              background cells) is copied to the output. The
---                              selection only decides where the window is.
+--                              members is a WINDOW on the raw input grid;
+--                              every pixel inside (other colours, background
+--                              cells) is copied. The selection only decides
+--                              where the window is.
 --   EmitSelectedWithOwnCanvas  the selected members themselves, translated to
 --                              the local origin, on a canvas of the bounds'
---                              size; nothing else is drawn.
+--                              size filled with the view's background colour
+--                              (not applicable under NoBackground).
 --
 -- They coincide only when the window holds nothing but the selected members.
 --
@@ -33,10 +41,10 @@
 module Synthesis.Collection.ContentFirst
   ( ContentFirst(..), contentFirstOff, contentFirstOn
   , SelectionMode(..), SelectionPlan(..), ContentConstruction(..), ContentFirstPlan(..)
-  , selectionText, constructionText, planText, planCost, planJSON, enumeratePlans
+  , selectionText, constructionText, planText, planCost, planJSON, enumeratePlans, planUsesGeometry
   , Bounds(..), boundsDims, boundsOf
-  , SelectionWitness(..), OutputContent(..), OutputSpecWitness(..), OutputSpec(..)
-  , selectWith, deriveOutputSpec, specEmitted, renderOutputSpec, cropWindow, specWitnessJSON, specJSON
+  , SelectionWitness(..), OutputContent(..), OutputSpecWitness(..), OutputSpec(..), DeriveOptions(..), deriveQuiet, deriveWithGeometry
+  , selectWith, deriveOutputSpec, specEmitted, renderOutputSpec, cropWindow, specWitnessJSON, specJSON, sceneForView
   , CFCase(..), CFCaseTrace(..), CFCandidate(..), CFResult(..), searchContentFirst
   , CFTrigger(..), triggerText, SizeFirstStatus(..), sizeFirstStatusText, classifyResult, cfMetricNames
   , CFRun(..)
@@ -46,8 +54,12 @@ import Latent.Grid
 import qualified Latent.Object as O
 import Synthesis.Collection.Relation (Pred(..), Selector(..), selectObjects, EmittedObject(..), predText, CaseTrace(..), caseTraceJSON, gridDiffCount)
 import Synthesis.Collection.Size (natPosRange)
+import Synthesis.Collection.Geometry.View
+import Synthesis.Collection.Geometry.Cover (pixelSetFromList, defaultCoverBudget)
+import Synthesis.Collection.Geometry.Features (GeometryWitness(..), geometryWitness, geometryWitnessJSON, RegionProvenance(..), provenanceJSON)
 import Synthesis.Collection.Diagnostics (jstr, jobj, jarr, jbool, jmaybe, stableHash, traceAt, traceCand, levelBranches, levelCandidates, levelFull)
 import qualified Data.Map.Strict as M
+import qualified Data.Set as S
 import Data.List (sortOn, nub, sort)
 import Debug.Trace (traceEvent)
 
@@ -61,16 +73,18 @@ data ContentFirst = ContentFirst
   , cfPlanBudget :: Int               -- plans visited (cost-sorted prefix of the finite plan universe)
   , cfExecutionBudget :: Int          -- per-case derive+render executions over the whole content-first search
   , cfMaxFits :: Int                  -- training-exact representatives kept
+  , cfViews :: Bool                   -- E0: plans over the explicit background views (after the legacy-view plans)
+  , cfGeometry :: Bool                -- E1: GeoRectCount selection predicates and geometry witnesses
   } deriving (Eq,Show)
 contentFirstOff :: ContentFirst
-contentFirstOff=ContentFirst False False False False 0 0 0
+contentFirstOff=ContentFirst False False False False 0 0 0 False False
 contentFirstOn :: ContentFirst
-contentFirstOn=ContentFirst True True True False 400 4000 16
+contentFirstOn=ContentFirst True True True False 400 4000 16 False False
 
 data SelectionMode = SelectUnique | SelectNonEmpty deriving (Eq,Ord,Show,Enum,Bounded)
 data SelectionPlan = SelectionPlan { spMode :: SelectionMode, spSelector :: Selector } deriving (Eq,Ord,Show)
 data ContentConstruction = CropInputWindow | EmitSelectedWithOwnCanvas deriving (Eq,Ord,Show,Enum,Bounded)
-data ContentFirstPlan = ContentFirstPlan { cfpSelection :: SelectionPlan, cfpConstruction :: ContentConstruction } deriving (Eq,Ord,Show)
+data ContentFirstPlan = ContentFirstPlan { cfpSelection :: SelectionPlan, cfpConstruction :: ContentConstruction, cfpView :: ViewId } deriving (Eq,Ord,Show)
 
 selectorText :: Selector -> String
 selectorText AllObjects="Objects(Input)"
@@ -84,41 +98,53 @@ constructionText EmitSelectedWithOwnCanvas="EmitSelectedWithOwnCanvas"
 -- The dependency chain in words: Dimensions come from the bounds of the
 -- selection; the content construction names what is drawn in them.
 planText :: ContentFirstPlan -> String
-planText (ContentFirstPlan sel c)="OutputSpec(Dimensions <- Bounds("++selectionText sel++"); "++constructionText c++")"
+planText (ContentFirstPlan sel c v)="OutputSpec(Dimensions <- Bounds("++selectionText sel++"); "++constructionText c++")"++(if v==LegacyView then "" else " @ "++viewText v)
 -- Structural cost (same prior as the relation grammar: nodes plus 4 per
--- shared colour constant). Unique is the cheaper selection mode; both
--- constructions cost the same, ties are broken by the derived order
--- (CropInputWindow first).
+-- shared constant). Unique is the cheaper selection mode; both constructions
+-- cost the same, ties are broken by the derived order (CropInputWindow
+-- first); a non-legacy view costs one more than the legacy view.
 planCost :: ContentFirstPlan -> Int
-planCost (ContentFirstPlan (SelectionPlan m s) _)=selC+modeC+2
+planCost (ContentFirstPlan (SelectionPlan m s) _ v)=selC+modeC+2+(if v==LegacyView then 0 else 1)
   where selC=case s of AllObjects->0; FilterBy p->1+depth p+4*constants p
         depth (NotP q)=1+depth q
         depth _=0
         constants (ColorIs _)=1
+        constants (GeoRectCount _)=1
         constants (NotP q)=constants q
         constants _=0
         modeC=case m of SelectUnique->0; SelectNonEmpty->1
+planUsesGeometry :: ContentFirstPlan -> Bool
+planUsesGeometry (ContentFirstPlan (SelectionPlan _ s) _ _)=case s of FilterBy p->geo p; AllObjects->False
+  where geo (GeoRectCount _)=True
+        geo (NotP q)=geo q
+        geo _=False
 planJSON :: ContentFirstPlan -> String
-planJSON p@(ContentFirstPlan (SelectionPlan m s) c)=jobj
-  [("kind",jstr "ContentFirst"),("selection",jobj [("mode",jstr (show m)),("selector",selJ s)]),("construction",jstr (show c))
+planJSON p@(ContentFirstPlan (SelectionPlan m s) c v)=jobj
+  [("kind",jstr "ContentFirst"),("selection",jobj [("mode",jstr (show m)),("selector",selJ s)]),("construction",jstr (show c)),("view",viewIdJSON v)
   ,("cost",show (planCost p)),("text",jstr (planText p)),("plan_id",jstr (stableHash (show p)))]
   where selJ AllObjects=jobj [("kind",jstr "AllObjects")]
         selJ (FilterBy q)=jobj [("kind",jstr "FilterBy"),("pred",predJ q)]
         predJ (ColorIs k)=jobj [("kind",jstr "ColorIs"),("color",show k)]
+        predJ (GeoRectCount k)=jobj [("kind",jstr "GeoRectCount"),("k",show k)]
         predJ (NotP q)=jobj [("kind",jstr "NotP"),("pred",predJ q)]
         predJ q=jobj [("kind",jstr (show q))]
 
 -- The finite plan universe: the relation grammar's input-side predicates
 -- (colour constants come from the INPUT scenes of the training cases only),
--- both selection modes, both constructions; sorted by (cost, structure).
-enumeratePlans :: [Int] -> Bool -> Bool -> [ContentFirstPlan]
-enumeratePlans colors shape diagonal=sortOn (\p->(planCost p,p)) (nub plans)
+-- optionally the geometry predicates, both selection modes, both
+-- constructions, the legacy view and optionally the background views; sorted
+-- by (cost, structure). With both flags off this is exactly the Content-first
+-- universe of the previous round (every plan on LegacyView).
+enumeratePlans :: [Int] -> Bool -> Bool -> Bool -> Bool -> [ContentFirstPlan]
+enumeratePlans colors shape diagonal views geometry=sortOn (\p->(planCost p,p)) (nub plans)
   where
     basePreds=[ColorIs c | c<-colors]++[IsMaxArea,IsMinArea,ColorMostFrequent,ColorLeastFrequent]
       ++[p | shape, p<-[IsRect,IsSquare,IsShell,IsTriangle]]++[IsDiagonal | shape, diagonal]
+      ++[GeoRectCount k | geometry, k<-[1,2,3]]
     preds=basePreds++map NotP basePreds
     selectors=AllObjects:map FilterBy preds
-    plans=[ContentFirstPlan (SelectionPlan m s) c | s<-selectors, m<-[minBound..maxBound], c<-[minBound..maxBound]]
+    viewList=LegacyView:[v | views, v<-allBackgroundViews]
+    plans=[ContentFirstPlan (SelectionPlan m s) c v | v<-viewList, s<-selectors, m<-[minBound..maxBound], c<-[minBound..maxBound]]
 
 -- Inclusive pixel bounds; the dimensions are +1 on each axis.
 data Bounds = Bounds { bMinX, bMinY, bMaxX, bMaxY :: Int } deriving (Eq,Ord,Show)
@@ -134,14 +160,15 @@ boundsJSON (Bounds x0 y0 x1 y1)=jobj [("min_x",show x0),("min_y",show y0),("max_
 data SelectionWitness = SelectionWitness
   { swPlan :: SelectionPlan
   , swExamined :: Int            -- input objects the selector was evaluated on
-  , swMatched :: [Int]           -- ids of the matching input objects
+  , swMatched :: [Int]           -- ids of the matching input objects (region ids of the plan's view)
   , swEvidence :: String         -- why the selection is legal (uniqueness / non-empty aggregate)
   , swBounds :: Bounds } deriving (Eq,Show)
 
 -- The selection reads the input objects only. Zero matches and (for
 -- SelectUnique) several matches are explicit failures that name the
 -- cardinality; a predicate that itself needs a unique choice (IsMaxArea on a
--- tie, colour mode on a tie) fails inside selectObjects with its own reason.
+-- tie, colour mode on a tie, an unproven rectangle count) fails inside
+-- selectObjects with its own reason.
 selectWith :: SelectionPlan -> [O.Object] -> Either String SelectionWitness
 selectWith plan@(SelectionPlan mode sel) objs=do
   (chosen,_)<-either (\e->Left ("selection "++selectionText plan++": "++e)) Right (selectObjects sel objs)
@@ -167,8 +194,18 @@ data OutputSpecWitness = OutputSpecWitness
   , oswContentKind :: String
   , oswPixelSources :: [(Int,Int,Bool)]      -- (source object id, pixels contributed, source is a selected member)
   , oswSelectedPixels, oswOtherPixels, oswBackgroundCells :: Int
+  , oswView :: ViewId
+  , oswCanvasFill :: Int                     -- fill colour of an own canvas (view background; the encoder background for the legacy view)
+  , oswProvenance :: RegionProvenance
+  , oswGeometry :: Maybe [GeometryWitness]   -- E1: cover/bounds witness of every selected member (when requested)
   } deriving (Eq,Show)
 data OutputSpec = OutputSpec { osDims :: Dimensions, osContent :: OutputContent, osWitness :: OutputSpecWitness } deriving (Eq,Show)
+-- Derivation options: whether the (budgeted) geometry witnesses of the
+-- selected members are computed. Program execution never needs them.
+newtype DeriveOptions = DeriveOptions { doGeometryWitness :: Bool } deriving (Eq,Show)
+deriveQuiet, deriveWithGeometry :: DeriveOptions
+deriveQuiet=DeriveOptions False
+deriveWithGeometry=DeriveOptions True
 
 -- Read the inclusive window of the raw input grid; out-of-grid bounds are an
 -- explicit failure (never clipped).
@@ -179,11 +216,22 @@ cropWindow g b@(Bounds x0 y0 x1 y1)
   | otherwise = mkGrid [[maybe 0 id (cell g (Coord x y)) | x<-[x0..x1]] | y<-[y0..y1]]
   where Dimensions gw gh=dimensions g
 
+-- The scene a plan's view produces for a raw grid: the legacy scene is the
+-- caller's encoded scene (encoder, diagonal view, permutation already
+-- applied); a background view yields its regions as objects plus its
+-- background decision (Nothing under NoBackground).
+sceneForView :: ViewId -> Grid -> O.Scene -> Either String (O.Scene,Maybe Int,String)
+sceneForView LegacyView _ scene=Right (scene,Just (O.background scene),"legacy encoder scene")
+sceneForView v grid _=do
+  vr<-viewRegions v grid
+  Right (viewScene vr,vrBackground vr,vrEvidence vr)
+
 -- Inference-time derivation: input grid + its encoded scene -> OutputSpec.
--- Order: selection -> bounds -> dimensions (checked against the ARC range)
--- -> content. The training target is not an argument.
-deriveOutputSpec :: ContentFirstPlan -> Int -> Grid -> O.Scene -> Either String OutputSpec
-deriveOutputSpec (ContentFirstPlan sel construction) bg grid scene=do
+-- Order: view -> selection -> bounds -> dimensions (checked against the ARC
+-- range) -> content. The training target is not an argument.
+deriveOutputSpec :: DeriveOptions -> ContentFirstPlan -> Int -> Grid -> O.Scene -> Either String OutputSpec
+deriveOutputSpec opts (ContentFirstPlan sel construction view) bg0 grid scene0=do
+  (scene,viewBg,viewEvidence)<-either (\e->Left ("view "++viewText view++": "++e)) Right (sceneForView view grid scene0)
   sw<-selectWith sel (O.objects scene)
   let b=swBounds sw
       dims@(Dimensions w h)=boundsDims b
@@ -191,15 +239,28 @@ deriveOutputSpec (ContentFirstPlan sel construction) bg grid scene=do
       dimsSource="Dimensions <- Bounds("++selectionText sel++") = "++show (w,h)
       chosenIds=swMatched sw
       shift o=O.translate o (Vec (negate (bMinX b)) (negate (bMinY b)))
+      bg=if view==LegacyView then bg0 else maybe 0 id viewBg
+      chosen=[o | o<-O.objects scene, O.objectId o `elem` chosenIds]
+      provenance otherCells=RegionProvenance (stableHash (show (rows grid))) view viewBg viewEvidence chosenIds
+        "inclusive bounding box of the selected members' pixel sets (+1 per axis)"
+        (if construction==CropInputWindow then "raw input window (every colour inside the bounds)" else "selected members only") otherCells
+      geometry=if doGeometryWitness opts then Just [geometryWitness "" 0 view defaultCoverBudget (pixelSetFromList (map fst (O.absolutePixels o))) | o<-chosen] else Nothing
+      geometryTrace spec=case geometry of
+        Nothing->spec
+        Just ws->foldr (\gw acc->traceAt levelCandidates [("scope",jstr "ContentFirst"),("kind",jstr (if gwStatus gw=="bounded" then "cover-bounded" else "cover-proven")),("stage",jstr "geometry"),("branch_id",jstr "content_first.geometry"),("parent_branch_id",jstr "content_first")
+                        ,("view",jstr (viewText view)),("pixels",show (S.size (gwPixels gw))),("rectangles",show (length (gwRects gw))),("lower_bound",show (gwLower gw)),("upper_bound",show (gwUpper gw)),("status",jstr (gwStatus gw))] acc) spec ws
   if w<lo || h<lo then Left ("output size realization: non-positive dimensions "++show (w,h)++" from "++dimsSource) else Right ()
   if w>hi || h>hi then Left ("output size realization: dimensions "++show (w,h)++" exceed the ARC bound "++show hi) else Right ()
   case construction of
     EmitSelectedWithOwnCanvas->do
-      let chosen=[o | o<-O.objects scene, O.objectId o `elem` chosenIds]
-          emitted=[EmittedObject (shift o) [O.objectId o] ("selected member "++show (O.objectId o)++" translated to the local canvas origin") | o<-chosen]
+      fill<-case (view,viewBg) of
+        (LegacyView,_)->Right bg0
+        (_,Just c)->Right c
+        (_,Nothing)->Left ("EmitSelectedWithOwnCanvas not applicable under "++viewText view++": no background colour to fill the own canvas")
+      let emitted=[EmittedObject (shift o) [O.objectId o] ("selected member "++show (O.objectId o)++" translated to the local canvas origin") | o<-chosen]
           px=sum (map (O.size . eoObject) emitted)
           sources=[(O.objectId o,O.size o,True) | o<-chosen]
-      Right (OutputSpec dims (ContentEmit emitted) (OutputSpecWitness sw dimsSource "emit_selected: only the selected members are drawn" sources px 0 (w*h-px)))
+      Right (geometryTrace (OutputSpec dims (ContentEmit emitted) (OutputSpecWitness sw dimsSource "emit_selected: only the selected members are drawn" sources px 0 (w*h-px) view fill (provenance (w*h-px)) geometry)))
     CropInputWindow->do
       window<-cropWindow grid b
       let inside (Coord x y)=x>=bMinX b && x<=bMaxX b && y>=bMinY b && y<=bMaxY b
@@ -214,17 +275,19 @@ deriveOutputSpec (ContentFirstPlan sel construction) bg grid scene=do
           sources=[(O.objectId (eoObject e),O.size (eoObject e),s) | (e,s)<-clipped]
           selPx=sum [n | (_,n,True)<-sources]; otherPx=sum [n | (_,n,False)<-sources]
       -- The provenance split must reproduce the raw window exactly; a
-      -- disagreement (e.g. a background convention the encoder does not
-      -- share) is a failure, never a silent colour loss.
+      -- disagreement (e.g. a background convention the view does not share)
+      -- is a failure, never a silent colour loss.
       replay<-gridFromCells dims bg (concatMap (O.absolutePixels . eoObject) emitted)
-      if replay/=window then Left ("crop provenance mismatch: the encoded objects inside the window do not reproduce the raw input window (background "++show bg++")") else Right ()
-      Right (OutputSpec dims (ContentCrop window emitted) (OutputSpecWitness sw dimsSource "crop_input_window: every input pixel inside the selection's bounding box" sources selPx otherPx (w*h-selPx-otherPx)))
+      if replay/=window then Left ("crop provenance mismatch: the view's objects inside the window do not reproduce the raw input window (fill "++show bg++")") else Right ()
+      Right (geometryTrace (OutputSpec dims (ContentCrop window emitted) (OutputSpecWitness sw dimsSource "crop_input_window: every input pixel inside the selection's bounding box" sources selPx otherPx (w*h-selPx-otherPx) view bg (provenance (w*h-selPx-otherPx)) geometry)))
 
 specEmitted :: OutputSpec -> [EmittedObject]
 specEmitted s=case osContent s of ContentEmit es->es; ContentCrop _ es->es
--- Render on the derived canvas; a pixel outside the canvas is a failure.
+-- Render on the derived canvas with the spec's own fill colour; a pixel
+-- outside the canvas is a failure.
 renderOutputSpec :: Int -> OutputSpec -> Either String Grid
-renderOutputSpec bg s=do
+renderOutputSpec bg0 s=do
+  let bg=if oswView (osWitness s)==LegacyView then bg0 else oswCanvasFill (osWitness s)
   g<-gridFromCells (osDims s) bg (concatMap (O.absolutePixels . eoObject) (specEmitted s))
   case osContent s of
     ContentCrop window _ | g/=window->Left "render disagrees with the cropped input window"
@@ -236,10 +299,13 @@ specWitnessJSON s=
   in jobj [("selection",jobj [("text",jstr (selectionText (swPlan sw))),("mode",jstr (show (spMode (swPlan sw)))),("objects_examined",show (swExamined sw))
              ,("matched_ids",show (swMatched sw)),("cardinality",show (length (swMatched sw))),("evidence",jstr (swEvidence sw))])
           ,("bounds",boundsJSON (swBounds sw)),("dims",jarr [show dw,show dh]),("dims_source",jstr (oswDimsSource w))
-          ,("content_kind",jstr (oswContentKind w))
+          ,("content_kind",jstr (oswContentKind w)),("view",jstr (viewText (oswView w))),("canvas_fill",show (oswCanvasFill w))
           ,("pixel_sources",jarr [jobj [("source",show i),("pixels",show n),("selected_member",jbool sel)] | (i,n,sel)<-oswPixelSources w])
           ,("selected_pixels",show (oswSelectedPixels w)),("other_object_pixels",show (oswOtherPixels w)),("background_cells",show (oswBackgroundCells w))
-          ,("input_only_dependency",jstr "input grid -> encoded objects -> selector -> bounds -> dimensions -> content; the training target is never read")]
+          ,("provenance",provenanceJSON (oswProvenance w))
+          ,("geometry",jmaybe (\ws->jarr (map geometryWitnessJSON ws)) (oswGeometry w))
+          ,("geometry_summary",jmaybe (\ws->jobj [("members",show (length ws)),("proven",show (length [() | g<-ws, gwStatus g/="bounded"])),("bounded",show (length [() | g<-ws, gwStatus g=="bounded"]))]) (oswGeometry w))
+          ,("input_only_dependency",jstr "input grid -> view -> objects/regions -> selector -> bounds -> dimensions -> content; the training target is never read")]
 specJSON :: Int -> OutputSpec -> String
 specJSON bg s=jobj [("witness",specWitnessJSON s),("emitted",jarr [jobj [("sources",show (eoSources e)),("origin",jstr (eoOrigin e)),("pixels",jarr [jarr [show (cx p),show (cy p),show c] | (p,c)<-O.absolutePixels (eoObject e)])] | e<-specEmitted s])
   ,("grid",either (const "null") (\g->jarr [jarr (map show r) | r<-rows g]) (renderOutputSpec bg s))]
@@ -267,17 +333,24 @@ data CFResult = CFResult
   , crRendered :: Int                       -- per-case renders that produced a grid
   , crTruncated :: Bool, crTruncationReason :: Maybe String
   , crFirstFitExecutions :: Maybe Int       -- executions spent when the first fit appeared
+  , crViewsUsed :: S.Set (Int,ViewId)       -- (case, non-legacy view) pairs materialised by a visited plan
+  , crViewsNotApplicable :: S.Set (Int,ViewId)
+  , crGeometryEvaluations :: Int            -- plan x case selection evaluations of plans with a geometry predicate
   } deriving (Eq,Show)
 
 searchContentFirst :: ContentFirst -> Int -> [ContentFirstPlan] -> [CFCase] -> CFResult
 searchContentFirst cf bg universe cases=
   let visited=take (cfPlanBudget cf) universe
       planCut=length universe>cfPlanBudget cf
-      start=CFResult [] [] (length universe) 0 0 0 0 0 0 planCut (if planCut then Just ("plan budget: "++show (cfPlanBudget cf)++" of "++show (length universe)++" plans visited") else Nothing) Nothing
+      start=CFResult [] [] (length universe) 0 0 0 0 0 0 planCut (if planCut then Just ("plan budget: "++show (cfPlanBudget cf)++" of "++show (length universe)++" plans visited") else Nothing) Nothing S.empty S.empty 0
       final=go start (zip [0::Int ..] visited)
   in final {crCandidates=reverse (crCandidates final),crFits=reverse (crFits final)}
   where
     ncases=length cases
+    -- Views are materialised at most once per case (lazy map) and shared by every plan.
+    viewTable=M.fromList [((k,v),sceneForView v (cfcGrid c) (cfcScene c)) | (k,c)<-zip [0::Int ..] cases, v<-LegacyView:allBackgroundViews]
+    viewOf k v=M.findWithDefault (Left "view not materialised") (k,v) viewTable
+    opts=DeriveOptions (cfGeometry cf)
     go r []=r
     go r ((i,plan):rest)
       | crExecutions r>=cfExecutionBudget cf = traceAt levelBranches (budgetEvent "case_execution_budget" "cfExecutionBudget" (cfExecutionBudget cf) (crExecutions r) (length rest+1) plan)
@@ -285,9 +358,19 @@ searchContentFirst cf bg universe cases=
       | length (crFits r)>=cfMaxFits cf = traceAt levelBranches (budgetEvent "fit_representative_cap" "cfMaxFits" (cfMaxFits cf) (length (crFits r)) (length rest+1) plan)
           r {crTruncated=True,crTruncationReason=Just ("representative cap "++show (cfMaxFits cf)++" reached; "++show (length rest+1)++" enumerated plans not visited")}
       | otherwise =
-          let sels=[(k,selectWith (cfpSelection plan) (O.objects (cfcScene c))) | (k,c)<-zip [0::Int ..] cases]
+          let view=cfpView plan
+              ks=[0..ncases-1]
+              sels=[(k,case viewOf k view of
+                          Left e->Left ("view "++viewText view++": "++e)
+                          Right (sc,_,_)->selectWith (cfpSelection plan) (O.objects sc)) | k<-ks]
               legal=all (either (const False) (const True) . snd) sels
-              r1=r {crTried=crTried r+1,crSelectionEvaluations=crSelectionEvaluations r+ncases}
+              viewOk k=either (const False) (const True) (viewOf k view)
+              usedViews=if view==LegacyView then S.empty else S.fromList [(k,view) | k<-ks, viewOk k]
+              naViews=if view==LegacyView then S.empty else S.fromList [(k,view) | k<-ks, not (viewOk k)]
+              newViews=S.toList (S.difference usedViews (crViewsUsed r))++S.toList (S.difference naViews (crViewsNotApplicable r))
+              r1=r {crTried=crTried r+1,crSelectionEvaluations=crSelectionEvaluations r+ncases
+                   ,crViewsUsed=S.union (crViewsUsed r) usedViews,crViewsNotApplicable=S.union (crViewsNotApplicable r) naViews
+                   ,crGeometryEvaluations=crGeometryEvaluations r+(if planUsesGeometry plan then ncases else 0)}
               (r2,execs)=if legal then runCases r1 {crSelectionLegalPlans=crSelectionLegalPlans r1+1} plan else (r1,[])
               cand'=if legal then CFCandidate plan i (statusOf execs) (map snd sels) execs
                     else CFCandidate plan i "selection_failed" (map snd sels) [CFCaseTrace k (either (const "selection_failed") (const "selection_ok") e) (either id (\w->swEvidence w++"; matched "++show (swMatched w)) e) Nothing Nothing | (k,e)<-sels]
@@ -296,9 +379,17 @@ searchContentFirst cf bg universe cases=
                     ,crFits=if ok then cand':crFits r2 else crFits r2
                     ,crFirstFitExecutions=case crFirstFitExecutions r2 of Nothing | ok->Just (crExecutions r2); x->x}
               next=if ok then traceEvent "latis-train-exact" (go r3 rest) else go r3 rest
-          in traceCand levelCandidates (stableHash (show plan)) (\level->
+              viewEvents x=foldr (\(k,v) acc->case viewOf k v of
+                  Right (sc,vbg,ev)->traceAt levelBranches [("scope",jstr "ContentFirst"),("kind",jstr "geometry-view-created"),("stage",jstr "content_first"),("branch_id",jstr "content_first.view"),("parent_branch_id",jstr "content_first")
+                    ,("case_index",show k),("view",jstr (viewText v)),("background",jmaybe show vbg),("evidence",jstr ev),("regions",show (length (O.objects sc))),("input_only",jbool True)] acc
+                  Left e->traceAt levelBranches [("scope",jstr "ContentFirst"),("kind",jstr "geometry-view-not-applicable"),("stage",jstr "content_first"),("branch_id",jstr "content_first.view"),("parent_branch_id",jstr "content_first"),("case_index",show k),("view",jstr (viewText v)),("reason",jstr e)] acc) x newViews
+              geometryEvent x=if planUsesGeometry plan then traceAt levelCandidates [("scope",jstr "ContentFirst"),("kind",jstr "geometry-feature-evaluated"),("stage",jstr "geometry"),("branch_id",jstr "content_first.geometry"),("parent_branch_id",jstr "content_first")
+                  ,("candidate_id",jstr (stableHash (show plan))),("plan",jstr (planText plan)),("cases",jarr [jobj [("case_index",show k),("legal",jbool (either (const False) (const True) e)),("reason",jstr (either id (const "") e))] | (k,e)<-sels])] x else x
+              executedEvent x=if legal then traceAt levelCandidates [("scope",jstr "ContentFirst"),("kind",jstr "content-first-branch-executed"),("stage",jstr "content_first"),("branch_id",jstr "content_first.search"),("parent_branch_id",jstr "content_first")
+                  ,("candidate_id",jstr (stableHash (show plan))),("view",jstr (viewText view)),("cases_executed",show (length [() | t<-execs, cftOutcome t/="not_executed"])),("outcome",jstr (ccStatus cand'))] x else x
+          in viewEvents $ geometryEvent $ executedEvent $ traceCand levelCandidates (stableHash (show plan)) (\level->
                [("scope",jstr "ContentFirst"),("kind",jstr "evaluated"),("stage",jstr "content_first"),("entry",jstr "content_first"),("branch_id",jstr "content_first.search"),("parent_branch_id",jstr "content_first")
-               ,("enumeration_index",show i),("candidate_ast",planJSON plan),("candidate_type",jstr "Input -> OutputSpec(Dimensions,Content)"),("cost",show (planCost plan))
+               ,("enumeration_index",show i),("candidate_ast",planJSON plan),("candidate_type",jstr "Input -> OutputSpec(Dimensions,Content)"),("cost",show (planCost plan)),("view",jstr (viewText view))
                ,("outcome",jstr (if ok then "fit" else case ccStatus cand' of "selection_failed"->"invalid"; "derive_failed"->"invalid"; "render_invalid"->"invalid"; _->"no_fit"))
                ,("reason_code",jstr (if ok then "train_exact" else ccStatus cand'))
                ,("selection_legal_on_every_case",jbool legal),("case_executions",show (length [() | t<-ccCases cand', cftOutcome t `notElem` ["not_executed","selection_failed","selection_ok"]]))
@@ -313,7 +404,7 @@ searchContentFirst cf bg universe cases=
           | crExecutions r>=cfExecutionBudget cf = (r {crTruncated=True,crTruncationReason=Just "execution budget reached inside a candidate"},reverse (CFCaseTrace k "not_executed" "execution budget reached inside the candidate" Nothing Nothing:acc)++[CFCaseTrace k' "not_executed" "after budget cut" Nothing Nothing | (k',_)<-cs])
           | otherwise =
               let r1=r {crExecutions=crExecutions r+1}
-              in case deriveOutputSpec plan bg (cfcGrid c) (cfcScene c) of
+              in case deriveOutputSpec opts plan bg (cfcGrid c) (cfcScene c) of
                    Left e->(r1,reverse (CFCaseTrace k "derive_failed" e Nothing Nothing:acc)++[CFCaseTrace k' "not_executed" "earlier case failed (early exit)" Nothing Nothing | (k',_)<-cs])
                    Right spec->
                      let r2=r1 {crSpecsDerived=crSpecsDerived r1+1}
@@ -360,7 +451,7 @@ classifyResult trig r
   | otherwise = "content_first_no_train_exact"
 
 cfMetricNames :: [String]
-cfMetricNames=words "cf_triggered cf_trigger_size_failed cf_trigger_downstream_failed cf_trigger_explore_alternatives cf_plan_universe cf_plans_tried cf_selection_evaluations cf_selection_legal_plans cf_case_executions cf_specs_derived cf_rendered cf_fits cf_truncated cf_representation_unavailable cf_first_fit_executions cf_alternative_fits cf_deferred_plans cf_selected_cost"
+cfMetricNames=words "cf_triggered cf_trigger_size_failed cf_trigger_downstream_failed cf_trigger_explore_alternatives cf_plan_universe cf_plans_tried cf_selection_evaluations cf_selection_legal_plans cf_case_executions cf_specs_derived cf_rendered cf_fits cf_truncated cf_representation_unavailable cf_first_fit_executions cf_alternative_fits cf_deferred_plans cf_selected_cost geo_views_created geo_views_not_applicable geo_feature_evaluations geo_cover_proven geo_cover_bounded geo_selected_rect_count"
 
 -- One content-first search as recorded in the derivation graph.
 data CFRun = CFRun

@@ -5,6 +5,7 @@ import Synthesis.Collection.Relation (Pred(..), Selector(..), verifyRenderWitnes
 import qualified Synthesis.Collection.Diagnostics as DG
 import ARC.ContentFirstEvaluate
 import ARC.ContentFirstMechanism
+import Synthesis.Collection.Geometry.View (ViewId(..))
 import ARC.StageDMechanism (instancesD, InstanceD(..))
 import ARC.StageCEvaluate (mechanismInstancesC, instanceTaskC)
 import ARC.StageAEvaluate (trainExactOf, heldExactOf, failureStage)
@@ -27,9 +28,9 @@ gridOf w h cells=must (gridFromCells (Dimensions w h) 0 [(Coord x y,c) | (x,y,c)
 sceneOf :: Grid -> O.Scene
 sceneOf=encode defaultEncoder
 plan :: SelectionMode -> Selector -> ContentConstruction -> ContentFirstPlan
-plan m s c=ContentFirstPlan (SelectionPlan m s) c
+plan m s c=ContentFirstPlan (SelectionPlan m s) c LegacyView
 derive :: ContentFirstPlan -> Grid -> Either String OutputSpec
-derive p g=deriveOutputSpec p 0 g (sceneOf g)
+derive p g=deriveOutputSpec deriveQuiet p 0 g (sceneOf g)
 rendered :: ContentFirstPlan -> Grid -> Either String Grid
 rendered p g=derive p g >>= renderOutputSpec 0
 -- A content-first Program never consults its sequence body; build one from a
@@ -67,13 +68,13 @@ main=do
   assert "non-empty set of two objects: union bounds" (fmap osDims (derive (plan SelectNonEmpty (FilterBy (ColorIs 2)) CropInputWindow) g3)==Right (Dimensions 6 3))
   assert "crop window outside the grid is rejected" (isLeft (cropWindow g3 (Bounds 0 0 8 4)) && isLeft (cropWindow g3 (Bounds 3 1 2 1)))
   let permuted=(sceneOf g1) {O.objects=reverse (O.objects (sceneOf g1))}
-  assert "selection and spec are permutation invariant" (fmap (\s->(osDims s,swMatched (oswSelection (osWitness s)))) (deriveOutputSpec crop2 0 g1 permuted)==fmap (\s->(osDims s,swMatched (oswSelection (osWitness s)))) (derive crop2 g1)
-    && (deriveOutputSpec crop2 0 g1 permuted >>= renderOutputSpec 0)==Right cropG)
+  assert "selection and spec are permutation invariant" (fmap (\s->(osDims s,swMatched (oswSelection (osWitness s)))) (deriveOutputSpec deriveQuiet crop2 0 g1 permuted)==fmap (\s->(osDims s,swMatched (oswSelection (osWitness s)))) (derive crop2 g1)
+    && (deriveOutputSpec deriveQuiet crop2 0 g1 permuted >>= renderOutputSpec 0)==Right cropG)
   -- the plan universe
-  let u=enumeratePlans [2,4] True True
-  assert "plan universe: deterministic, cost-sorted, no duplicates, both modes and constructions" (and (zipWith (\a b->planCost a<=planCost b) u (drop 1 u)) && length u==length (sort u) && u==enumeratePlans [2,4] True True
+  let u=enumeratePlans [2,4] True True False False
+  assert "plan universe: deterministic, cost-sorted, no duplicates, both modes and constructions" (and (zipWith (\a b->planCost a<=planCost b) u (drop 1 u)) && length u==length (sort u) && u==enumeratePlans [2,4] True True False False
     && plan SelectUnique (FilterBy (ColorIs 2)) CropInputWindow `elem` u && plan SelectNonEmpty AllObjects EmitSelectedWithOwnCanvas `elem` u)
-  assert "plan universe without the Shape flag has no shape predicate" (not (any (\p->spSelector (cfpSelection p)==FilterBy IsShell) (enumeratePlans [2] False False)) && any (\p->spSelector (cfpSelection p)==FilterBy IsShell) u)
+  assert "plan universe without the Shape flag has no shape predicate" (not (any (\p->spSelector (cfpSelection p)==FilterBy IsShell) (enumeratePlans [2] False False False False)) && any (\p->spSelector (cfpSelection p)==FilterBy IsShell) u)
   -- 2. mechanism matrix: measured baseline, positive/negative controls ----
   let run cfg t=frontSearch SafeOnline cfg (training t)
       m k f=metric k (graph f)

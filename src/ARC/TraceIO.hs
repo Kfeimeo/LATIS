@@ -26,7 +26,8 @@ import Synthesis.Collection.Parameter
 import Synthesis.Collection.Typed (TExpr(..), TVal(..), TOp(..), opName)
 import Synthesis.Collection.Shape (applyDiagonalView, maskCells, DiagonalChain(..), DiagonalRejection(..))
 import Synthesis.Collection.Unified (StageD(..))
-import Synthesis.Collection.ContentFirst (planJSON, OutputSpec, ContentFirstPlan(..), SelectionPlan(..), SelectionMode(..), ContentConstruction(..), deriveOutputSpec, renderOutputSpec, specEmitted, specWitnessJSON, planText)
+import Synthesis.Collection.ContentFirst (planJSON, OutputSpec, ContentFirstPlan(..), SelectionPlan(..), SelectionMode(..), ContentConstruction(..), deriveOutputSpec, deriveWithGeometry, renderOutputSpec, specEmitted, specWitnessJSON, planText)
+import Synthesis.Collection.Geometry.View (ViewId(..), BackgroundHypothesis(..), viewText, viewRegions, viewResultJSON, allBackgroundViews)
 import Latent.Encode (encoderBackground)
 import qualified ARC.StageAEvaluate as SA
 import qualified ARC.StageBEvaluate as SB
@@ -224,6 +225,8 @@ runTraceIO opt=do
          ,("diagonal_view_enabled",jbool (F.scDiagonalView (F.stageC conf))),("search_objects",jarr (map objectFullJ (O.objects sx)))
          ,("diagonal_chains",jarr [jobj [("color",show (dcColor c)),("pixels",jarr [jarr [show (cx p),show (cy p)] | p<-dcPixels c]),("sources",show (dcSources c))] | c<-chains])
          ,("diagonal_rejections",jarr [jobj [("color",show (drColor r)),("reason",jstr (drReason r))] | r<-rejs])])
+      ,("views",jarr [either (\e->jobj [("view",jstr (viewText v)),("applicable",jbool False),("reason",jstr e)]) (\vr->jobj [("applicable",jbool True),("result",viewResultJSON vr)]) (viewRegions v x) | v<-LegacyView:allBackgroundViews])
+      ,("views_note",jstr "E0: every view is an input-side interpretation of the same raw grid; colour 0 has no special meaning at the geometry layer")
       ,("output_encoding",jobj [("search_objects",jarr (map objectFullJ (O.objects sy))),("note",jstr "training target encoding; never a program input")])
       ,("predicted",predicted)])
   writeFile (out </> "grids.json") (jobj (meta++[("pairs",jarr gridsOut)])++"\n")
@@ -249,7 +252,12 @@ decodeContentFirst j=do
   mode<-field "mode" selection >>= str >>= \m->case m of "SelectUnique"->Right SelectUnique; "SelectNonEmpty"->Right SelectNonEmpty; _->Left ("unknown selection mode "++m)
   sel<-field "selector" selection >>= decodeSelector
   construction<-field "construction" j >>= str >>= \c->case c of "CropInputWindow"->Right CropInputWindow; "EmitSelectedWithOwnCanvas"->Right EmitSelectedWithOwnCanvas; _->Left ("unknown construction "++c)
-  Right (ContentFirstPlan (SelectionPlan mode sel) construction)
+  view<-case field "view" j of
+    Left _->Right LegacyView
+    Right vj->do
+      name<-case vj of JString s'->Right s'; _->field "view" vj >>= str
+      maybe (Left ("unknown view "++name)) Right (lookup name ([(viewText v,v) | v<-LegacyView:[BackgroundView h | h<-[minBound..maxBound]]]++[("LegacyView",LegacyView)]++[(show h,BackgroundView h) | h<-[minBound..maxBound]]))
+  Right (ContentFirstPlan (SelectionPlan mode sel) construction view)
 isContentFirstAst :: JSON -> Bool
 isContentFirstAst j=either (const False) (=="ContentFirst") (field "kind" j >>= str)
 str :: JSON -> Either String String
@@ -267,6 +275,7 @@ decodeSelector j=kindOf j >>= \k->case k of
 decodePred :: JSON -> Either String Pred
 decodePred j=kindOf j >>= \k->case k of
   "ColorIs"->ColorIs <$> intF "color" j
+  "GeoRectCount"->GeoRectCount <$> intF "k" j
   "NotP"->NotP <$> (field "pred" j >>= decodePred)
   _->maybe (Left ("unknown predicate "++k)) Right (lookup k [(show p,p) | p<-[IsMaxArea,IsMinArea,IsRect,IsSquare,IsShell,IsDiagonal,IsTriangle,ColorMostFrequent,ColorLeastFrequent]])
 decodePer :: JSON -> Either String PerObject
@@ -402,7 +411,7 @@ replayContentFirst conf pairs req rid cid=case field "ast" req >>= decodeContent
       if pj<0 || pj>=length pairs then pure (jobj [("pair_index",show pj),("outcome",jstr "unverifiable"),("reason",jstr "pair index outside the task")]) else do
         let (x,y)=pairs!!pj
             (scene,_,_)=sceneOf conf x
-        r<-try (evaluate (let v=deriveOutputSpec plan bg x scene >>= \sp->fmap (\g->(sp,g)) (renderOutputSpec bg sp) in length (show v) `seq` v)) :: IO (Either SomeException (Either String (OutputSpec,Grid)))
+        r<-try (evaluate (let v=deriveOutputSpec deriveWithGeometry plan bg x scene >>= \sp->fmap (\g->(sp,g)) (renderOutputSpec bg sp) in length (show v) `seq` v)) :: IO (Either SomeException (Either String (OutputSpec,Grid)))
         pure $ case r of
           Left e->jobj [("pair_index",show pj),("outcome",jstr "runtime_error"),("reason",jstr (take 300 (show e)))]
           Right (Left e)->jobj [("pair_index",show pj),("outcome",jstr (if "selection" `isPrefixOf` e then "selection_failed" else "execution_invalid")),("reason",jstr e),("grid","null"),("grid_hash","null")]
