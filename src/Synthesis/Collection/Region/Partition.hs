@@ -31,7 +31,7 @@ import Synthesis.Collection.Geometry.Cover (PixelSet, boundsOfPixels, BoundsE(..
 import Synthesis.Collection.Diagnostics (jstr, jobj, jarr, jbool, jmaybe, stableHash)
 import qualified Data.Set as S
 import qualified Data.Map.Strict as M
-import Data.List (sortOn, nub)
+import Data.List (sortOn, nub, sort)
 
 data RegionRole = RoleRoot | RoleSeparator | RoleContent deriving (Eq,Ord,Show)
 data RegionNode = RegionNode
@@ -200,6 +200,7 @@ verifyPartitionWitness w=do
 
 nodeJSON :: RegionTree -> RegionNode -> String
 nodeJSON t n=jobj [("region_id",show (rnId n)),("parent_id",jmaybe show (rnParent n)),("depth",show (rnDepth n)),("role",jstr (show (rnRole n))),("area",show (regionArea n))
+  ,("colours",show (nub (sort [c | p<-S.toList (rnPixels n), Just c<-[cell (shGrid (rtScene t)) p]])))
   ,("bounds",jmaybe rectJSON (regionBoundsOf n)),("split_object_id",jmaybe show (rnSplitObject n)),("children",show (rnChildren n)),("leaf",jmaybe jstr (rnLeaf n)),("objects",show (rnObjects n))
   ,("pixels",jarr [jarr [show x,show y] | Coord x y<-take 400 (S.toList (rnPixels n))]),("pixels_truncated",jbool (S.size (rnPixels n)>400)),("view",jstr (show (shView (rtScene t))))]
 treeJSON :: RegionTree -> String

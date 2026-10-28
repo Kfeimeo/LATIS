@@ -96,7 +96,7 @@ def main():
       "## 证据与限制\n",
       "三套测试包括旧 1518 round trips/语言 checks、旧 joint consistency tests、新 codec inverse/所有 anchor-pair inverse、orientation/paint-order preservation、malformed latent rejection、inactive-symbol rejection、独立 Z0 interpreter equivalence、A–J heldout、strict MDL、fixedpoint idempotence、reverse-constraint verifier savings、17 regression 与 tiny-budget termination。新 system 是有限 task-local abstraction/coordinate grammar；未实现 arbitrary latent constructor composition、relational multivalued concretization、多步动作或跨 latent 迭代。Z0 search 仍完整先运行，尚未与旧 DFS 的每个节点交错推进，因而不宣称彻底改变原搜索复杂度。\n"]
     report = "\n".join(parts)
-    (ROOT / "LATIS_V03_REPORT.md").write_text(report, encoding="utf-8")
+    (ROOT / "reports" / "LATIS_V03_REPORT.md").write_text(report, encoding="utf-8")
     (OUT / "summary.json").write_text(json.dumps({"stress_secondary_solutions": len(selected), "mean_delta_mdl": avg_delta, "mean_program_length_saved": statistics.mean(program_savings), "regressions_passed": len(regression), "raw_solved": solved, "train_exact": train, "heldout_exact": held, "failure_taxonomy": dict(failures)}, indent=2) + "\n", encoding="utf-8")
     print(f"Report verified: stress secondary={len(selected)}, regressions={len(regression)}, ARC solved={solved}/30")
 

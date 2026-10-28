@@ -1,6 +1,6 @@
 # LATIS 阶段 A：Grid Size Feature + Typed N-ary Feature Synthesis + ML Parity
 
-本轮对应 `LATIS_STAGE_A_TSL_EXTENSION_PROMPT.md`，在 v0.6.1 代码上实现最小、可审计的增量。v0.6.1 的入口（`solve-collection-v61`、`collection-v61-experiment`、`collection-v61-battery`、`arc-train-only-stage --stage feature|feature-v04|r2`）、v0.6/v0.5/v0.4 求解器与 R2 fallback 的行为不变：所有阶段 A 能力都挂在前端 `Config` 的新字段 `stageA :: StageA` 上，默认 `stageAOff`（全部关闭）；`defaultConfig`/`v61Config` 的搜索语义与 v0.6.1 逐步一致（回归见 `results/stage_a/validation/`）。结果与结论见 `LATIS_STAGE_A_REPORT.md`。
+本轮对应 `../prompts/LATIS_STAGE_A_TSL_EXTENSION_PROMPT.md`，在 v0.6.1 代码上实现最小、可审计的增量。v0.6.1 的入口（`solve-collection-v61`、`collection-v61-experiment`、`collection-v61-battery`、`arc-train-only-stage --stage feature|feature-v04|r2`）、v0.6/v0.5/v0.4 求解器与 R2 fallback 的行为不变：所有阶段 A 能力都挂在前端 `Config` 的新字段 `stageA :: StageA` 上，默认 `stageAOff`（全部关闭）；`defaultConfig`/`v61Config` 的搜索语义与 v0.6.1 逐步一致（回归见 `results/stage_a/validation/`）。结果与结论见 `LATIS_STAGE_A_REPORT.md`。
 
 ## 1. 开工前审计（接口定位）
 

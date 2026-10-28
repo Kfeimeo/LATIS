@@ -18,9 +18,16 @@
 -- (role, depth, area order, object counts, colour presence); ties fail.
 -- The read/write scopes of every program are declared (effect classes) and
 -- used by the safe pruning in Search.
+--
+-- Stage E3.1: `resolveSelector` is the single structured evaluation of a
+-- selector on a tree (OK / root unsplit / empty / non-unique / tie). The
+-- executor (`selectRegion`) and the input-side precheck (Search) both call
+-- it, so a precheck verdict is the executor's verdict by construction; the
+-- reason strings of `selectRegion` are unchanged from E2.
 module Synthesis.Collection.Region.Program
   ( RegionSelector(..), RegionEdit(..), RegionAction(..), RegionProgram(..), EffectClass(..)
   , selectorText, actionText, programText, programCost, programJSON, programEffect
+  , SelectorOutcome(..), resolveSelector, outcomeText, outcomeKind, outcomeIds, programSelectors
   , selectRegion, runRegionProgram, runRegionProgramOn, RegionExec(..), regionExecJSON, treeFor, enumerateSelectors, enumerateActions
   ) where
 
@@ -76,6 +83,12 @@ programEffect p=case rpAction p of
   TranslateRegion _ _->EffectLocal
   StampAtMarkers _->EffectCrossRegion
 
+-- Every selector a program evaluates, in evaluation order (target first, then
+-- the Stamp source). Region programs have no branches, bindings or local
+-- scopes: each listed selector is evaluated exactly once on every case.
+programSelectors :: RegionProgram -> [(String,RegionSelector)]
+programSelectors p=("target",rpSelector p):case rpAction p of StampAtMarkers s->[("source",s)]; _->[]
+
 -- Lazily expanded tree of a grid under a view (root split once; content
 -- children of the root further expanded up to the budget).
 treeFor :: PartitionBudget -> ViewId -> Grid -> Either String RegionTree
@@ -88,29 +101,58 @@ treeFor b v g=do
 depth1Content :: RegionTree -> [RegionNode]
 depth1Content t=[n | n<-M.elems (rtNodes t), rnRole n==RoleContent, rnDepth n==1]
 
--- Unique selection or explicit failure with the cardinality.
-selectRegion :: RegionSelector -> RegionTree -> Either String RegionNode
-selectRegion SelRoot t=maybe (Left "no root") Right (M.lookup 0 (rtNodes t))
-selectRegion s t=
+-- Structured selector verdict on one tree. Exactly one outcome per
+-- (selector, tree); no implicit choice anywhere.
+data SelectorOutcome
+  = SelOK RegionNode                       -- exactly one region
+  | SelRootUnsplit RegionSelector          -- no depth-1 content region at all (root not split)
+  | SelEmpty String Int                    -- predicate: no match (number of content regions)
+  | SelNonUnique String [Int]              -- predicate: several matches (their ids)
+  | SelTie String Int Int                  -- extremum: the top two are equal
+  | SelNoRoot                              -- malformed tree
+  deriving (Eq,Show)
+
+resolveSelector :: RegionSelector -> RegionTree -> SelectorOutcome
+resolveSelector SelRoot t=maybe SelNoRoot SelOK (M.lookup 0 (rtNodes t))
+resolveSelector s t=
   let cs=depth1Content t
       g=shGrid (rtScene t)
       colours n=S.fromList [c | p<-S.toList (rnPixels n), Just c<-[cell g p]]
       unique what xs=case xs of
-        [n]->Right n
-        []->Left (what++": no depth-1 content region matches ("++show (length cs)++" content regions)")
-        ns->Left (what++": not unique: "++show (length ns)++" regions match "++show (map rnId ns)++"; no implicit choice")
+        [n]->SelOK n
+        []->SelEmpty what (length cs)
+        ns->SelNonUnique what (map rnId ns)
       extremum what f=case sortOn f cs of
-        (a:b:_) | f a==f b->Left (what++": tie between regions "++show (rnId a)++" and "++show (rnId b))
-        (a:_)->Right a
-        []->Left (what++": no content region")
-  in if null cs then Left (selectorText s++": the root was not split (no legal separator)") else case s of
+        (a:b:_) | f a==f b->SelTie what (rnId a) (rnId b)
+        (a:_)->SelOK a
+        []->SelEmpty what 0
+  in if null cs then SelRootUnsplit s else case s of
        SelLargestContent->extremum "UniqueLargestContent" (negate . regionArea)
        SelSmallestContent->extremum "UniqueSmallestContent" regionArea
        SelContentWithObjects->unique "UniqueContentWithObjects" [n | n<-cs, not (null (rnObjects n))]
        SelContentWithoutObjects->unique "UniqueContentWithoutObjects" [n | n<-cs, null (rnObjects n)]
        SelContentWithColor c->unique ("UniqueContentWithColor "++show c) [n | n<-cs, S.member c (colours n)]
        SelContentWithObjectCount k->unique ("UniqueContentWithObjectCount "++show k) [n | n<-cs, length (rnObjects n)==k]
-       SelRoot->Left "unreachable"
+       SelRoot->SelNoRoot
+
+-- The E2 reason strings, reproduced exactly.
+outcomeText :: SelectorOutcome -> Either String RegionNode
+outcomeText o=case o of
+  SelOK n->Right n
+  SelNoRoot->Left "no root"
+  SelRootUnsplit s->Left (selectorText s++": the root was not split (no legal separator)")
+  SelEmpty what n->Left (what++": no depth-1 content region matches ("++show n++" content regions)")
+  SelNonUnique what ids->Left (what++": not unique: "++show (length ids)++" regions match "++show ids++"; no implicit choice")
+  SelTie what a b->Left (what++": tie between regions "++show a++" and "++show b)
+outcomeKind :: SelectorOutcome -> String
+outcomeKind o=case o of SelOK _->"ValidSelected"; SelNoRoot->"InvalidOther"; SelRootUnsplit _->"InvalidRootUnsplit"; SelEmpty _ _->"InvalidEmpty"; SelNonUnique _ _->"InvalidNonUnique"; SelTie _ _ _->"InvalidNonUnique"
+-- Matched region ids (the cardinality evidence).
+outcomeIds :: SelectorOutcome -> [Int]
+outcomeIds o=case o of SelOK n->[rnId n]; SelNonUnique _ ids->ids; SelTie _ a b->[a,b]; _->[]
+
+-- Unique selection or explicit failure with the cardinality.
+selectRegion :: RegionSelector -> RegionTree -> Either String RegionNode
+selectRegion s t=outcomeText (resolveSelector s t)
 
 data RegionExec = RegionExec { reProgram :: RegionProgram, reRegion :: Int, reRegionArea :: Int, reRegionBounds :: Maybe Rect, reReadRegions :: [Int], reWriteRegions :: [Int], reOutput :: Grid, reNote :: String } deriving (Eq,Show)
 

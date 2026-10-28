@@ -56,7 +56,8 @@ NOT_INSTRUMENTED = [
     {'scope': 'TypedParameter@unified', 'detail': 'D 参数模板内部逐模板 fit / 类型过滤计数', 'source': 'src/Synthesis/Collection/Unified.hs goal → Typed.synthesizeTyped'},
     {'scope': 'Render', 'detail': '旧 alignment 序列体 realize 的逐 case 网格', 'source': 'src/Synthesis/Collection/Front.hs realize'},
     {'scope': 'ContentFirst', 'detail': '逐 case 的 selector 谓词求值（每个 plan 只记录 selection 结论与 bounds）', 'source': 'src/Synthesis/Collection/ContentFirst.hs selectWith / searchContentFirst'},
-    {'scope': 'RegionSearch', 'detail': '惰性分区展开与 Scene 构建（只在 solver_record.region_search.run.trees 中记录结果，不逐步发事件）', 'source': 'src/Synthesis/Collection/Region/Partition.hs expandLazy / Scene.hs sceneFromView'},
+    {'scope': 'RegionSearch', 'detail': '惰性分区展开与 Scene 构建（只在 solver_record.region_search.run.trees 中记录结果，不逐步发事件）', 'source': 'src/Synthesis/Collection/Region/Partition.hs expandLazy / Scene.hs sceneFromRegions'},
+    {'scope': 'RegionSearch', 'detail': 'Stage E3.1 输入侧 Selector 预检查与 Shape MDL 缓存：逐 (视图, Selector, case) 的判定与缓存统计记录在 solver_record.region_search.run.precheck / mdl_cache，不逐候选发事件；被跳过的候选没有 evaluated 事件', 'source': 'src/Synthesis/Collection/Region/Search.hs precheckOf / MDLCache.hs'},
 ]
 VOLATILE = {'timestamp_monotonic_ns', 'wall_seconds', 'task_file', 'sink_seconds', 'monotonic_seconds', 'elapsed_seconds'}
 

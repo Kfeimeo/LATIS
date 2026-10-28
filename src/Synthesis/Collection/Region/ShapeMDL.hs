@@ -16,27 +16,40 @@
 --   Difference    = 2 + cost a + cost b   (a difference is a stronger claim than a union)
 --
 -- C_ast(S) = min { cost e | eval e == S } is DIFFERENT from C_rect(S) (E1's
--- minimal rectangle cover, overlapping rectangles allowed). Both are kept.
+-- minimal rectangle cover, overlapping rectangles allowed). Both are kept:
+-- C_ast lives in `mrCost`, C_rect in `mrRectCover` (Nothing = NotComputed,
+-- never 0; Just a CoverResult carries its own proof status).
 -- The optimiser is exhaustive only inside a declared finite universe
 -- (expressions over at most `smMaxRects` sub-rectangles of the bounding box
 -- with the two operators); its result is ProvenOptimal-in-universe. Outside
 -- the universe (large masks, budget) the row-run disjoint partition gives a
 -- legal BoundedBest with an upper bound that is never called optimal.
+--
+-- Stage E3.1: the level enumeration is streamed (one strict pass per level,
+-- the expression list is never retained), `mrRectCover` is optional, and
+-- `mdlDSLVersion` names the algebra + cost table for cache keys. The
+-- optimum, its status and the universe text are unchanged from E2.
 module Synthesis.Collection.Region.ShapeMDL
   ( ShapeExpr(..), evalShape, shapeCost, shapeText, shapeJSON, shapeDepth, shapeRects
   , ShapeWitness(..), shapeWitness, verifyShapeWitness, shapeWitnessJSON
-  , MDLBudget(..), defaultMDLBudget, MDLResult(..), mdlStatusText, bestShape, mdlJSON
-  , rowRunPartition, bruteForceBestCost
+  , MDLBudget(..), defaultMDLBudget, MDLResult(..), mdlStatusText, bestShape, attachRectCover, mdlJSON, mdlDSLVersion
+  , rowRunPartition, bruteForceBestCost, rectCoverBudget
   ) where
 
 import Latent.Grid (Coord(..))
-import Synthesis.Collection.Geometry.Cover (PixelSet, Rect(..), rectCells, rectJSON, boundsOfPixels, BoundsE(..), pixelSetToList)
+import Synthesis.Collection.Geometry.Cover (PixelSet, Rect(..), rectCells, rectJSON, boundsOfPixels, BoundsE(..), pixelSetToList, CoverResult(..), CoverBudget(..), defaultCoverBudget, minimalCover, coverRectCount, coverStatusText)
 import Synthesis.Collection.Diagnostics (jstr, jobj, jarr, jbool, jmaybe, stableHash)
 import qualified Data.Set as S
 import Data.List (sortOn, nub, minimumBy)
 import Data.Ord (comparing)
 
 data ShapeExpr = SRect Rect | SUnion ShapeExpr ShapeExpr | SDiff ShapeExpr ShapeExpr deriving (Eq,Ord,Show)
+
+-- Name of the algebra, its restricted syntax and its cost table; part of
+-- every cache key so that a result computed under one algebra is never
+-- reused under another.
+mdlDSLVersion :: String
+mdlDSLVersion="ShapeMDL-E2-v1:Rect=5,DisjointUnion=+1,Difference=+2;restricted-difference;levels-by-rectangle-count"
 
 evalShape :: ShapeExpr -> Either String PixelSet
 evalShape (SRect r)
@@ -117,26 +130,32 @@ foldUnion [r]=SRect r
 foldUnion (r:rs)=SUnion (SRect r) (foldUnion rs)
 foldUnion []=error "empty partition"
 
-data MDLBudget = MDLBudget { smMaxRects :: Int, smMaxArea :: Int, smMaxExprs :: Int } deriving (Eq,Show)
+data MDLBudget = MDLBudget { smMaxRects :: Int, smMaxArea :: Int, smMaxExprs :: Int } deriving (Eq,Ord,Show)
 defaultMDLBudget :: MDLBudget
 defaultMDLBudget=MDLBudget 3 64 200000
+-- Budget of the E1 rectangle cover that is reported next to c_ast (reporting
+-- only; never an input of any ranking).
+rectCoverBudget :: CoverBudget
+rectCoverBudget=defaultCoverBudget {cbMaxNodes=2000, cbMaxArea=64}
 
 -- ProvenOptimal: exhaustive over the finite universe (expressions over <= smMaxRects
 -- sub-rectangles of the bounding box, operators (+) and \ with the restricted
 -- syntax) and the row-run partition; the universe is part of the result.
 -- BoundedBest: only legal explanations were tried (budget).
-data MDLResult = MDLResult { mrBest :: ShapeExpr, mrCost :: Int, mrStatus :: String, mrUniverse :: String, mrAlternatives :: [ShapeExpr], mrExprsTried :: Int, mrRectCost :: Int } deriving (Eq,Show)
+-- mrRectCover: the E1 minimal rectangle cover of the same mask when it was
+-- requested (attachRectCover); Nothing means NotComputed and is printed as null.
+data MDLResult = MDLResult { mrBest :: ShapeExpr, mrCost :: Int, mrStatus :: String, mrUniverse :: String, mrAlternatives :: [ShapeExpr], mrExprsTried :: Int, mrRectCover :: Maybe CoverResult } deriving (Eq,Show)
 mdlStatusText :: MDLResult -> String
 mdlStatusText=mrStatus
 
-bestShape :: MDLBudget -> Int -> PixelSet -> Either String MDLResult
-bestShape b crect s
+bestShape :: MDLBudget -> PixelSet -> Either String MDLResult
+bestShape b s
   | S.null s = Left "empty mask has no shape expression"
   | otherwise =
       let part=rowRunPartition s
           base=foldUnion part
           area=case boundsOfPixels s of EmptyBounds->0; PixelBounds r->(rx1 r-rx0 r+1)*(ry1 r-ry0 r+1)
-      in if area>smMaxArea b then Right (MDLResult base (shapeCost base) "BoundedBest" ("row-run partition only; bbox area "++show area++" > "++show (smMaxArea b)) [] 1 crect)
+      in if area>smMaxArea b then Right (MDLResult base (shapeCost base) "BoundedBest" ("row-run partition only; bbox area "++show area++" > "++show (smMaxArea b)) [] 1 Nothing)
          else
            -- Level n = expressions over exactly n rectangles. Costs are
            -- monotone in n (level 1 = 5, level 2 >= 11, level 3 >= 17), so the
@@ -146,8 +165,7 @@ bestShape b crect s
            let go n tried
                  | n>smMaxRects b = (Nothing,tried,False)
                  | otherwise =
-                     let (cands,cnt,cut)=level b s n (smMaxExprs b-tried)
-                         fits=[e | e<-cands, evalShape e==Right s]
+                     let (fits,cnt,cut)=level b s n (smMaxExprs b-tried)
                      in if not (null fits) && not cut then (Just fits,tried+cnt,False)
                         else if cut then (if null fits then Nothing else Just fits,tried+cnt,True)
                         else go (n+1) (tried+cnt)
@@ -158,10 +176,20 @@ bestShape b crect s
                proven=not cut && (found/=Nothing || smMaxRects b>=3)
            in Right (MDLResult best (shapeCost best) (if proven then "ProvenOptimalInUniverse" else "BoundedBest")
                  ("expressions over <= "++show (smMaxRects b)++" sub-rectangles of the bbox with (+) and restricted \\, plus the row-run partition; levels enumerated by rectangle count, costs monotone in the count"++(if cut then "; expression budget cut" else ""))
-                 alts tried crect)
+                 alts tried Nothing)
+
+-- Attach the E1 minimal rectangle cover (overlaps allowed) of the SAME mask.
+-- It never changes mrBest/mrCost/mrStatus; it is reporting-only evidence.
+attachRectCover :: CoverBudget -> PixelSet -> MDLResult -> MDLResult
+attachRectCover cb s r=r {mrRectCover=Just (minimalCover cb s)}
 
 -- Level n of the finite universe (expressions over exactly n sub-rectangles
--- of the bounding box), cut at `limit` expressions.
+-- of the bounding box), streamed: one strict pass that counts the
+-- expressions tried, keeps only the fitting ones and reports whether the
+-- `limit` cut the level before it was exhausted. The expression list is
+-- consumed once and never retained (Stage E3.1 memory fix; same results as
+-- the E2 list-based version: the fits are the fitting expressions among the
+-- first `limit` expressions in enumeration order, cut iff more exist).
 level :: MDLBudget -> PixelSet -> Int -> Int -> ([ShapeExpr],Int,Bool)
 level _ s n limit=
   let PixelBounds bb=boundsOfPixels s
@@ -174,8 +202,14 @@ level _ s n limit=
         3->[op (SUnion (SRect a) (SRect c)) (SRect d) | a<-rects, inside a, c<-rects, c>a, inside c, d<-rects, d/=a, d/=c, op<-[SUnion,SDiff]]
            ++[op (SDiff (SRect a) (SRect c)) (SRect d) | a<-rects, c<-rects, c/=a, d<-rects, d/=a, d/=c, op<-[SUnion,SDiff]]
         _->[]
-      kept=take limit exprs
-  in (kept,length kept,length (take (limit+1) exprs)>limit)
+      walk :: Int -> [ShapeExpr] -> [ShapeExpr] -> ([ShapeExpr],Int,Bool)
+      walk cnt acc es
+        | cnt>=limit = (reverse acc,cnt,not (null es))
+        | otherwise = case es of
+            []->(reverse acc,cnt,False)
+            (e:rest)->let acc'=if evalShape e==Right s then e:acc else acc
+                      in cnt `seq` walk (cnt+1) acc' rest
+  in if limit<=0 then ([],0,not (null exprs)) else walk 0 [] exprs
 
 -- Independent brute force for tests (same universe definition, no pruning,
 -- evaluates every expression): returns the minimum cost of a fitting
@@ -191,6 +225,7 @@ bruteForceBestCost maxRects s=
 
 mdlJSON :: MDLResult -> String
 mdlJSON r=jobj [("best",shapeJSON (mrBest r)),("text",jstr (shapeText (mrBest r))),("c_ast",show (mrCost r)),("status",jstr (mrStatus r)),("universe",jstr (mrUniverse r))
-  ,("c_rect",show (mrRectCost r)),("c_rect_note",jstr "E1 minimal rectangle cover count (overlaps allowed); not the same measure as c_ast")
-  ,("alternatives_same_cost",jarr (map (jstr . shapeText) (mrAlternatives r))),("expressions_tried",show (mrExprsTried r)),("depth",show (shapeDepth (mrBest r)))]
-  where _=jbool; _=jmaybe
+  ,("c_rect",jmaybe (show . coverRectCount) (mrRectCover r)),("c_rect_status",jstr (maybe "NotComputed" coverStatusText (mrRectCover r)))
+  ,("c_rect_note",jstr "E1 minimal rectangle cover count (overlaps allowed); not the same measure as c_ast; null = not computed")
+  ,("alternatives_same_cost",jarr (map (jstr . shapeText) (mrAlternatives r))),("expressions_tried",show (mrExprsTried r)),("depth",show (shapeDepth (mrBest r))),("dsl_version",jstr mdlDSLVersion)]
+  where _=jbool

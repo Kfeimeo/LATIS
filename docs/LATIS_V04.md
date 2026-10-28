@@ -111,7 +111,7 @@ source budget 包含逐案例 operator evaluation 以及首次定义构建的符
 
 ## 兼容性界限
 
-前端失败不会缩减 R2 的预算、语言或配置。一个前端训练 exact 的假设仍可能在未知案例上泛化失败；本原型不声称对所有 ARC heldout 都不劣于 R2，也没有用测试标签选择是否 fallback。实测范围及负结果见根目录 `LATIS_V04_REPORT.md`。
+前端失败不会缩减 R2 的预算、语言或配置。一个前端训练 exact 的假设仍可能在未知案例上泛化失败；本原型不声称对所有 ARC heldout 都不劣于 R2，也没有用测试标签选择是否 fallback。实测范围及负结果见根目录 `../reports/LATIS_V04_REPORT.md`。
 
 ## 并行候选求值（`--workers`）
 
@@ -195,7 +195,7 @@ cabal test triggered-parallel-tests --test-show-details=direct --test-options='+
 
 ### 实测结论与限制
 
-实测（AMD Ryzen 7 5800H，GHC 9.14.1 `-O2`，`v04-bench` 预热 2 次、重复 9 次取中位数）表明在现有压力任务上并行求值**没有加速**：F 的 closure 由 0.356 s（workers=1）变为 0.417 s（2，`-N2`）和 0.484 s（4，`-N4`），C 由 0.131 s 变为 0.125 s 和 0.214 s；A/B/D 在 3 ms 以内，E/G 没有候选可求值。`v04-bench` 的 `eval_only_seconds` 列显示候选求值只占 closure 时间的 4–6%，其余是必须串行的权威提交路径（全量 `rematch`、Map 插入、可见性与只读参数扫描、边追加），因此 Amdahl 上限约 1.05x，而线程交接是净开销。`parallel_discarded` 在全部压力任务上为 0。详细数据、环境和 GHC 9.10.3 的对照见 [LATIS_V04_PARALLEL_REPORT.md](../LATIS_V04_PARALLEL_REPORT.md)。
+实测（AMD Ryzen 7 5800H，GHC 9.14.1 `-O2`，`v04-bench` 预热 2 次、重复 9 次取中位数）表明在现有压力任务上并行求值**没有加速**：F 的 closure 由 0.356 s（workers=1）变为 0.417 s（2，`-N2`）和 0.484 s（4，`-N4`），C 由 0.131 s 变为 0.125 s 和 0.214 s；A/B/D 在 3 ms 以内，E/G 没有候选可求值。`v04-bench` 的 `eval_only_seconds` 列显示候选求值只占 closure 时间的 4–6%，其余是必须串行的权威提交路径（全量 `rematch`、Map 插入、可见性与只读参数扫描、边追加），因此 Amdahl 上限约 1.05x，而线程交接是净开销。`parallel_discarded` 在全部压力任务上为 0。详细数据、环境和 GHC 9.10.3 的对照见 [../reports/LATIS_V04_PARALLEL_REPORT.md](../reports/LATIS_V04_PARALLEL_REPORT.md)。
 
 未验证平台：仅在 Windows 11 x86_64 上实测；GHC 9.14.1 与 9.10.3 均通过构建和全部相关测试套件；Linux 命令未实际运行。
 

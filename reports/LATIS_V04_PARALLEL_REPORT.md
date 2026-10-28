@@ -1,6 +1,6 @@
 # LATIS v0.4 并行候选求值报告
 
-日期：2026-10-21。本报告记录单任务 source closure 候选表达式并行求值（`--workers N`）的实现验证与性能实测。设计与语义见 [docs/LATIS_V04.md](docs/LATIS_V04.md) 的“并行候选求值”一节。原始数据在 `results/v04-parallel/`（新目录，未覆盖 `results/v04/` 的历史结果）。
+日期：2026-10-21。本报告记录单任务 source closure 候选表达式并行求值（`--workers N`）的实现验证与性能实测。设计与语义见 [docs/LATIS_V04.md](../docs/LATIS_V04.md) 的“并行候选求值”一节。原始数据在 `results/v04-parallel/`（新目录，未覆盖 `results/v04/` 的历史结果）。
 
 ## 改动摘要
 

@@ -5,7 +5,7 @@
 module ARC.ContentFirstEvaluate
   ( frozenD, contentFirstOnly, contentFirstExplore, namedConfigsCF, configByNameCF, configNamesCF
   , contentFirstJSON, finalClassification, programSceneCF, programSpecsCF, planFromProgram, crossCaseOf
-  , configNamesE01, namedConfigsE01, namedConfigsE23, configNamesE23, regionJSONOf
+  , configNamesE01, namedConfigsE01, namedConfigsE23, configNamesE23, namedConfigsE31, configNamesE31, regionJSONOf
   ) where
 import Synthesis.Collection.Region.Search (regionSearchJSON)
 import Synthesis.Collection.Region.Program (programJSON, runRegionProgram, regionExecJSON, RegionExec(..))
@@ -64,6 +64,12 @@ namedConfigsE23 :: [(String,Config)]
 namedConfigsE23=[(n,c) | n<-["FrozenE01","E2Only","RegionPriority","BreadthScheduler","RegionBreadth","FullE3","FullE3_NoMDL","FullE3_NoSafePrune"], Just c<-[configByNameD n]]
 configNamesE23 :: [String]
 configNamesE23=map fst namedConfigsE23
+-- Stage E3.1 matrix (one binary): FrozenE01 as the negative control plus the
+-- eight region configurations of StageDEvaluate.
+namedConfigsE31 :: [(String,Config)]
+namedConfigsE31=[(n,c) | n<-configNamesE31, Just c<-[configByNameD n]]
+configNamesE31 :: [String]
+configNamesE31=["FrozenE01","E31_PatchedBaseline","E31_PrecheckOnly","E31_LazyMDLOnly","E31_Full","E31_FullNoMDL","E31_FullNoSafePrune","E31_FullSelectorPriority","E31_FullCostOrder"]
 
 -- Region-search evidence of one run: the search record and, for a region
 -- program, its per-pair execution (read/write regions, output dims, exact).

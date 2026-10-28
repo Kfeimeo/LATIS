@@ -13,7 +13,7 @@ def table(headers,rows):
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--out',type=pathlib.Path,default=ROOT/'results/v03r1')
-    parser.add_argument('--report',type=pathlib.Path,default=ROOT/'LATIS_V03R1_REPORT.md')
+    parser.add_argument('--report',type=pathlib.Path,default=ROOT/'reports'/'LATIS_V03R1_REPORT.md')
     a=parser.parse_args()
     out=a.out.resolve()
     manifest,_,_=validate_inputs()

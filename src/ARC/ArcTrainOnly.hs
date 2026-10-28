@@ -158,9 +158,13 @@ runConfigured conf stageB stageC ms pairs=settle <$> timed ms (do
   _<-evaluate (length (oStatus o)+length (oDetail o)+maybe 0 length (oProgram o)+oWork o)
   traceEventIO "latis-search-end"
   statsOn<-getRTSStatsEnabled
-  mem<-if statsOn then (\st->[("rts_max_live_bytes",show (max_live_bytes st)),("rts_max_mem_in_use_bytes",show (max_mem_in_use_bytes st))]) <$> getRTSStats
-       else pure [("rts_max_live_bytes","null"),("rts_max_mem_in_use_bytes","null")]
+  mem<-if statsOn then (\st->[("rts_max_live_bytes",show (max_live_bytes st)),("rts_max_mem_in_use_bytes",show (max_mem_in_use_bytes st))
+                              ,("rts_allocated_bytes",show (allocated_bytes st)),("rts_gcs",show (gcs st)),("rts_major_gcs",show (major_gcs st))
+                              ,("rts_gc_cpu_ns",show (gc_cpu_ns st)),("rts_mutator_cpu_ns",show (mutator_cpu_ns st)),("rts_cpu_ns",show (cpu_ns st)),("rts_gc_elapsed_ns",show (gc_elapsed_ns st))]) <$> getRTSStats
+       else pure [("rts_max_live_bytes","null"),("rts_max_mem_in_use_bytes","null"),("rts_allocated_bytes","null"),("rts_gcs","null"),("rts_major_gcs","null"),("rts_gc_cpu_ns","null"),("rts_mutator_cpu_ns","null"),("rts_cpu_ns","null"),("rts_gc_elapsed_ns","null")]
+  phases<-DG.timerJSON
   pure o {oExtra=[("trace_lines",show (length (F.trace g))),("semantic_classes",show (length (F.classes g)))
+    ,("phase_timings",phases),("phase_timings_note",jsonString "wall ms and count per observational phase timer (scene_build, partition_expand, selector_precheck, dependency_prune, candidate_execution, mdl_compute, minimal_cover); one count per evaluated cache entry; absent phases were not evaluated")
     ,("failure_stage",jsonString (SA.failureStage (F.failure f)))
     ,("size_rule_exact",boolJSON (m "size_rule_exact">0)),("canvas_changed",boolJSON (any (\(x,y)->dimensions x/=dimensions y) pairs))
     ,("grid_realization_ok",boolJSON (m "grid_realization_ok">0)),("grid_realizations_attempted",show (m "grid_realizations_attempted"))
@@ -230,6 +234,7 @@ configText (StageDStage c)=maybe "unknown" show (SD.configByNameD c)
 runStage :: Stage -> FilePath -> FilePath -> Int -> IO ()
 runStage stage taskPath out ms=do
   DG.resetDiagnostics
+  DG.resetTimers
   createDirectoryIfMissing True out
   let file=out </> (stageName stage++".json")
       base status detail extra seconds=objectJSON ([("stage",jsonString (stageName stage)),("task_file",jsonString taskPath)

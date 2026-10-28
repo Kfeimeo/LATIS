@@ -1,11 +1,23 @@
--- Stage E2/E3 mechanism tasks: frozen generators, expectations, matrix runner.
+-- Stage E2/E3 + E3.1 mechanism tasks: frozen generators, expectations, matrix runner.
 -- 4 training pairs + 1 heldout per instance; heldout is scoring only.
+--
+-- Stage E3.1 adds five families that exercise the input-side selector
+-- precheck and the cache keys (the generators are frozen before the runs):
+--   SelectorCardinalityCaseDependent  the competitor selector is unique on cases 0-2 and
+--                                     non-unique on case 3 (case-dependent cardinality)
+--   SelectorEmptyInOneCase            the competitor colour selector is empty on case 3 only
+--   BackgroundViewSelectorDivergence  the same selector AST is non-unique in the legacy view
+--                                     and unique in the most-frequent-colour view
+--   NestedRegionOwnership             a dot inside a ring inside a quadrant: ownership at depth 1
+--   OneCaseCoincidence                a candidate fits training case 0 only (never accepted)
 module ARC.RegionMechanism
-  ( FamilyR(..), InstanceR(..), instancesR, instanceTaskR, familyExpectationR, familyNegativeR, runMechanismR, filledR, shellCellsR
+  ( FamilyR(..), InstanceR(..), instancesR, instanceTaskR, familyExpectationR, familyNegativeR, runMechanismR, filledR, shellCellsR, e31FamilyR
   ) where
 import Synthesis.Collection.Front
 import Synthesis.Collection.Region.Program (programText)
+import Synthesis.Collection.Region.Search (regionMetricNames)
 import ARC.ContentFirstEvaluate
+import ARC.StageDEvaluate (configByNameD)
 import ARC.StageAEvaluate (trainExactOf, heldExactOf, failureStage)
 import ARC.Dataset (Task(..), TestPair(..))
 import ARC.Evaluate (jsonString)
@@ -21,8 +33,12 @@ import Data.Maybe (isJust)
 
 data FamilyR = ShellVsPixelPatchwork | BackgroundByResidual | CrossSeparatorPartition | RingSeparatorPartition | InvalidObjectStraddle
   | RegionPreserveWithLocalEdit | SharedRuleAcrossRegions | CrossRegionCopyCounterexample | BreadthBeatsDeepWrongView | LazyVsEagerFinitePartition
+  | SelectorCardinalityCaseDependent | SelectorEmptyInOneCase | BackgroundViewSelectorDivergence | NestedRegionOwnership | OneCaseCoincidence
   deriving (Eq,Ord,Show,Enum,Bounded)
 data InstanceR = InstanceR { irFamily :: FamilyR, irSeed :: Int, irTrain :: [(Grid,Grid)], irHeld :: (Grid,Grid), irNote :: String } deriving (Eq,Show)
+
+e31FamilyR :: FamilyR -> Bool
+e31FamilyR f=f `elem` [SelectorCardinalityCaseDependent,SelectorEmptyInOneCase,BackgroundViewSelectorDivergence,NestedRegionOwnership,OneCaseCoincidence]
 
 filledR :: Int -> Int -> Int -> [(Int,Int,Int)] -> Grid
 filledR w h bg cells=either (\e->error ("mechanism grid: "++e)) id (mkGrid [[maybe bg id (lookup (x,y) [((a,b),c) | (a,b,c)<-cells]) | x<-[0..w-1]] | y<-[0..h-1]])
@@ -40,6 +56,12 @@ recolor :: Int -> [(Int,Int,Int)] -> [(Int,Int,Int)]
 recolor c=map (\(x,y,_)->(x,y,c))
 paint :: Grid -> [(Int,Int,Int)] -> Grid
 paint g cells=either error id (mkGrid [[maybe (maybe 0 id (cell g (Coord x y))) id (lookup (x,y) [((a,b),c) | (a,b,c)<-cells]) | x<-[0..gridWidth (dimensions g)-1]] | y<-[0..gridHeight (dimensions g)-1]])
+-- Quadrant q (0 top-left, 1 top-right, 2 bottom-left, 3 bottom-right) of a w x h canvas with a cross at (cx', cy'): (x0,y0,x1,y1).
+quadrant :: Int -> Int -> Int -> Int -> Int -> (Int,Int,Int,Int)
+quadrant w h cx' cy' q=
+  let (x0,y0)=[(0,0),(cx'+1,0),(0,cy'+1),(cx'+1,cy'+1)]!!q
+      x1=if x0==0 then cx'-1 else w-1; y1=if y0==0 then cy'-1 else h-1
+  in (x0,y0,x1,y1)
 
 instancesR :: [InstanceR]
 instancesR=[InstanceR f seed [make f seed i | i<-[0..3]] (make f seed 4) (note f) | f<-[minBound..maxBound], seed<-[1..3]]
@@ -55,6 +77,11 @@ instancesR=[InstanceR f seed [make f seed i | i<-[0..3]] (make f seed 4) (note f
       CrossRegionCopyCounterexample->"bar separator; the small left region holds a pattern, the large right region holds 1-pixel markers; output = pattern stamped at every marker (cross-region read/write)"
       BreadthBeatsDeepWrongView->"the separator bar is colour 0 on a non-zero background: the legacy view is legal but has no separator (every candidate fails), the most-frequent-colour view has a layer-0 crop fit; breadth exposes it earlier than view-sequential search"
       LazyVsEagerFinitePartition->"small canvas with a cross and two nested separators; output = crop of the quadrant holding the nested ring (eager closure == lazy; budget cut reported)"
+      SelectorCardinalityCaseDependent->"cross separator; the colour-7 quadrant is the target; on cases 0-2 it is the only quadrant with objects, on case 3 (and the heldout) a second quadrant holds an object: UniqueContentWithObjects / UniqueContentWithObjectCount(1) are unique on three cases and non-unique on the fourth, so the input-side precheck must reject them with a case-3 witness while UniqueContentWithColor(7) + Crop fits"
+      SelectorEmptyInOneCase->"cross separator; one quadrant holds a 2x1 object: colour 5 on cases 0-2 and the heldout, colour 8 on case 3; UniqueContentWithColor(5) is valid on cases 0-2 and EMPTY on case 3 (and UniqueContentWithColor(8) empty on 0-2); UniqueContentWithObjects + Crop fits every case"
+      BackgroundViewSelectorDivergence->"non-zero background, a full-height bar of another colour, a top line and a dot in the left region: in the legacy view (colour 0 = background) the background cells are objects, so both sides hold objects and UniqueContentWithObjects is non-unique; in the most-frequent-colour view only the line and the dot are objects and the same selector is unique; output = crop of the left region (no single legacy object or same-colour set has that bbox)"
+      NestedRegionOwnership->"cross separator; the target quadrant holds a ring with a dot inside its hole (2 objects owned by the quadrant at depth 1), another quadrant holds one plain object; UniqueContentWithObjectCount(2) + Crop fits, UniqueContentWithObjectCount(1) crops the wrong quadrant, UniqueContentWithObjects is non-unique"
+      OneCaseCoincidence->"cross at (3,3) so the top-left 3x3 quadrant is always the unique smallest; the colour-7 object (the target quadrant) is in the top-left on case 0 only: CropRegion[UniqueSmallestContent] fits training case 0 and no other case; CropRegion[UniqueContentWithObjects] (and UniqueContentWithColor(7)) fit all"
     cols=[[2,4,6,1,3],[1,6,2,4,9],[4,2,9,6,1]]
     cols2=[[3,1,4,2,7],[9,3,1,2,4],[6,9,1,2,4]]
     make f s i=
@@ -120,12 +147,55 @@ instancesR=[InstanceR f seed [make f seed i | i<-[0..3]] (make f seed 4) (note f
         LazyVsEagerFinitePartition->
           let g=filledR 11 11 0 (cross 11 11 5 5 c1++shellCellsR 1 1 3 3 c2++[(2,2,c1)]++[(8,8,c2)])
           in (g,cropR g (0,0,4,4))
+        SelectorCardinalityCaseDependent->
+          let cx'=4+(i `mod` 2); cy'=4+(s `mod` 2)
+              qt=i `mod` 4; q2=(i+1) `mod` 4
+              (tx,ty,tx1,ty1)=quadrant w h cx' cy' qt
+              (ox,oy,_,_)=quadrant w h cx' cy' q2
+              cOther=if c2==7 then 5 else c2
+              target=rect (tx+1) (ty+1) 2 1 7
+              other=if i>=3 then rect (ox+1) (oy+2) 1 2 cOther else []
+              g=filledR w h 0 (cross w h cx' cy' c1++target++other)
+          in (g,cropR g (tx,ty,tx1,ty1))
+        SelectorEmptyInOneCase->
+          let cx'=4+(i `mod` 2); cy'=4+(s `mod` 2)
+              qt=(i+s) `mod` 4
+              (tx,ty,tx1,ty1)=quadrant w h cx' cy' qt
+              cObj=if i==3 then 8 else 5
+              g=filledR w h 0 (cross w h cx' cy' c1++rect (tx+1) (ty+1) 2 1 cObj)
+          in (g,cropR g (tx,ty,tx1,ty1))
+        BackgroundViewSelectorDivergence->
+          let bg=[8,5,3,9,7]!!i; bx=3+(i `mod` 2)
+              cBar=if c1==bg then 6 else c1
+              cDot=if c2==bg || c2==cBar then (if bg/=4 && cBar/=4 then 4 else 2) else c2
+              -- a top line of the dot colour across the left region keeps every legacy object's bbox (and every
+              -- same-colour set's bbox) strictly smaller than the left region, so no content-first crop coincides
+              g=filledR w h bg (bar h bx cBar++[(x,0,cDot) | x<-[0..bx-1]]++[(1,2+(i `mod` 3),cDot)])
+          in (g,cropR g (0,0,bx-1,h-1))
+        NestedRegionOwnership->
+          let w'=12+s; h'=12+s; cx'=5+(i `mod` 2); cy'=5
+              qt=i `mod` 4; q2=(i+2) `mod` 4
+              (tx,ty,tx1,ty1)=quadrant w' h' cx' cy' qt
+              (ox,oy,_,_)=quadrant w' h' cx' cy' q2
+              -- the dot colour changes with the case (never the cross or ring colour), so no colour selector fits all cases
+              cDot=head [c | c<-drop i (cycle [7,8,5,9,3,6]), c/=c1, c/=c2]
+              ring=shellCellsR (tx+1) (ty+1) 4 4 c2
+              dot=[(tx+2,ty+2,cDot)]
+              other=rect (ox+1) (oy+1) 2 1 c2
+              g=filledR w' h' 0 (cross w' h' cx' cy' c1++ring++dot++other)
+          in (g,cropR g (tx,ty,tx1,ty1))
+        OneCaseCoincidence->
+          let w'=11+s; h'=11+s; cx'=3; cy'=3
+              qt=if i==4 then 0 else i `mod` 4
+              (tx,ty,tx1,ty1)=quadrant w' h' cx' cy' qt
+              g=filledR w' h' 0 (cross w' h' cx' cy' c1++rect (tx+1) (ty+1) 2 1 7)
+          in (g,cropR g (tx,ty,tx1,ty1))
 
 instanceTaskR :: InstanceR -> Task
 instanceTaskR ins=Task (show (irFamily ins)++"-"++show (irSeed ins)) (irTrain ins) [TestPair (fst (irHeld ins)) (Just (snd (irHeld ins)))]
 
 regionConfigs :: [String]
-regionConfigs=["E2Only","RegionPriority","BreadthScheduler","RegionBreadth","FullE3","FullE3_NoMDL","FullE3_NoSafePrune"]
+regionConfigs=["E2Only","RegionPriority","BreadthScheduler","RegionBreadth","FullE3","FullE3_NoMDL","FullE3_NoSafePrune"]++filter (/="FrozenE01") configNamesE31
 familyExpectationR :: FamilyR -> [String]
 familyExpectationR f=case f of
   InvalidObjectStraddle->[]
@@ -144,7 +214,7 @@ runMechanismR out names=do
       [("note",jsonString (irNote ins)),("train",arrayJSON [objectJSON [("input",show (rows x)),("output",show (rows y))] | (x,y)<-irTrain ins])
       ,("heldout",objectJSON [("input",show (rows (fst (irHeld ins)))),("output",show (rows (snd (irHeld ins))))])])
     forM names $ \name->do
-      cfg<-maybe (error ("unknown configuration "++name)) pure (lookup name namedConfigsE23)
+      cfg<-maybe (error ("unknown configuration "++name)) pure (configByNameD name)
       start<-getMonotonicTimeNSec
       let f=frontSearch SafeOnline cfg (training task)
       finished<-timeout 180000000 (evaluate (length (show f)))
@@ -158,7 +228,7 @@ runMechanismR out names=do
                  ,("search_work",show (metric "search_work" g)),("first_solution_work",show (metric "first_solution_work" g))
                  ,("program",maybe "null" (jsonString . show) (program f)),("region_program",maybe "null" (jsonString . programText) (program f >>= progRegion))
                  ,("program_kind",jsonString (case program f of Nothing->"none"; Just p->if progRegion p/=Nothing then "region_program" else if progContentFirst p/=Nothing then "content_first" else "legacy"))
-                 ,("region_metrics",objectJSON [(k,show (metric k g)) | k<-words "rg_triggered rg_views_legal rg_views_rejected rg_trees rg_splits_tried rg_splits_legal rg_universe rg_goals rg_executed rg_pruned rg_fits rg_budget_cut rg_deferred rg_resumed rg_first_fit_exposure rg_first_view_exposure_max rg_k2plus_splits"])
+                 ,("region_metrics",objectJSON [(k,show (metric k g)) | k<-regionMetricNames])
                  ,("region_search",regionJSONOf (training task) g (program f))
                  ,("positive_control",boolJSON (name `elem` familyExpectationR (irFamily ins))),("negative_control",boolJSON (name `elem` familyNegativeR (irFamily ins)))]
       writeFile (out </> (label++"-"++name++".json")) json

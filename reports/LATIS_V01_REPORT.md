@@ -11,7 +11,7 @@
 - 官方 `03560426`：3/3 training exact，1/1 public test exact。搜索入口只接收训练对，测试 output 不用于 skeleton、witness、排序或 MDL。
 - `test/negative/BadHole.hs` 经 GHC 检查按预期拒绝 `Param Int` 装入 `Param Vec`。
 
-完整 [trace](results/03560426/trace.md)、[primitive 定义表](results/03560426/primitives.md)、[原始 CSV](results/03560426/ablation.csv)、[JSON](results/03560426/ablation.json)、[环境及 source hashes](results/03560426/environment.json)、[合成任务结果](results/synthetic/suite.md) 均保存在仓库。
+完整 [trace](../results/03560426/trace.md)、[primitive 定义表](../results/03560426/primitives.md)、[原始 CSV](../results/03560426/ablation.csv)、[JSON](../results/03560426/ablation.json)、[环境及 source hashes](../results/03560426/environment.json)、[合成任务结果](../results/synthetic/suite.md) 均保存在仓库。
 
 ## 实验协议与边界
 

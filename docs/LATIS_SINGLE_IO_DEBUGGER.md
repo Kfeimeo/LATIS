@@ -123,3 +123,11 @@ python -I scripts/trace_io.py oracle-replay --record results/trace_io/examples/a
 - 漏斗新增阶段 `RegionSearch`（D+ 事件 `entered/completed`，`exhaustiveness_scope` 为本任务 Region 程序宇宙；候选事件 `kind=evaluated` 带 `candidate_ast`（`RegionProgram` JSON：view/selector/action/effect）、`layer`、`exposure_index`、`region_area`）。
 - 新标签页"Scene/Region"：搜索摘要（合法/被拒视图及原因、宇宙/执行/剪枝/fit、首个 fit 曝光序号、各视图首次曝光）；每个 (case, view) 的 Scene（对象数、残差格数、背景 `UniformResidual c | NoResidual`、逐像素重构状态、MDL 成本分项）、Region 树表（id/parent/depth/role/area/bounds/split object/children/leaf/objects）、Input 上深度 1 分区着色（S = Separator 虚线框，C<id> = Content 点线框）、邻接与 SeparatedBy、Scene 对象的 Shape MDL（`c_ast`、状态、`c_rect` 分列）；Goal 账本（allocated/used/cursor/deferred/resumed/status）；曝光序列（执行顺序、fit 标绿）；DependencyWitness（骨架、读写范围、各 case 变化区域、被剪枝候选与证据）。
 - 数据来自 `solver_record.region_search`（`run`/`selected_program`/`executions`）；`trace-replay` 不接受 Region 程序 AST（Region 程序由 `arc-train-only-stage` 的 `region_search.executions` 逐对重放记录）。
+
+## 附：Stage E3.1 预检查 / MDL 缓存观测（2026-10-28 新增）
+
+- "Scene/Region" 页的搜索摘要新增固定宇宙记账（`considered = executed + prechecked_invalid + dependency_pruned`、`remaining`、`consistent`）、结果计数（fit / no_fit / execution_invalid）、调度参数（quantum 的口径：每轮从 goal 列表取的候选数，被跳过候选也占名额；执行预算只计执行）、首个 fit 的曝光序号与**候选位置**（含被跳过候选的固定宇宙位置）。
+- 新卡片"Selector 预检查"：每个 (视图, Selector) 在每个训练 case 输入树上的判定（`ValidSelected | InvalidEmpty | InvalidNonUnique | InvalidRootUnsplit | InvalidOther`）、匹配的 region id、E2 原文 reason、树 hash；以及被跳过的候选（候选位置、程序、kind、role=target/source、case、证据）。数据来自 `solver_record.region_search.run.precheck`；关闭预检查的配置没有这张卡片。
+- 新卡片"Shape MDL：缓存与证明状态"：`shape_basis`（`not_computed | mdl_eager | mdl_cached`）、对象引用数、distinct masks / static hits、键的定义与生命周期、`ProvenOptimalInUniverse / BoundedBest / NotComputed` 计数、平移共享说明。Scene 对象表的 `c_ast`/`c_rect` 未计算时显示 `null`，并多出 `c_rect status` 列（`proven_minimal | bounded: … | NotComputed`）。`--trace-level full` 下对关闭 MDL 的配置强制记录 Shape（`run_status.json.mdl_record_forced_on=true`，只影响记录，不影响排序）。
+- 新卡片"Goal 恢复进度"：每个 goal 的 cursor/total 进度条、used + prechecked + pruned、valid candidates、deferred → resumed、状态。Goal 账本表新增 prechecked / pruned / valid 列（E3 记录在广度模式下 `used`/`fits` 恒为 0 的记录缺陷已修正）。
+- 自检（`#selftest`）新增 `region_cards`：渲染出的预检查证据行数、被跳过候选行数、goal 进度行数（计数渲染元素，不匹配字符串）。预检查与缓存不逐候选发事件（见 `not_instrumented`）：被跳过的候选没有 `evaluated` 事件，只在记录中。

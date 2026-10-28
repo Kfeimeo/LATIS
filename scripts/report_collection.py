@@ -132,7 +132,7 @@ def main():
                "```powershell", "./build/latis-collection.exe collection-experiment --out results/v05",
                "python scripts/report_collection.py", "```", "",
                "完整构建方法与边界见 docs/LATIS_COLLECTION.md。原始表格：results/v05/metrics.csv。"]
-    (ROOT / "LATIS_COLLECTION_REPORT.md").write_text("\n".join(report)+"\n", encoding="utf-8")
+    (ROOT / "reports" / "LATIS_COLLECTION_REPORT.md").write_text("\n".join(report)+"\n", encoding="utf-8")
     (OUT / "validation/audit.json").write_text(json.dumps({"runs":len(rows),"witnesses":audited_witnesses,"passed":True}, indent=2)+"\n", encoding="utf-8")
     print(f"PASS {len(rows)} runs, {audited_witnesses} witnesses; wrote LATIS_COLLECTION_REPORT.md")
 

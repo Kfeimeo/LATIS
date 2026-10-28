@@ -545,11 +545,36 @@ if (typeof document !== 'undefined') (function () {
     var r = regionInfo(), out = [];
     if (!r) return [card('Scene / Region', h('div', { class: 'muted', text: 'Region 搜索未进入（配置关闭，或 Size-first / Content-first 已解）。' }))];
     var run = r.run;
-    out.push(card('Region 搜索摘要', kv([['合法 Scene 视图', run.views.map(function (v) { return v.view + (v.scene_cost != null ? '（scene cost ' + v.scene_cost + '）' : ''); }).join('；') || '无'],
+    var acc = run.universe_accounting || {}, pre = run.precheck || {}, sched = run.scheduler || {};
+    out.push(card('Region 搜索摘要', kv([['合法 Scene 视图', run.views.map(function (v) { return v.view + (v.scene_cost != null ? '（scene cost ' + v.scene_cost + (v.scene_cost_basis ? '，' + v.scene_cost_basis : '') + '）' : ''); }).join('；') || '无'],
       ['被拒绝的视图', run.rejected_views.map(function (v) { return v.view + '：' + v.reason; }).join('；') || '无'],
       ['程序宇宙 / 已执行 / 已剪枝 / fit', run.universe + ' / ' + run.executed + ' / ' + run.pruned + ' / ' + (run.fits || []).length], ['预算截断', String(run.budget_cut)],
-      ['首个 fit 的曝光序号', run.first_fit_exposure == null ? '无' : run.first_fit_exposure], ['各视图首次曝光序号', JSON.stringify(run.first_view_exposure)],
+      ['固定宇宙记账', acc.identity ? ('considered ' + acc.considered + ' = executed ' + acc.executed + ' + prechecked_invalid ' + acc.prechecked_invalid + ' + dependency_pruned ' + acc.dependency_pruned + '；remaining ' + acc.remaining_not_reached + '；consistent ' + acc.consistent) : '（旧记录，无记账字段）'],
+      ['结果计数', run.outcome_counts ? JSON.stringify(run.outcome_counts) : '—'],
+      ['调度', sched.quantum != null ? ('breadth ' + sched.breadth + '，region_first ' + sched.region_first + '，selector_priority ' + sched.selector_priority + '，quantum ' + sched.quantum + '（' + sched.quantum_unit + '），execution budget ' + sched.execution_budget) : '—'],
+      ['首个 fit 的曝光序号 / 候选位置', (run.first_fit_exposure == null ? '无' : run.first_fit_exposure) + ' / ' + (run.first_fit_candidate_index == null ? '无' : run.first_fit_candidate_index)], ['各视图首次曝光序号', JSON.stringify(run.first_view_exposure)],
       ['选中程序', r.selected_program ? r.selected_program.text + '（effect ' + r.selected_program.effect + '）' : '无']])));
+    // Stage E3.1: input-side selector precheck (per (view, selector): per-case verdict and matched ids), skipped candidates
+    if (pre.enabled != null) {
+      var witRows = (pre.witnesses || []).map(function (w) { return [w.view, w.selector, chip(w.verdict, w.verdict === 'ValidSelected' ? 'ok' : 'warn'), (w.cases || []).map(function (c) { return 'case ' + c.case_index + '：' + c.kind + ' ' + JSON.stringify(c.matched_ids) + (c.kind === 'ValidSelected' ? '' : '（' + c.reason + '）'); }).join('；'), (w.cases || []).map(function (c) { return c.tree_hash; }).join(' ')]; });
+      var skRows = (pre.skipped_candidates || []).slice(0, 300).map(function (x) { return [x.candidate_index, x.program, chip(x.kind, 'warn'), x.role || '', x.selector || '', x.case_index == null ? '—' : x.case_index, x.evidence || x.why || '']; });
+      out.push(card('Selector 预检查（输入侧；跳过的候选仍属于固定宇宙，不计为 accepted）', kv([['启用', String(pre.enabled)], ['跳过候选 / 条目 / 查找 / 逐 case 求值', pre.skipped + ' / ' + pre.entries + ' / ' + pre.lookups + ' / ' + pre.selector_evaluations], ['跳过原因', JSON.stringify(pre.kinds || {})], ['说明', pre.note || '']]),
+        h('h3', { text: '证据：每个 (视图, Selector) 在每个训练 case 输入树上的判定' }), h('div', { class: 'scroll', id: 'precheck-witnesses' }, table(['视图', 'selector', '判定', '逐 case（kind，匹配 region id）', 'tree hash'], witRows)),
+        h('h3', { text: '被跳过的候选（前 300 条）' }), h('div', { class: 'scroll', id: 'precheck-skipped' }, table(['候选位置', 'program', 'kind', 'role', 'selector', 'case', '证据'], skRows))));
+    }
+    // Stage E3.1: Shape MDL cache / proof status
+    var shapeStatus = {}; (run.trees || []).forEach(function (t) { ((t.tree.scene || {}).object_list || []).forEach(function (o) { var k = o.shape_status || (o.shape ? o.shape.status : 'NotComputed'); shapeStatus[k] = (shapeStatus[k] || 0) + 1; }); });
+    var mc = run.mdl_cache;
+    out.push(card('Shape MDL：缓存与证明状态', kv([['shape basis', run.shape_basis || '—'], ['对象（引用）数', run.mdl_objects == null ? '—' : run.mdl_objects],
+      ['缓存', mc ? ('distinct masks ' + mc.mdl_distinct_masks + '，references ' + mc.mdl_object_references + '，static hits ' + mc.mdl_cache_hits_static + '；key = ' + mc.key + '；lifetime = ' + mc.lifetime) : (run.shape_basis === 'mdl_eager' ? '关闭（逐对象 eager 计算）' : '不适用（未计算 Shape）')],
+      ['证明状态计数（ProvenOptimalInUniverse / BoundedBest / NotComputed）', JSON.stringify(shapeStatus)], ['平移共享', mc ? (mc.translation_sharing + '：' + mc.translation_sharing_note) : '—']])));
+    // Stage E3.1: goal recovery progress
+    out.push(card('Goal 恢复进度（cursor / total；used + prechecked + pruned；deferred → resumed）', h('div', { id: 'goal-progress' }, (run.goals || []).map(function (g) {
+      var pct = g.total ? Math.round(100 * g.cursor / g.total) : 0;
+      return h('div', { class: 'goal-progress-row', style: 'display:flex;gap:8px;align-items:center;margin:2px 0' }, h('span', { class: 'mono', style: 'min-width:320px', text: g.goal_id }),
+        h('span', { style: 'display:inline-block;width:160px;height:10px;background:var(--chip);border-radius:5px;overflow:hidden' }, h('span', { style: 'display:block;height:10px;width:' + pct + '%;background:var(--ok)' })),
+        h('span', { class: 'mono', text: g.cursor + '/' + g.total + '  used ' + g.used + ' + prechecked ' + (g.prechecked == null ? '—' : g.prechecked) + ' + pruned ' + (g.pruned == null ? '—' : g.pruned) + (g.valid_candidates != null ? '  valid ' + g.valid_candidates : '') + '  deferred ' + g.deferred + ' → resumed ' + g.resumed }), chip(g.status));
+    }))));
     (run.trees || []).forEach(function (t, i) {
       var tr = t.tree, sc = tr.scene;
       var nodes = tr.nodes.slice().sort(function (a, b) { return a.region_id - b.region_id; });
@@ -564,10 +589,10 @@ if (typeof document !== 'undefined') (function () {
         gridEl,
         h('div', { class: 'scroll' }, table(['region', 'parent', 'depth', 'role', 'area', 'bounds', 'split object', 'children', 'leaf', 'objects'], nodes.map(function (n) { return [n.region_id, n.parent_id == null ? '—' : n.parent_id, n.depth, n.role, n.area, n.bounds ? [n.bounds.x_min, n.bounds.y_min, n.bounds.x_max, n.bounds.y_max].join(',') : 'EmptyBounds', n.split_object_id == null ? '—' : n.split_object_id, JSON.stringify(n.children), n.leaf || '', JSON.stringify(n.objects)]; }))),
         h('h3', { text: '邻接（像素接触）与 SeparatedBy' }), table(['a', 'b', 'contacts', 'separated by'], (tr.adjacency || []).map(function (a) { return [a.a, a.b, a.contacts, a.separated_by == null ? '—' : a.separated_by]; })),
-        h('h3', { text: 'Scene 对象（Shape MDL：c_ast 与 c_rect 分别列出）' }), h('div', { class: 'scroll' }, table(['id', 'pixels', 'bounds', 'colours', 'shape expr', 'c_ast', 'status', 'c_rect'], (sc.object_list || []).map(function (o) { return [o.id, o.pixels, o.bounds ? [o.bounds.x_min, o.bounds.y_min, o.bounds.x_max, o.bounds.y_max].join(',') : '', o.colours, o.shape ? o.shape.text : '—', o.shape ? o.shape.c_ast : '—', o.shape ? o.shape.status : '—', o.shape ? o.shape.c_rect : '—']; }))))));
+        h('h3', { text: 'Scene 对象（Shape MDL：c_ast 与 c_rect 分别列出；null = NotComputed）' }), h('div', { class: 'scroll' }, table(['id', 'pixels', 'bounds', 'colours', 'shape expr', 'c_ast', 'status', 'c_rect', 'c_rect status'], (sc.object_list || []).map(function (o) { return [o.id, o.pixels, o.bounds ? [o.bounds.x_min, o.bounds.y_min, o.bounds.x_max, o.bounds.y_max].join(',') : '', o.colours, o.shape ? o.shape.text : '—', o.shape ? o.shape.c_ast : 'null', o.shape ? o.shape.status : (o.shape_status || 'NotComputed'), o.shape && o.shape.c_rect != null ? o.shape.c_rect : 'null', o.shape ? (o.shape.c_rect_status || '—') : 'NotComputed']; }))))));
     });
-    out.push(card('Goal 账本（分层公平调度：allocated / used / cursor / deferred / resumed）', h('div', { class: 'scroll' }, table(['goal', 'view', 'layer', 'total', 'cursor', 'used', 'allocated', 'deferred', 'resumed', 'status', 'fits'], (run.goals || []).map(function (g) { return [g.goal_id, g.view, g.layer, g.total, g.cursor, g.used, g.allocated, g.deferred, g.resumed, chip(g.status), g.fits]; })))));
-    out.push(card('曝光序列（执行顺序）', h('div', { class: 'scroll' }, table(['#', 'view', 'layer', 'cost', 'program', 'outcome', 'reason', 'region area'], (run.exposures || []).slice(0, 600).map(function (e) { return [e.index, e.view, e.layer, e.cost, e.program, chip(e.outcome, e.outcome === 'fit' ? 'ok' : ''), e.reason, e.region_area == null ? '—' : e.region_area]; }))), run.exposures && run.exposures.length > 600 ? h('div', { class: 'muted', text: '仅显示前 600 条；完整列表见 solver_record.json' }) : null));
+    out.push(card('Goal 账本（分层公平调度：allocated / used / cursor / deferred / resumed）', h('div', { class: 'scroll' }, table(['goal', 'view', 'layer', 'total', 'cursor', 'used', 'prechecked', 'pruned', 'valid', 'allocated', 'deferred', 'resumed', 'status', 'fits'], (run.goals || []).map(function (g) { return [g.goal_id, g.view, g.layer, g.total, g.cursor, g.used, g.prechecked == null ? '—' : g.prechecked, g.pruned == null ? '—' : g.pruned, g.valid_candidates == null ? '—' : g.valid_candidates, g.allocated, g.deferred, g.resumed, chip(g.status), g.fits]; })))));
+    out.push(card('曝光序列（执行顺序；候选位置 = 固定宇宙中含被跳过者的位置）', h('div', { class: 'scroll' }, table(['#', '候选位置', 'view', 'layer', 'cost', 'program', 'outcome', 'reason', 'region area'], (run.exposures || []).slice(0, 600).map(function (e) { return [e.index, e.candidate_index == null ? '—' : e.candidate_index, e.view, e.layer, e.cost, e.program, chip(e.outcome, e.outcome === 'fit' ? 'ok' : ''), e.reason, e.region_area == null ? '—' : e.region_area]; }))), run.exposures && run.exposures.length > 600 ? h('div', { class: 'muted', text: '仅显示前 600 条；完整列表见 solver_record.json' }) : null));
     out.push(card('DependencyWitness（安全剪枝证明）', (run.dependency_witnesses || []).map(function (d) {
       return h('details', null, h('summary', null, d.skeleton + ' · dims preserved ' + d.dims_preserved + ' · pruned ' + d.pruned_count + ' · executed ' + d.kept_executed),
         h('div', { class: 'muted', text: d.scope + '；' + d.note }),
@@ -704,6 +729,9 @@ if (typeof document !== 'undefined') (function () {
         diff_marked: panels[3].querySelectorAll('.c.diff').length, diff_expected: expected.comparable ? expected.count : 0,
         predicted_cells_drawn: panels[2].querySelectorAll('.c').length, predicted_cells_expected: rc.grid.length * rc.grid[0].length });
     } catch (e) { report.errors.push('grid_check: ' + e.message); } });
+    // Stage E3.1 region cards: count rendered rows (never grep strings that also live in this script)
+    run('region_e31', function () { state.tab = 'region'; });
+    report.region_cards = { precheck_witness_rows: Math.max(0, document.querySelectorAll('#precheck-witnesses tr').length - 1), precheck_skipped_rows: Math.max(0, document.querySelectorAll('#precheck-skipped tr').length - 1), goal_progress_rows: document.querySelectorAll('#goal-progress .goal-progress-row').length };
     report.embedded_unchanged = document.getElementById('trace-data').textContent.length === before;
     report.candidates = cs.length; report.events = (D.events || []).length;
     var pre = document.createElement('pre'); pre.id = 'selftest-result'; pre.textContent = JSON.stringify(report); document.body.appendChild(pre);

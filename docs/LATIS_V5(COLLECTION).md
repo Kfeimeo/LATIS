@@ -1,6 +1,6 @@
 # Collection experiment (v0.5)
 
-本轮对应仓库根目录 `LATIS_next_round_experiment_prompt.md`。实现为新的 `solve-collection` / `collection-experiment` 入口；现有 v0.4 solver、并行分支和 R2 fallback 不改写。实验结果与边界见 `../LATIS_COLLECTION_REPORT.md`。
+本轮对应`../prompts/LATIS_next_round_experiment_prompt.md`。实现为新的 `solve-collection` / `collection-experiment` 入口；现有 v0.4 solver、并行分支和 R2 fallback 不改写。实验结果与边界见 `../reports/LATIS_COLLECTION_REPORT.md`。
 
 ## 复现
 

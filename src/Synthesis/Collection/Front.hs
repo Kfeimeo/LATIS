@@ -473,14 +473,15 @@ frontSearch mode conf examples
       startWork<-currentWork
       traceMsg ("RegionSearch trigger ("++trig++"): scene views, object-induced partitions and whole-region programs unlocked")
       let res=searchRegions rg examples
-          work=rsExecuted res*length examples+rsPruned res
+          -- one unit per skipped candidate (dependency prune or input-side precheck), ncases per executed one
+          work=rsExecuted res*length examples+rsPruned res+length (rsPrechecked res)
       mapM_ (uncurry inc) (regionMetrics res)
       inc "operator_applications" work
       onGraph (\g->g {regionRun=Just res})
-      emit [("scope",DG.jstr "RegionSearch"),("branch_id",DG.jstr "region_search"),("parent_id",DG.jstr "task"),("event",DG.jstr "completed"),("attempted",show (rsExecuted res+rsPruned res)),("evaluated",show (rsExecuted res))
+      emit [("scope",DG.jstr "RegionSearch"),("branch_id",DG.jstr "region_search"),("parent_id",DG.jstr "task"),("event",DG.jstr "completed"),("attempted",show (rsConsidered res)),("evaluated",show (rsExecuted res)),("prechecked_invalid",show (length (rsPrechecked res))),("dependency_pruned",show (rsPruned res))
            ,("train_exact_candidates",show (length (rsFits res))),("stop_reason",DG.jstr (if rsBudgetCut res then "BudgetCut" else if null (rsFits res) then "NoFitYet" else "FoundFit"))
            ,("exhaustiveness",DG.jstr (if rsBudgetCut res then "ProvenNotExhausted" else if null (rsFits res) then "ProvenExhausted" else "Unknown")),("exhaustiveness_scope",DG.jstr "the finite region-program universe of the legal views of this task (selectors x actions x views)")]
-      traceMsg ("region search: "++show (length (rsViews res))++" legal views, universe "++show (rsUniverse res)++", executed "++show (rsExecuted res)++", pruned "++show (rsPruned res)++", fits "++show (length (rsFits res))++(if rsBudgetCut res then ", budget cut" else ""))
+      traceMsg ("region search: "++show (length (rsViews res))++" legal views, universe "++show (rsUniverse res)++", executed "++show (rsExecuted res)++", pruned "++show (rsPruned res)++", prechecked invalid "++show (length (rsPrechecked res))++", fits "++show (length (rsFits res))++(if rsBudgetCut res then ", budget cut" else ""))
       case (trig,rsFits res) of
         ("explore_alternatives",_)->pure (Left "explore: region alternatives recorded")
         (_,[])->pure (Left (prior++"; region: "++(if null (rsViews res) then "no legal single-colour-residual scene view" else if rsBudgetCut res then "no train-exact region program within the budget" else "no train-exact region program in the finite universe")))

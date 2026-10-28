@@ -5,6 +5,7 @@ module Synthesis.Collection.Diagnostics
   , Exhaustiveness(..), finiteEvidence
   , TraceSettings(..), traceOff, configureTrace, closeTrace, traceSinkStats, currentTraceLevel
   , traceAt, traceCand, traceRecord, levelSummary, levelBranches, levelCandidates, levelFull
+  , timedForce, resetTimers, timerStats, timerJSON
   , jarr, jbool, jmaybe ) where
 import Data.Bits (xor)
 import Data.Char (ord)
@@ -176,3 +177,31 @@ traceCand lvl candidate fields x=unsafePerformIO $ do
 -- IO-side record (run start/terminal written by the trace-io driver).
 traceRecord :: [(String,String)] -> IO ()
 traceRecord=copyToSink "driver" Nothing
+
+-- Observational phase timers (Stage E3.1). `timedForce label force x`
+-- evaluates `force x` once (the caller chooses how deep), charges the wall
+-- time of that evaluation to `label` and returns x unchanged. Because a
+-- shared thunk is evaluated at most once, wrapping a cache entry counts
+-- exactly one computation per entry (= a cache miss). No solver counter,
+-- prior, order or candidate depends on these numbers; they are read back by
+-- the record writer only.
+{-# NOINLINE timers #-}
+timers :: IORef (M.Map String (Integer,Int))
+timers=unsafePerformIO (newIORef M.empty)
+resetTimers :: IO ()
+resetTimers=writeIORef timers M.empty
+{-# NOINLINE timedForce #-}
+timedForce :: String -> (a -> b) -> a -> a
+timedForce label force x=unsafePerformIO $ do
+  start<-getMonotonicTimeNSec
+  _<-evaluate (force x)
+  end<-getMonotonicTimeNSec
+  modifyIORef' timers (M.insertWith (\(a,b) (c,d)->(a+c,b+d)) label (fromIntegral (end-start),1))
+  pure x
+timerStats :: IO [(String,(Integer,Int))]
+timerStats=M.toAscList <$> readIORef timers
+-- {"label":{"ms":..,"count":..},...}; ms is wall time, 3 decimals.
+timerJSON :: IO String
+timerJSON=do
+  ts<-timerStats
+  pure (jobj [(k,jobj [("ms",show (fromIntegral ns/1e6::Double)),("count",show n)]) | (k,(ns,n))<-ts])

@@ -127,10 +127,12 @@ runTraceIO opt=do
       used=if single then [k] else [0..length pairs-1]
       searchPairs=[pairs!!i | i<-used]
       forced=not (sdDiagnostics (F.stageD conf0))
-      conf=conf0 {F.stageD=(F.stageD conf0) {sdDiagnostics=True}}
+      -- at level full the per-object Shape MDL is recorded even for configurations that do not use it for ordering (record-only; rcMDL is untouched)
+      mdlRecordForced=oLevel o>=DG.levelFull && not (F.rcMDLRecord (F.regionSearch conf0)) && F.rcEnabled (F.regionSearch conf0)
+      conf=conf0 {F.stageD=(F.stageD conf0) {sdDiagnostics=True},F.regionSearch=(F.regionSearch conf0) {F.rcMDLRecord=F.rcMDLRecord (F.regionSearch conf0) || mdlRecordForced}}
       meta=[("task_id",jstr (taskId task)),("task_file",jstr (oTask o)),("mode",jstr (oMode o)),("pair_index",show k),("pairs_used_in_search",show used)
            ,("train_pairs_in_task",show (length pairs)),("config",jstr (oConfig o)),("diagnostics_forced_on",jbool forced)
-           ,("trace_level",show (oLevel o)),("timeout_ms",show (oMs o))]
+           ,("trace_level",show (oLevel o)),("timeout_ms",show (oMs o)),("mdl_record_forced_on",jbool mdlRecordForced)]
   writeFile (out </> "run_status.json") (jobj (("state",jstr "running"):meta)++"\n")
   opened<-DG.configureTrace (DG.TraceSettings (oLevel o) (Just (out </> "search_events.jsonl")) (oMaxEvents o) (oMaxBytes o) (oSample o))
   either (failRun out 4) pure opened

@@ -50,10 +50,27 @@ namedConfigsD=
   ++[("FrozenE01",e01),("E2Only",e01 {regionSearch=regionConfigOn {rcRegionFirst=False,rcBreadth=False,rcSafePrune=False}})
     ,("RegionPriority",e01 {regionSearch=regionConfigOn {rcBreadth=False,rcSafePrune=False}}),("BreadthScheduler",e01 {regionSearch=regionConfigOn {rcRegionFirst=False,rcSafePrune=False}})
     ,("RegionBreadth",e01 {regionSearch=regionConfigOn {rcSafePrune=False}}),("FullE3",e01 {regionSearch=regionConfigOn})
-    ,("FullE3_NoMDL",e01 {regionSearch=regionConfigOn {rcMDL=False}}),("FullE3_NoSafePrune",e01 {regionSearch=regionConfigOn {rcSafePrune=False}})]
+    ,("FullE3_NoMDL",e01 {regionSearch=regionConfigOn {rcMDL=False,rcMDLRecord=False}}),("FullE3_NoSafePrune",e01 {regionSearch=regionConfigOn {rcSafePrune=False}})]
+  -- Stage E3.1 (ARC.ContentFirstEvaluate.namedConfigsE31): one final binary,
+  -- the same universe, budgets and E3 scheduler; the switches are
+  -- rcPrecheck (input-side selector precheck), rcLazyMDL (exact per-task
+  -- shape cache), rcMDL/rcMDLRecord (MDL used for view order / recorded),
+  -- rcSafePrune, rcSelectorPriority (scheduling-only), rcRegionFirst.
+  -- E31_PatchedBaseline == FullE3 on the patched sources (the regression
+  -- check against the E3 frozen records); E31_FullCostOrder is the
+  -- cost-only candidate order (no size class) for the PriorityVsBreadth matrix.
+  ++[("E31_PatchedBaseline",e01 {regionSearch=regionConfigOn})
+    ,("E31_PrecheckOnly",e01 {regionSearch=regionConfigOn {rcPrecheck=True}})
+    ,("E31_LazyMDLOnly",e01 {regionSearch=regionConfigOn {rcLazyMDL=True}})
+    ,("E31_Full",e01 {regionSearch=e31})
+    ,("E31_FullNoMDL",e01 {regionSearch=e31 {rcMDL=False,rcMDLRecord=False}})
+    ,("E31_FullNoSafePrune",e01 {regionSearch=e31 {rcSafePrune=False}})
+    ,("E31_FullSelectorPriority",e01 {regionSearch=e31 {rcSelectorPriority=True}})
+    ,("E31_FullCostOrder",e01 {regionSearch=e31 {rcRegionFirst=False}})]
   where
     d0=scaling 1 2 2 True
     e01=d0 {contentFirst=contentFirstOn {cfViews=True,cfGeometry=True,cfPlanBudget=2400,cfExecutionBudget=16000}}
+    e31=regionConfigOn {rcPrecheck=True,rcLazyMDL=True}
     scaling m cd pd diag=fullD
       { alignmentBudget=alignmentBudget fullD*m,scalarBudget=scalarBudget fullD*m
       , stageA=(stageA fullD) {saHoleBudget=saHoleBudget (stageA fullD)*m,saTotalHoleBudget=saTotalHoleBudget (stageA fullD)*m}

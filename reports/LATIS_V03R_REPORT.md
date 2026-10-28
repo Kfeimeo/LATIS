@@ -4,7 +4,7 @@
 
 ## 可复现协议和定义
 
-`cabal --config-file=scripts/cabal.config build all --offline`；`python scripts/run_v03r.py --tests`；`python scripts/make_v03r_report.py`。CLI：`latis solve-v03r --task PATH --out PATH --mode InducedTSLFull`。核心 trace：[induced_tsl_trace.md](results/v03r/03560426/induced_tsl_trace.md)。完整 source/binary/task hashes：[protocol.json](results/v03r/protocol.json)；全部计数：[metrics.csv](results/v03r/metrics.csv)。四个 test suites 本次全部 PASS，包含 1518 round trips、旧 solver regressions、typed kernel/witness/VSA、core heldout，以及改变画布和首物体 x 的独立扰动检查。
+`cabal --config-file=scripts/cabal.config build all --offline`；`python scripts/run_v03r.py --tests`；`python scripts/make_v03r_report.py`。CLI：`latis solve-v03r --task PATH --out PATH --mode InducedTSLFull`。核心 trace：[induced_tsl_trace.md](../results/v03r/03560426/induced_tsl_trace.md)。完整 source/binary/task hashes：[protocol.json](../results/v03r/protocol.json)；全部计数：[metrics.csv](../results/v03r/metrics.csv)。四个 test suites 本次全部 PASS，包含 1518 round trips、旧 solver regressions、typed kernel/witness/VSA、core heldout，以及改变画布和首物体 x 的独立扰动检查。
 
 固定 B = typed ML + ARC semantic atoms。Q=(type,specification,typed environment)。TSLτ=Signature(VSroot)∪Iτ。此处 VSroot 是 **bounded discovered support** 的 underapproximation：非空支持必须可审计，但未发现支持不是 operator 不可能支持该 task 的证明。TSL 比 winning program 的 used-symbol closure 更宽：核心有 19 个 BaseActivated，而 winning program 有 15 个 distinct symbols。Base没有 ScanP、Attach、MapPose、Progression 等结构。
 
@@ -24,7 +24,7 @@
 
 是。根 function graph → lambda binding → mkScene 的 correspondence/Render-valid residual → List PlacedObject specification。Learn 对全部 return-compatible Base ops 求 witness；map 产生逐元素函数约束，scan 产生 seed=y₀、step((yᵢ₋₁,xᵢ))=yᵢ、以及 tail input list。只有所有 child VS 非空才能创建 Join_scan，失败的 map/scan child branches 会记录。Translate 的 vector instance constraints 是 TL(target)−TL(source)，向量表达式从 Anchor 与 coordDelta 的组合中学习；没有 blind vector lattice。step 的 pair parameter 访问路径 `.0/.1` 从 AST 和 witness bindings 自动导出，不使用 depends-on-prev family。
 
-Trace、[version_space.json](results/v03r/03560426/version_space.json) 和 [induced_tsl.json](results/v03r/03560426/induced_tsl.json) 给出 root spec、compatible rules、effect pruning、子任务/MRV、map/scan 支持、Translate vectors、表达式、FV/access paths、VS nodes、inventions、exact/MDL。
+Trace、[version_space.json](../results/v03r/03560426/version_space.json) 和 [induced_tsl.json](../results/v03r/03560426/induced_tsl.json) 给出 root spec、compatible rules、effect pruning、子任务/MRV、map/scan 支持、Translate vectors、表达式、FV/access paths、VS nodes、inventions、exact/MDL。
 
 ## Q3：Attach 是否真正 invention？
 

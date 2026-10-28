@@ -1,10 +1,10 @@
 # LATIS — Latent Task-Induced Synthesis
 
-新增 **v0.4 — Triggered Typed Feature Saturation**：`solve-v04` 优先使用逐对象 Object/Position 特征、触发式可见性、冻结剪枝、全局共享解释与 output-wise construction；失败自动回退原 R2。运行方法与边界见 [设计说明](docs/LATIS_V04.md)，实测与消融见 [v0.4 报告](LATIS_V04_REPORT.md)。`--workers N`（配合 `+RTS -N<N>`）可并行求值单任务 source closure 的候选表达式，结果与串行逐位一致；语义、预算与性能实测见设计说明的并行章节和 [并行报告](LATIS_V04_PARALLEL_REPORT.md)。
+新增 **v0.4 — Triggered Typed Feature Saturation**：`solve-v04` 优先使用逐对象 Object/Position 特征、触发式可见性、冻结剪枝、全局共享解释与 output-wise construction；失败自动回退原 R2。运行方法与边界见 [设计说明](docs/LATIS_V04.md)，实测与消融见 [v0.4 报告](reports/LATIS_V04_REPORT.md)。`--workers N`（配合 `+RTS -N<N>`）可并行求值单任务 source closure 的候选表达式，结果与串行逐位一致；语义、预算与性能实测见设计说明的并行章节和 [并行报告](reports/LATIS_V04_PARALLEL_REPORT.md)。
 
 新增实验入口 **`solve-features`**：同特征匹配／同类型程序、跨特征匹配／程序复用、全输出 witness 驱动的剩余特征构造。统一限制为标量常量和跨案例语义指称。实现范围、预算及运行方法见 [三阶段算法说明](docs/FEATURE_PIPELINE.md)；旧版本入口保留用于对照。
 
-最新入口是 **v0.3R.1**：固定 typed Base，扩充 generic deductive witnesses，并让 typed anti-unification / lambda lifting 产生的 task-local inventions 回馈后续 Learn。StructuralPriorCount=0；v0.3R 和 legacy 路径保留。结果与限制见 [LATIS_V03R1_REPORT.md](LATIS_V03R1_REPORT.md)，前一轮见 [LATIS_V03R_REPORT.md](LATIS_V03R_REPORT.md)。
+最新入口是 **v0.3R.1**：固定 typed Base，扩充 generic deductive witnesses，并让 typed anti-unification / lambda lifting 产生的 task-local inventions 回馈后续 Learn。StructuralPriorCount=0；v0.3R 和 legacy 路径保留。结果与限制见 [reports/LATIS_V03R1_REPORT.md](reports/LATIS_V03R1_REPORT.md)，前一轮见 [reports/LATIS_V03R_REPORT.md](reports/LATIS_V03R_REPORT.md)。
 
 ```powershell
 cabal --config-file=scripts/cabal.config run latis --offline -- solve-v03r1 --task data/03560426.json --out results/v03r1/single --mode Full
@@ -20,7 +20,7 @@ cabal --config-file=scripts/cabal.config run latis --offline -- solve-v02a --tas
 
 `v03-stress` 跑 A–J；`v03-regression` 比较旧 v0.2A / LatentDisabled / Full；`v03-ablation` 跑八组 v0.3 mode 并保留真实 v0.2A。`--mode` 支持 `V03Full|NoLocalLatent|NoGlobalLatent|NoFusion|NoLatentMDL|EagerLatentEnumeration|NoProgramToLatent|LatentDisabled`。开发套件用 `python scripts/run_v03.py --no-audit`。每个任务输出 `solution.json`、`hypotheses.json`、`task.json`、`latent_trace.md`。
 
-30-task 官方 ARC-1 training 随机抽样在核心实现前固定于 `results/v03/frozen_arc1_tasks.json`；`scripts/freeze_arc1.py` 验证已有文件时不会重新选题。首次 audit 的 source/binary/预算/开启时间另行封存于 `audit_opened.json`；之后源或 protocol 改变会拒绝覆盖首次 audit。详细研究结论、MDL 比较范围、消融与保守 failure taxonomy 见 [LATIS_V03_REPORT.md](LATIS_V03_REPORT.md)。没有加入 split/union/occlusion search、neural 或新的 Level-0 object semantics。
+30-task 官方 ARC-1 training 随机抽样在核心实现前固定于 `results/v03/frozen_arc1_tasks.json`；`scripts/freeze_arc1.py` 验证已有文件时不会重新选题。首次 audit 的 source/binary/预算/开启时间另行封存于 `audit_opened.json`；之后源或 protocol 改变会拒绝覆盖首次 audit。详细研究结论、MDL 比较范围、消融与保守 failure taxonomy 见 [reports/LATIS_V03_REPORT.md](reports/LATIS_V03_REPORT.md)。没有加入 split/union/occlusion search、neural 或新的 Level-0 object semantics。
 
 v0.3 先尝试真实旧 solver；高成本或失败后才发现 abstraction。新坐标程序同时可展开为独立可执行的 Z0 reference AST，比完整 `A→P→D` 与 legacy 两者的最小成本。该 reference 不代表原 v0.2A 搜索出了程序，也没有 unrestricted CSE/let 优化；报告明确区分 legacy 成本与展开参考成本。`LatentDisabled` 完全复现原 solver。
 
@@ -30,7 +30,7 @@ v0.3 先尝试真实旧 solver；高成本或失败后才发现 abstraction。�
 ./scripts/run-v02a.ps1
 ```
 
-该脚本离线构建、运行两套测试、七组 core 消融、11 项回归、6 项压力任务及其七组消融，生成 [LATIS_V02A_REPORT.md](LATIS_V02A_REPORT.md)。结果包括 [完整 core trace](results/03560426/v02a_trace.md)、[消融表](results/03560426/v02a_ablation.md)、[压力任务消融](results/v02a/stress/ablation.md)、原始 JSON 与环境/source 哈希。`03560426` 保持原 scan，最终 expanded 314、首解 266；原 Full 为 1305、1251。全部训练/heldout 回归通过，具体统计口径、时间与负结果见报告。
+该脚本离线构建、运行两套测试、七组 core 消融、11 项回归、6 项压力任务及其七组消融，生成 [reports/LATIS_V02A_REPORT.md](reports/LATIS_V02A_REPORT.md)。结果包括 [完整 core trace](results/03560426/v02a_trace.md)、[消融表](results/03560426/v02a_ablation.md)、[压力任务消融](results/v02a/stress/ablation.md)、原始 JSON 与环境/source 哈希。`03560426` 保持原 scan，最终 expanded 314、首解 266；原 Full 为 1305、1251。全部训练/heldout 回归通过，具体统计口径、时间与负结果见报告。
 
 单独运行：
 
@@ -140,7 +140,7 @@ flowchart LR
 
 状态计数包含 correspondence edges/branches、dependency relation hypotheses、partial skeletons、effect queries、hole expression checks 与完整候选验证；没有把分析工作当作免费步骤。所有模式都缓存输入编码一次；time 包含分析、验证及最终 MDL，排除文件读取、构建与报告写入。
 
-- [LATIS_V01_REPORT.md](LATIS_V01_REPORT.md)：Q1–Q6、消融解释、边界与瓶颈。
+- [reports/LATIS_V01_REPORT.md](reports/LATIS_V01_REPORT.md)：Q1–Q6、消融解释、边界与瓶颈。
 - [完整 synthesis trace](results/03560426/trace.md)：匹配图、所有 witness、选择的程序及 TSL。
 - [消融表](results/03560426/ablation.md)、[原始 CSV](results/03560426/ablation.csv)、[原始 JSON](results/03560426/ablation.json)。
 - [合成任务结果](results/synthetic/suite.md)：包含其他 anchor、reverse ordering、map、filter、fold、iterate 的留出验证。
@@ -165,7 +165,7 @@ python scripts/make_v03r_report.py
 
 新搜索是 `Learn(type,spec,env)`：return-type filtering → conditional effects → operator witness → child tasks → MRV → shared Union/Join → bounded ranked extraction → original Grid exact verification。Witness 是 partial；通用 bounded forward observers 条件化 inverse semantics。已有 exact observation 会作为 terminal domain，避免无限 identity 展开。这里得到的是 **bounded discovered support**；未激活的 symbol 不等于数学上不可能支持该 task。
 
-`I<n>` inventions 来自多个 distinct exact-valid portfolio 程序中的 repeated alpha-equivalent lambda subtrees。定义与引用都计成本；saving 明确以 portfolio 为范围，不能冒充单个 scan AST 的节省。所有数据沿用 v0.3 snapshots；原 30 题标为 `PreviouslyOpenedDiagnosticSet`。结果、回归退化、witness/representation coverage 与 Q1–Q10 见 [LATIS_V03R_REPORT.md](LATIS_V03R_REPORT.md)；核心 trace 位于 [results/v03r/03560426/induced_tsl_trace.md](results/v03r/03560426/induced_tsl_trace.md)。
+`I<n>` inventions 来自多个 distinct exact-valid portfolio 程序中的 repeated alpha-equivalent lambda subtrees。定义与引用都计成本；saving 明确以 portfolio 为范围，不能冒充单个 scan AST 的节省。所有数据沿用 v0.3 snapshots；原 30 题标为 `PreviouslyOpenedDiagnosticSet`。结果、回归退化、witness/representation coverage 与 Q1–Q10 见 [reports/LATIS_V03R_REPORT.md](reports/LATIS_V03R_REPORT.md)；核心 trace 位于 [results/v03r/03560426/induced_tsl_trace.md](results/v03r/03560426/induced_tsl_trace.md)。
 
 ## v0.3R.1：deductive coverage 与在线 task abstraction
 
@@ -215,7 +215,7 @@ build/latis-r2-final.exe solve-v03r2 --task data/03560426.json `
   --out results/v03r2-single --mode Full --budget 250000 --cost 96 --saturation-budget 25000
 ```
 
-七项消融为 Full / NoDiversityPreservation / FixedAliasCap / NoLetSharing / NoGroundedLiteralPrior / BeamSearchLegacy / NoCounterfactualDiagnosis；额外 `NoPortfolioCover` 检查完整 witness 覆盖的作用。结果与限制见 `LATIS_V03R2_REPORT.md`。每次运行保存 source/binary/input hashes、完整命令、equivalence classes、共享上下文、VSA、portfolio 和原 training/heldout 验证。
+七项消融为 Full / NoDiversityPreservation / FixedAliasCap / NoLetSharing / NoGroundedLiteralPrior / BeamSearchLegacy / NoCounterfactualDiagnosis；额外 `NoPortfolioCover` 检查完整 witness 覆盖的作用。结果与限制见 `reports/LATIS_V03R2_REPORT.md`。每次运行保存 source/binary/input hashes、完整命令、equivalence classes、共享上下文、VSA、portfolio 和原 training/heldout 验证。
 
 首次构建 runner 默认的二进制：`ghc -O2 -isrc -iapp -XGHC2021 -outputdir build/r2-opt app/Main.hs -o build/latis-r2-final.exe`。测试脚本可用 `--cabal`、`--ghc`、`--ghc-pkg` 指定工具路径；它将 R.1 兼容测试的新结果写入 R2 实验目录，保留旧报告数据。
 
@@ -223,7 +223,7 @@ build/latis-r2-final.exe solve-v03r2 --task data/03560426.json `
 
 新增 `solve-collection` 与 `collection-experiment`，从携带 size index 的无序集合出发，通过带 provenance 的 OrderBy、RankAlign、AlignmentLift 与匿名抽象实现可变数量对象的解释式对齐。03560426 的新前端训练和留出均 exact；七组消融与负向测试检查枚举顺序、尺寸约束、偶然 equality 和高层具体边泄漏。原 v0.4 与 R2 路径保留。
 
-复现与限制见 [集合实验设计](docs/LATIS_COLLECTION.md)，结果见 [实验报告](LATIS_COLLECTION_REPORT.md)。
+复现与限制见 [集合实验设计](docs/LATIS_COLLECTION.md)，结果见 [实验报告](reports/LATIS_COLLECTION_REPORT.md)。
 
 ```powershell
 cabal run latis -- collection-experiment --out results/v05
@@ -234,7 +234,7 @@ python scripts/report_collection.py
 
 新增 `solve-collection-v6` 与 `collection-v6-experiment`，作为 v0.5 collection front-end 的增量升级（v0.5 模块与 R2 不改动）。三项机制：训练上 denotation 相同的候选保留为 semantic class 内的多个 representative，并用带合法性证明的 counterfactual context 检测它们是否真的不同；alignment key 不再限死为六个手写键，而是在 AlignmentFailure 触发后由受限 KeyExpr 语法合成；语义内聚的子图在搜索过程中被 anti-unify、按 utility 在线 promotion 并在同一次 solve 中复用。附带 dependent size index 反例与 11 组消融。
 
-复现与限制见 [v0.6 设计](docs/LATIS_V06.md)，结果见 [实验报告](LATIS_V06_REPORT.md)。
+复现与限制见 [v0.6 设计](docs/LATIS_V06.md)，结果见 [实验报告](reports/LATIS_V06_REPORT.md)。
 
 ```powershell
 ./scripts/run_collection_v6.ps1
@@ -244,7 +244,7 @@ python scripts/report_collection.py
 
 新增 `solve-collection-v61`、`collection-v61-experiment`、`collection-v61-battery`。在线抽象的复用改为 SafeOnline：`Call(I_k)` 只是优先候选，残余语法作为 deferred 候选保存并在 preferred branch 失败、realization 失败或第一个解之后 resume，最终 class 覆盖 NoOnlineAbstraction 的候选集；`ExclusiveReuseLegacy` 保留 v0.6 行为作对照。新增误导复用任务 G/H、训练完全相同的 paired 任务 P、七个任务族的种子化 metamorphic battery（置换不变、平移等变、size-index 合法性、tie 拒绝、抽象稳健性）。
 
-设计与命令见 [v0.6.1 设计](docs/LATIS_V061.md)，结果见 [实验报告](LATIS_V061_REPORT.md)。
+设计与命令见 [v0.6.1 设计](docs/LATIS_V061.md)，结果见 [实验报告](reports/LATIS_V061_REPORT.md)。
 
 ```powershell
 ./scripts/run_collection_v61.ps1
@@ -252,7 +252,7 @@ python scripts/report_collection.py
 
 ## v0.6.1：真实 ARC-AGI-1 Train-only Fallback 实验
 
-只做评估，不改算法：在官方 ARC-AGI-1 `training` split 全部 400 个任务上（`data/arc1-training/`，原样副本），求解器只接收剥离了 `test` 字段的 train-only 文件，先运行 v0.6.1 前端（Feature），无 train-exact 程序、超时、不受支持或运行错误时在**独立进程**中回退到既有 R2；v0.4 feature front 作为诊断列单独运行。新子命令 `arc-train-only-stage`，驱动器 `scripts/arc_train_only.py`（prepare / test / run / report），一键 `scripts/run_arc_train_only.ps1`。方法见 [说明](docs/LATIS_V061_ARC_TRAIN_ONLY.md)，指标、失败分类与任务 ID 见 `results/arc_agi1_train_only_fallback/summary.md`，总结报告见 [LATIS_V061_ARC_TRAIN_ONLY_REPORT.md](LATIS_V061_ARC_TRAIN_ONLY_REPORT.md)。
+只做评估，不改算法：在官方 ARC-AGI-1 `training` split 全部 400 个任务上（`data/arc1-training/`，原样副本），求解器只接收剥离了 `test` 字段的 train-only 文件，先运行 v0.6.1 前端（Feature），无 train-exact 程序、超时、不受支持或运行错误时在**独立进程**中回退到既有 R2；v0.4 feature front 作为诊断列单独运行。新子命令 `arc-train-only-stage`，驱动器 `scripts/arc_train_only.py`（prepare / test / run / report），一键 `scripts/run_arc_train_only.ps1`。方法见 [说明](docs/LATIS_V061_ARC_TRAIN_ONLY.md)，指标、失败分类与任务 ID 见 `results/arc_agi1_train_only_fallback/summary.md`，总结报告见 [reports/LATIS_V061_ARC_TRAIN_ONLY_REPORT.md](reports/LATIS_V061_ARC_TRAIN_ONLY_REPORT.md)。
 
 ## 阶段 A：Grid Size Feature + Typed N-ary Feature Synthesis + ML Parity
 
@@ -281,3 +281,7 @@ python -I test/TraceIOValidation.py
 ```
 
 说明见 [docs/LATIS_SINGLE_IO_DEBUGGER.md](docs/LATIS_SINGLE_IO_DEBUGGER.md)，开工审计见 [docs/LATIS_SINGLE_IO_DEBUGGER_AUDIT.md](docs/LATIS_SINGLE_IO_DEBUGGER_AUDIT.md)，实测与回归见 [docs/LATIS_SINGLE_IO_DEBUGGER_REPORT.md](docs/LATIS_SINGLE_IO_DEBUGGER_REPORT.md)。样例在 `results/trace_io/examples/<task>/{inspect,single}/index.html`，验证证据在 `results/trace_io/validation/`。
+
+## 阶段 E3.1：Selector 输入侧预检查、精确 Shape MDL 缓存与可信效率基线（2026-10-28）
+
+只优化 Stage E2–E3 已有的 Region 搜索，不改语义、不加规则：`RegionConfig` 新增可关闭开关 `rcPrecheck`（候选执行前在训练**输入**树上判定其 Selector 的基数，无效者记为 `PrecheckedInvalid` 跳过，带逐 case 证据，固定宇宙不变）、`rcLazyMDL`（每题精确归一化 mask 键的 Shape MDL 缓存，最优值与视图排序不变）、`rcMDLRecord`（NotComputed 写 `null`，不写 0）、`rcSelectorPriority`（仅调度）。配置 `E31_PatchedBaseline`（= FullE3 语义，含评测后修补）… `E31_FullCostOrder` 用同一冻结二进制跑 400 题；新增 `phase_timings`（scene/partition/precheck/prune/execution/MDL/cover 分项耗时）与 RTS GC/分配字段。审计见 [docs/LATIS_STAGE_E31_AUDIT.md](docs/LATIS_STAGE_E31_AUDIT.md)，设计见 [docs/LATIS_STAGE_E31.md](docs/LATIS_STAGE_E31.md)，实测见 [docs/LATIS_STAGE_E31_REPORT.md](docs/LATIS_STAGE_E31_REPORT.md)；一键 `scripts/run_stage_e31.ps1`，结果 `results/stage_e31/<run_id>/`。历次任务提示词已移到 `prompts/`，v0.1–v0.6.1 的旧报告移到 `reports/`。
