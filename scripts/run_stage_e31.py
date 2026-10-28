@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 import platform
+import stat
 import shutil
 import statistics
 import subprocess
@@ -110,8 +111,9 @@ def prepare(args):
         write(out / 'data_manifest.json', manifest)
     code = read(out / 'code_version.json')
     shutil.copyfile(args.binary, out / 'solver.exe')
+    (out / 'solver.exe').chmod((out / 'solver.exe').stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     code.update(run_id=out.name, frozen_binary='solver.exe', binary_sha256=sha(out / 'solver.exe'), all_configs=ALL_CONFIGS, reference_config=REFERENCE,
-                compiler=subprocess.check_output(['E:/ghcup/ghc/9.10.3/bin/ghc.exe', '--version'], text=True).strip(),
+                compiler=subprocess.check_output([args.ghc, '--version'], text=True).strip(),
                 feature_stage='Stage E3.1: one final patched binary; FrozenE01 (negative control), E31_PatchedBaseline (= FullE3 semantics on the patched sources) and the precheck / lazy MDL / scheduling ablations (see config text per record)',
                 r2_stage='not executed', os=platform.platform(), python=sys.version, cpu_count=os.cpu_count(),
                 previous_frozen={'run': 'results/stage_e2_e3/e23-20261027-main', 'binary_sha256': E3_FROZEN_SHA, 'post_evaluation_patches': ['Scene.hs: c_rect via minimalCover (now attachRectCover / MDLCache)', 'Search.hs: latis-train-exact traceEvent on region fits']},
@@ -403,7 +405,8 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('command', choices=['prepare', 'run', 'report'])
     p.add_argument('--out', required=True)
-    p.add_argument('--binary', default=str(ROOT / 'build/latis-stage-e31.exe'))
+    p.add_argument('--binary', default=str(ROOT / ('build/latis-stage-e31.exe' if os.name == 'nt' else 'build/latis-stage-e31')))
+    p.add_argument('--ghc', default=os.environ.get('LATIS_GHC', 'E:/ghcup/ghc/9.10.3/bin/ghc.exe' if os.name == 'nt' else 'ghc'), help='compiler used for the frozen binary (recorded in code_version.json)')
     p.add_argument('--workers', type=int, default=4)
     p.add_argument('--configs', default=','.join(ALL_CONFIGS))
     p.add_argument('--tasks', default='')

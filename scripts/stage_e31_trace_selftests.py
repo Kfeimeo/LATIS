@@ -19,6 +19,11 @@ def main():
     import TraceIOValidation as TV  # noqa: E402  (headless Chrome helper)
     (ROOT / 'build' / 'trace-io-tmp').mkdir(parents=True, exist_ok=True)
     results = {}
+    if not Path(TV.CHROME).exists():
+        pages = sorted((out / 'traces').glob('*/*/index.html'))
+        (out / 'validation' / 'trace_selftests.json').write_text(json.dumps({'not_run': f'headless Chrome not found at {TV.CHROME}', 'pages': [str(p.relative_to(out)) for p in pages]}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+        print('viewer self-tests not_run (no Chrome);', len(pages), 'pages rendered')
+        return
     for page in sorted((out / 'traces').glob('*/*/index.html')):
         key = f'{page.parent.parent.name}/{page.parent.name}'
         try:
