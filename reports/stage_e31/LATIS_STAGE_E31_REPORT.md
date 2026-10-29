@@ -1,6 +1,6 @@
 # LATIS Stage E3.1 实测报告
 
-设计见 [LATIS_STAGE_E31.md](LATIS_STAGE_E31.md)，实施前审计见 [LATIS_STAGE_E31_AUDIT.md](LATIS_STAGE_E31_AUDIT.md)。本报告的每个数字都可由 `results/stage_e31/e31-20261028-main/` 下的原始记录重算：`python -I scripts/run_stage_e31.py report --out <run>` 重建 `per_task.csv`/`metrics.json`，`python -I scripts/verify_stage_e31.py --out <run>` 重建 `verification_e31.json`，`python -I scripts/report_stage_e31.py --out <run>` 打印全部表格并写 `report_digest.json`。
+设计见 [LATIS_STAGE_E31.md](../../docs/LATIS_STAGE_E31.md)，实施前审计见 [LATIS_STAGE_E31_AUDIT.md](../../docs/LATIS_STAGE_E31_AUDIT.md)。本报告的每个数字都可由 `results/stage_e31/e31-20261028-main/` 下的原始记录重算：`python -I scripts/run_stage_e31.py report --out <run>` 重建 `per_task.csv`/`metrics.json`，`python -I scripts/verify_stage_e31.py --out <run>` 重建 `verification_e31.json`，`python -I scripts/report_stage_e31.py --out <run>` 打印全部表格并写 `report_digest.json`。
 
 ## 0. 运行信息
 

@@ -1,6 +1,6 @@
 # LATIS Stage E0–E1 报告：机制矩阵、ARC 消融、三题 Oracle 可达性
 
-run_id `e01-20261027-main`，目录 `results/stage_e01/e01-20261027-main/`（solver.exe 与源码快照哈希见 `code_version.json`；数据 manifest 与 `results/content_first/cf-20261026-main` 相同：官方 ARC-AGI-1 training 400 题 train-only 副本，test 对从不进入求解器）。设计见 [LATIS_STAGE_E0_E1.md](LATIS_STAGE_E0_E1.md)，审计见 [LATIS_STAGE_E0_E1_AUDIT.md](LATIS_STAGE_E0_E1_AUDIT.md)。表中数字由 `scripts/report_stage_e01.py` 从原始记录重算（`report_digest.md/json`）。
+run_id `e01-20261027-main`，目录 `results/stage_e01/e01-20261027-main/`（solver.exe 与源码快照哈希见 `code_version.json`；数据 manifest 与 `results/content_first/cf-20261026-main` 相同：官方 ARC-AGI-1 training 400 题 train-only 副本，test 对从不进入求解器）。设计见 [LATIS_STAGE_E0_E1.md](../../docs/LATIS_STAGE_E0_E1.md)，审计见 [LATIS_STAGE_E0_E1_AUDIT.md](../../docs/LATIS_STAGE_E0_E1_AUDIT.md)。表中数字由 `scripts/report_stage_e01.py` 从原始记录重算（`report_digest.md/json`）。
 
 ## 1. 验证套件（`validation/`，退出码均为 0）
 
@@ -53,7 +53,7 @@ run_id `e01-20261027-main`，目录 `results/stage_e01/e01-20261027-main/`（sol
 ## 5. 可视化与日志
 
 - `traces/c909285e/FullE01/index.html`（已解题的几何示例）：网格页在 Input 上以不同描边显示选中 shell 的 4 个矩形（渲染出 24 个 rect 格）、残差格斜线标记、视图并排表；推导页 CrossCaseWitness 表（视图/背景/选中基数/dims/矩形数均 `ObservedCaseAgreement`，target 只用于 exact 标记）；搜索流程页列出几何事件计数（view-created 6、view-not-applicable 3、cover-proven 9167、feature-evaluated 96、branch-executed 146）。headless Chrome 自检：全部标签页无错误、无死链。
-- 事件与记录结构见 [LATIS_SINGLE_IO_DEBUGGER.md](LATIS_SINGLE_IO_DEBUGGER.md) 附录。
+- 事件与记录结构见 [LATIS_SINGLE_IO_DEBUGGER.md](../../docs/LATIS_SINGLE_IO_DEBUGGER.md) 附录。
 
 ## 6. 限制与下一步
 

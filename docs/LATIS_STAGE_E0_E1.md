@@ -1,6 +1,6 @@
 # LATIS Stage E0–E1：背景无关的几何视图、最小矩形并与类型化坐标确界
 
-实施前审计见 [LATIS_STAGE_E0_E1_AUDIT.md](LATIS_STAGE_E0_E1_AUDIT.md)，实测见 [LATIS_STAGE_E0_E1_REPORT.md](LATIS_STAGE_E0_E1_REPORT.md)。本文描述数据模型、语义、算法、坐标类型与接口，以当前源码为准。
+实施前审计见 [LATIS_STAGE_E0_E1_AUDIT.md](LATIS_STAGE_E0_E1_AUDIT.md)，实测见 [LATIS_STAGE_E0_E1_REPORT.md](../reports/stage_e0_e1/LATIS_STAGE_E0_E1_REPORT.md)。本文描述数据模型、语义、算法、坐标类型与接口，以当前源码为准。
 
 ## 1. 数据流
 

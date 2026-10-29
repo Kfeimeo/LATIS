@@ -19,7 +19,7 @@ def literal_counts(ast):
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--out',type=pathlib.Path,default=ROOT/'results/v03r2')
-    parser.add_argument('--report',type=pathlib.Path,default=ROOT/'reports'/'LATIS_V03R2_REPORT.md')
+    parser.add_argument('--report',type=pathlib.Path,default=ROOT/'reports'/'v03'/'LATIS_V03R2_REPORT.md')
     parser.add_argument('--cover-out',type=pathlib.Path,default=ROOT/'results/v03r2-cover-ablation')
     parser.add_argument('--deadline-out',type=pathlib.Path,default=ROOT/'results/v03r2-deadline-ablation')
     parser.add_argument('--stress-out',type=pathlib.Path)

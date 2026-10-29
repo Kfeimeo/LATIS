@@ -44,7 +44,7 @@ remaining regressions without supplying any reference AST to the solver.
 
 Reproduction and all seven modes are in `scripts/run_v03r1.py`; the provenance
 validator/report builder is `scripts/make_v03r1_report.py`. Results and remaining
-coverage limitations are in [reports/LATIS_V03R1_REPORT.md](reports/LATIS_V03R1_REPORT.md).
+coverage limitations are in [reports/LATIS_V03R1_REPORT.md](reports/v03/LATIS_V03R1_REPORT.md).
 
 # LATIS v0.1 architecture
 
@@ -104,7 +104,7 @@ flowchart LR
 
 传播不随机挑候选；branch 在固定点后执行。context 展开先尝试 current，失败才试 admissible larger scopes；穷尽模式会把已访问 assignments 视为 nogoods，再搜索 deferred scope，同时保留已找到程序。所有 constraint 带 rule、correspondence branch、pair、object 与 premises；candidate 依赖边带 guard，不能混为最终依赖。只有严格相同 seed/step AST 且无 Previous 的 scan 全局等价 map，训练等价候选仍保留。
 
-终止条件、memo keys、穷尽范围、状态事件定义与消融负结果见 `reports/LATIS_V02A_REPORT.md`。前面的 v0.1 架构文档保留。
+终止条件、memo keys、穷尽范围、状态事件定义与消融负结果见 `reports/v02a/LATIS_V02A_REPORT.md`。前面的 v0.1 架构文档保留。
 # v0.3 hierarchical extension
 
 Canonical Object Grounding Principle: existing `Latent.{Grid,Object,Encode,Render,Correspondence}` and all v0.2A synthesis semantics remain unchanged. New modules compose with, rather than overwrite, the joint solver.

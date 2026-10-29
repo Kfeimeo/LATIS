@@ -159,7 +159,7 @@ BR 是 inclusive corner。输出可见连通块缺少被覆盖角点，correspon
 
 已在真实 regression task 与 {len(suite)} 个泛化构造例上证实：latent representation、residual/effect、dependency skeletons 与 typed witness constraints 能把直接候选的 Cartesian 枚举缩小为少量、可解释、exact-valid 的结构化搜索。最强实证来自 witness；dependency analysis 的首次解开销也被如实计入。结论只覆盖当前可复现的 bounded grammar，不代表完整 ARC solver 或整个 ARC benchmark 的成功率。
 """
-    (ROOT / "reports" / "LATIS_V01_REPORT.md").write_text(report, encoding="utf-8")
+    (ROOT / "reports" / "v01" / "LATIS_V01_REPORT.md").write_text(report, encoding="utf-8")
     print(f"Report generated: first-state reduction {state_factor:.2f}x, first-time reduction {time_factor:.2f}x; {len(suite)} synthetic heldouts exact.")
 
 

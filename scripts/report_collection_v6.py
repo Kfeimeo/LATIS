@@ -274,7 +274,7 @@ def main():
                f"通过 CollectionV6、Collection、Triggered、InducedR2、FeaturePipeline 五组测试，日志在 results/v06/validation。合成任务 A–F 的 R2 fallback 预算为 workBudget={mechanism_budget}，03560426 为 {vertical_budget}。Windows、GHC 9.10.3、-O1；wall-clock 只是单次观察。", "",
                "```powershell", "./scripts/run_collection_v6.ps1", "```", "",
                "构建方法、模块边界与消融定义见 docs/LATIS_V06.md。原始表格：results/v06/metrics.csv。"]
-    (ROOT / "reports" / "LATIS_V06_REPORT.md").write_text("\n".join(report) + "\n", encoding="utf-8")
+    (ROOT / "reports" / "v06" / "LATIS_V06_REPORT.md").write_text("\n".join(report) + "\n", encoding="utf-8")
     (OUT / "validation/audit.json").write_text(json.dumps({"runs": len(rows), "witnesses": witnesses, "classes": classes_audited,
                                                            "abstractions": abstractions_audited, "passed": True}, indent=2) + "\n", encoding="utf-8")
     print(f"PASS {len(rows)} runs, {witnesses} witnesses, {classes_audited} classes, {abstractions_audited} abstractions; wrote LATIS_V06_REPORT.md")

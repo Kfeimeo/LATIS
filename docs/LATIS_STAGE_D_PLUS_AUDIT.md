@@ -1,6 +1,6 @@
 # Stage D+：实施前审计
 
-依据 2026-10-26 当前已验收 Stage D 源码、`docs/LATIS_STAGE_D_REPORT.md`、Stage C 审计及 `results/stage_d/full_p0`。提示词中的报告文件实际位于 docs。历史 FullD 20/400、C 17/400；严格 ComposeOnly 与最后兼容性补丁有独立哈希，本轮不复用其数字作同 binary 消融。
+依据 2026-10-26 当前已验收 Stage D 源码、`../reports/stage_d/LATIS_STAGE_D_REPORT.md`、Stage C 审计及 `results/stage_d/full_p0`。提示词中的报告文件实际位于 docs。历史 FullD 20/400、C 17/400；严格 ComposeOnly 与最后兼容性补丁有独立哈希，本轮不复用其数字作同 binary 消融。
 
 ## 限额及语义
 

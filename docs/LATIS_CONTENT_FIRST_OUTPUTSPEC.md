@@ -1,6 +1,6 @@
 # LATIS Content-first OutputSpec：解除 Size-first 前置约束的设计与实现
 
-本文记录在 Stage D / D+ 源码上新增 Content-first / Goal-coupled OutputSpec 路径的真实调用链、类型语义、依赖方向、触发顺序、预算与限制。实测结果见 [LATIS_CONTENT_FIRST_REPORT.md](LATIS_CONTENT_FIRST_REPORT.md)。所有函数名以当前源码为准。
+本文记录在 Stage D / D+ 源码上新增 Content-first / Goal-coupled OutputSpec 路径的真实调用链、类型语义、依赖方向、触发顺序、预算与限制。实测结果见 [LATIS_CONTENT_FIRST_REPORT.md](../reports/content_first/LATIS_CONTENT_FIRST_REPORT.md)。所有函数名以当前源码为准。
 
 ## 1. 开工审计：旧调用链与阻塞点
 

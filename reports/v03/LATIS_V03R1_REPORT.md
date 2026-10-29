@@ -10,7 +10,7 @@
 
 Core/regression/A–J 使用相同開發預算；diagnostics 使用單獨預算。Legacy 的 work units 是另一算法的計量單位，不能直接與新路徑的 states 相除。30 ARC 僅稱 **PreviouslyOpenedDiagnosticSet**，不是新的 unseen audit；不使用 test labels 調整合成。
 
-來源：[protocol.json](../results/v03r1/protocol.json)、[metrics.csv](../results/v03r1/metrics.csv)、[tests.log](../results/v03r1/tests.log)。可用 `--out` 建立新輪次；參數、source 或 binary 改變時會失效 cache，`--force` 強制重新測量。
+來源：[protocol.json](../../results/v03r1/protocol.json)、[metrics.csv](../../results/v03r1/metrics.csv)、[tests.log](../../results/v03r1/tests.log)。可用 `--out` 建立新輪次；參數、source 或 binary 改變時會失效 cache，`--force` 強制重新測量。
 
 ## Expressible 與 Reachable
 
@@ -71,7 +71,7 @@ Full 後續 search=280 < NoOnlineAbstraction=46320；包括 discovery logical un
 
 discovery units 具體計 AST visits、AU pair attempts、lifting attempts、portfolio-program MDL evaluations；search units 計 Learn、propagation、witness/lookahead、expression row checks、macro expansion checks。它們不是 CPU instruction、完整求值步數或 elapsed seconds。Seconds 單列，不推論所有任務加速。開發中 20 demands 未能攤銷較完整的 discovery 計量，fixture 延長到 40；這裡的 whole-session 勝利只宣稱此長度與配置，短任務仍可能淨虧損。
 
-原始證據：[abstraction_stress.json](../results/v03r1/abstraction_stress.json)。此 harness 只對上述 search/discovery/hit 計數做驗收；其他 inherited root-only counters 不用來估算成本。
+原始證據：[abstraction_stress.json](../../results/v03r1/abstraction_stress.json)。此 harness 只對上述 search/discovery/hit 計數做驗收；其他 inherited root-only counters 不用來估算成本。
 
 ## 全部消融與覆蓋率
 
@@ -121,7 +121,7 @@ train=true、heldout=true，StructuralPriorCount=0。`scan` 仍由 generic step 
 
 其 Attach-like 含義只是人的事後解釋；名稱與構造未進入 solver 規則。core search before discovery=35723、after discovery=1770、discovery=38149、actual hits=4。重跑本身有成本，不能把後續降低當成單題總體加速。TSL 是非空 bounded root VS support 與 task definitions。
 
-[Core trace](../results/v03r1/core/03560426/Full/induced_tsl_trace.md)、[TSL](../results/v03r1/core/03560426/Full/induced_tsl.json)、[VS](../results/v03r1/core/03560426/Full/version_space.json)。
+[Core trace](../../results/v03r1/core/03560426/Full/induced_tsl_trace.md)、[TSL](../../results/v03r1/core/03560426/Full/induced_tsl.json)、[VS](../../results/v03r1/core/03560426/Full/version_space.json)。
 
 ## 兩個最終問題
 

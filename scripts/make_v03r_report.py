@@ -240,7 +240,7 @@ Logged work 对缺失 timeout/legacy 字段不填伪造值；完整 metrics.csv/
 
 支持核心研究问题的证据：没有任务结构 family，规格推动 generic scan+Translate+Anchor composition，且 Signature(VS) 包含非 winner 支持、I0 在合成后被发现。尚未解决的研究问题：自动诱导更丰富 secondary languages、完整 witnesses 与低成本广域搜索。现有退化和 diagnostic failures 是测量结果，不能被抽象名称或重新标为 unseen 来掩盖。
 """
-    (ROOT / 'reports' / 'LATIS_V03R_REPORT.md').write_text(text, encoding='utf-8')
+    (ROOT / 'reports' / 'v03' / 'LATIS_V03R_REPORT.md').write_text(text, encoding='utf-8')
     (OUT / 'summary.json').write_text(json.dumps({'core': core, 'regression': {'train': exact(full_reg), 'heldout': held(full_reg)},
         'stress': {'train': exact(full_stress), 'heldout': held(full_stress)}, 'diagnostic_label': 'PreviouslyOpenedDiagnosticSet',
         'diagnostic': {'train': exact(diag_full), 'heldout': held(diag_full)}, 'test_suites': 4}, indent=2) + '\n', encoding='utf-8')

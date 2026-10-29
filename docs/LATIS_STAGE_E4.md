@@ -1,6 +1,6 @@
 # LATIS Stage E4：Cross-Output Abstract Referents（跨全部训练输出的共享构造骨架）
 
-本轮对应 `../prompts/LATIS_STAGE_E4_CROSS_OUTPUT_REFERENTS_PROMPT.md`。实施前审计见 [LATIS_STAGE_E4_AUDIT.md](LATIS_STAGE_E4_AUDIT.md)，实测见 [LATIS_STAGE_E4_REPORT.md](LATIS_STAGE_E4_REPORT.md)。E4 是一个**可关闭的输出侧结构归纳 sidecar**：它只读训练输出 `O_1..O_n`，联合归纳一个共享的、带类型 Hole 的构造骨架 `Q`，并用独立 Witness 证明 `Render(Q[θ_i]) = O_i` 对每个训练输出成立；它**不**产生 `I→O` 程序，`θ_i` 全部 `OutputObserved`、`InputBindingStatus=NotAttempted`、`prediction_ready=false`，任何结果都不进入 `train_exact`。
+本轮对应 `../prompts/LATIS_STAGE_E4_CROSS_OUTPUT_REFERENTS_PROMPT.md`。实施前审计见 [LATIS_STAGE_E4_AUDIT.md](LATIS_STAGE_E4_AUDIT.md)，实测见 [LATIS_STAGE_E4_REPORT.md](../reports/stage_e4/LATIS_STAGE_E4_REPORT.md)。E4 是一个**可关闭的输出侧结构归纳 sidecar**：它只读训练输出 `O_1..O_n`，联合归纳一个共享的、带类型 Hole 的构造骨架 `Q`，并用独立 Witness 证明 `Render(Q[θ_i]) = O_i` 对每个训练输出成立；它**不**产生 `I→O` 程序，`θ_i` 全部 `OutputObserved`、`InputBindingStatus=NotAttempted`、`prediction_ready=false`，任何结果都不进入 `train_exact`。
 
 ## 1. 类型与语法（`Synthesis.Collection.Output.Template`）
 

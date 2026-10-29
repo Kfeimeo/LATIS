@@ -1,6 +1,6 @@
 # LATIS Stage E2–E3 实测报告
 
-设计见 [LATIS_STAGE_E2_E3.md](LATIS_STAGE_E2_E3.md)，审计见 [LATIS_STAGE_E2_E3_AUDIT.md](LATIS_STAGE_E2_E3_AUDIT.md)。本报告中的每个数字都可由 `results/stage_e2_e3/e23-20261027-main/` 下的原始记录重算（`python -I scripts/report_stage_e2_e3.py --out results/stage_e2_e3/e23-20261027-main` 打印全部表格并写 `report_digest.json`）。
+设计见 [LATIS_STAGE_E2_E3.md](../../docs/LATIS_STAGE_E2_E3.md)，审计见 [LATIS_STAGE_E2_E3_AUDIT.md](../../docs/LATIS_STAGE_E2_E3_AUDIT.md)。本报告中的每个数字都可由 `results/stage_e2_e3/e23-20261027-main/` 下的原始记录重算（`python -I scripts/report_stage_e2_e3.py --out results/stage_e2_e3/e23-20261027-main` 打印全部表格并写 `report_digest.json`）。
 
 ## 0. 运行信息
 

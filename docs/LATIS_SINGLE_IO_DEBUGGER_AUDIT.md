@@ -1,6 +1,6 @@
 # 单 IO 搜索诊断器：开工审计
 
-审计对象：2026-10-26 工作区（HEAD `c9632ab7` + 未提交 Stage D+ 修改），`docs/LATIS_STAGE_D_REPORT.md`、`docs/LATIS_STAGE_D_PLUS_REPORT.md`、`docs/LATIS_STAGE_D_PLUS_AUDIT.md`，以及 `results/stage_d_plus/dplus-20261026-v2` 的原始记录。本文件只记录"已有什么、缺什么、在哪里插桩、风险是什么"，实现说明见 `LATIS_SINGLE_IO_DEBUGGER.md`。
+审计对象：2026-10-26 工作区（HEAD `c9632ab7` + 未提交 Stage D+ 修改），`../reports/stage_d/LATIS_STAGE_D_REPORT.md`、`../reports/stage_d_plus/LATIS_STAGE_D_PLUS_REPORT.md`、`docs/LATIS_STAGE_D_PLUS_AUDIT.md`，以及 `results/stage_d_plus/dplus-20261026-v2` 的原始记录。本文件只记录"已有什么、缺什么、在哪里插桩、风险是什么"，实现说明见 `LATIS_SINGLE_IO_DEBUGGER.md`。
 
 ## 1. 现有逐任务入口
 

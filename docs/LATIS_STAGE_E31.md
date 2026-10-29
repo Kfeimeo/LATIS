@@ -1,6 +1,6 @@
 # LATIS Stage E3.1：Selector 输入侧预检查、精确 Shape MDL 缓存与可信效率基线
 
-本轮对应 `../prompts/LATIS_STAGE_E31_SEARCH_EFFICIENCY_BASELINE_PROMPT.md`。实施前审计见 [LATIS_STAGE_E31_AUDIT.md](LATIS_STAGE_E31_AUDIT.md)，实测见 [LATIS_STAGE_E31_REPORT.md](LATIS_STAGE_E31_REPORT.md)。本阶段**只**优化 Stage E2–E3 已有的 Region 搜索：不改 Scene / Partition / Shape / Program 的数学语义，不新增 ARC 专用规则、原语或 Selector，不读测试标签；所有新行为都是 `RegionConfig` 上独立可关闭的开关，全部关闭时与 E3 的 `FullE3` 逐候选一致（这正是 `E31_PatchedBaseline` 配置，并用 400 题对照 E3 冻结记录验证）。
+本轮对应 `../prompts/LATIS_STAGE_E31_SEARCH_EFFICIENCY_BASELINE_PROMPT.md`。实施前审计见 [LATIS_STAGE_E31_AUDIT.md](LATIS_STAGE_E31_AUDIT.md)，实测见 [LATIS_STAGE_E31_REPORT.md](../reports/stage_e31/LATIS_STAGE_E31_REPORT.md)。本阶段**只**优化 Stage E2–E3 已有的 Region 搜索：不改 Scene / Partition / Shape / Program 的数学语义，不新增 ARC 专用规则、原语或 Selector，不读测试标签；所有新行为都是 `RegionConfig` 上独立可关闭的开关，全部关闭时与 E3 的 `FullE3` 逐候选一致（这正是 `E31_PatchedBaseline` 配置，并用 400 题对照 E3 冻结记录验证）。
 
 ## 1. 开关与配置
 

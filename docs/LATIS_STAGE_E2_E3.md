@@ -1,6 +1,6 @@
 # LATIS Stage E2–E3：Shape-MDL、Scene 重构、Object 诱导的 Region 分区树与 Region-first 广度搜索
 
-审计见 [LATIS_STAGE_E2_E3_AUDIT.md](LATIS_STAGE_E2_E3_AUDIT.md)，实测见 [LATIS_STAGE_E2_E3_REPORT.md](LATIS_STAGE_E2_E3_REPORT.md)。模块：`src/Synthesis/Collection/Region/{ShapeMDL,Scene,Partition,Program,Search}.hs`、`src/ARC/RegionMechanism.hs`、`test/RegionMain.hs`。
+审计见 [LATIS_STAGE_E2_E3_AUDIT.md](LATIS_STAGE_E2_E3_AUDIT.md)，实测见 [LATIS_STAGE_E2_E3_REPORT.md](../reports/stage_e2_e3/LATIS_STAGE_E2_E3_REPORT.md)。模块：`src/Synthesis/Collection/Region/{ShapeMDL,Scene,Partition,Program,Search}.hs`、`src/ARC/RegionMechanism.hs`、`test/RegionMain.hs`。
 
 ## 1. 四个概念的类型化区分
 
@@ -61,6 +61,6 @@ Region 树内兄弟两两不交且并为父；祖先包含后代。E1 的最小�
 
 ## 9. 限制
 
-实测（[LATIS_STAGE_E2_E3_REPORT.md](LATIS_STAGE_E2_E3_REPORT.md)）：FrozenE01 22/400 与 E0/E1 逐 work 一致；7 个 region 配置均 26/400（+1c786137、2dc579da、5582e5ca、d9fac9be，0 丢失）；安全剪枝把执行数降 17.4%、预算截断题 24→7；Region-first 尺寸类排序与 MDL 视图排序在 400 题上没有可测收益（后者还使墙钟 +52%、峰值内存 1.2 GB）。运行后修补（不在冻结二进制内）：region fit 现在发 `latis-train-exact` eventlog 标记；`Scene` 现在用 `minimalCover` 填 `c_rect`（本批记录里为 0）。
+实测（[LATIS_STAGE_E2_E3_REPORT.md](../reports/stage_e2_e3/LATIS_STAGE_E2_E3_REPORT.md)）：FrozenE01 22/400 与 E0/E1 逐 work 一致；7 个 region 配置均 26/400（+1c786137、2dc579da、5582e5ca、d9fac9be，0 丢失）；安全剪枝把执行数降 17.4%、预算截断题 24→7；Region-first 尺寸类排序与 MDL 视图排序在 400 题上没有可测收益（后者还使墙钟 +52%、峰值内存 1.2 GB）。运行后修补（不在冻结二进制内）：region fit 现在发 `latis-train-exact` eventlog 标记；`Scene` 现在用 `minimalCover` 填 `c_rect`（本批记录里为 0）。
 
 Object 仍为同色 4 连通分量（多色 Region 为 P1）；选择器无 `CountColor/ArgMax`、无分隔线分区以外的 Region 来源；MDL 宇宙 ≤3 矩形；Region 程序只有 4 类动作；剪枝只覆盖 `PreserveExcept` 骨架；调度只有 3 层。

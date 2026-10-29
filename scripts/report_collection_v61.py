@@ -237,7 +237,7 @@ def main():
                "## 复现", "",
                "```powershell", "./scripts/run_collection_v61.ps1", "```", "",
                "设计、搜索语义与命令见 docs/LATIS_V061.md；原始数据：results/v061/metrics.csv、results/v061/battery/metrics.csv、每实例 instance.json / properties.json / 各模式 JSON（含 candidate_recovery 与 trace）。"]
-    (ROOT / "reports" / "LATIS_V061_REPORT.md").write_text("\n".join(report) + "\n", encoding="utf-8")
+    (ROOT / "reports" / "v061" / "LATIS_V061_REPORT.md").write_text("\n".join(report) + "\n", encoding="utf-8")
     (OUT / "validation/audit.json").write_text(json.dumps({"matrix_runs": len(rows), "deferred_records": deferred_audited, "battery_runs": len(brows),
                                                            "valid_instances": valid, "family_stats": {f: {k: v for k, v in s.items() if k != "misses"} for f, s in fam_stats.items()},
                                                            "passed": True}, indent=2, default=str) + "\n", encoding="utf-8")

@@ -243,7 +243,7 @@ notes="""# LATIS v0.3R.1 pipeline 展示图
 - data/03560426.json
 - results/v03r1/core/03560426/Full/induced_tsl.json
 - results/v03r1/abstraction_stress.json
-- reports/LATIS_V03R1_REPORT.md
+- reports/v03/LATIS_V03R1_REPORT.md
 
 重建：使用安装了 Pillow 的 Python 运行 scripts/make_v03r1_pipeline_visuals.py。
 图像生成不会更改 solver、Base、旧结果或实验协议。

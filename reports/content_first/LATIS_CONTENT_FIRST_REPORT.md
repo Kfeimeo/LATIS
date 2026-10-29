@@ -1,6 +1,6 @@
 # LATIS Content-first OutputSpec：机制测试、真实 ARC 消融与回归报告
 
-run_id `cf-20261026-main`，目录 `results/content_first/cf-20261026-main/`（solver.exe SHA256 `f02078a4a8d881bedf7a9b4b64528d3c2d768b78b562f0167b6c7f022e05ddee`，源码快照 `ef28367f…`，git HEAD `95c2fe8b` + 未提交改动见 `git.diff`）。数据 manifest 与 Stage D+ `dplus-20261026-v2` 相同（官方 ARC-AGI-1 training 400 题，train-only 副本 `test: []`，二进制对含 test 的文件退出码 3）。设计与调用链见 [LATIS_CONTENT_FIRST_OUTPUTSPEC.md](LATIS_CONTENT_FIRST_OUTPUTSPEC.md)。本报告所有数字由 `scripts/report_content_first.py` 从原始记录重算（`report_digest.md/json`）。
+run_id `cf-20261026-main`，目录 `results/content_first/cf-20261026-main/`（solver.exe SHA256 `f02078a4a8d881bedf7a9b4b64528d3c2d768b78b562f0167b6c7f022e05ddee`，源码快照 `ef28367f…`，git HEAD `95c2fe8b` + 未提交改动见 `git.diff`）。数据 manifest 与 Stage D+ `dplus-20261026-v2` 相同（官方 ARC-AGI-1 training 400 题，train-only 副本 `test: []`，二进制对含 test 的文件退出码 3）。设计与调用链见 [LATIS_CONTENT_FIRST_OUTPUTSPEC.md](../../docs/LATIS_CONTENT_FIRST_OUTPUTSPEC.md)。本报告所有数字由 `scripts/report_content_first.py` 从原始记录重算（`report_digest.md/json`）。
 
 ## 1. 验证套件
 

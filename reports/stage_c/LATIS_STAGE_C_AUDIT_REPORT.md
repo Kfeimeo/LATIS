@@ -1,6 +1,6 @@
 # LATIS 阶段 C 审计报告：统计一致性与集成边界
 
-范围：只审计，不扩展 TSL、不改搜索策略。依据：当前源码、`docs/LATIS_STAGE_C.md`、`docs/LATIS_STAGE_C_REPORT.md`、`results/stage_c/arc/`（主运行 `stage-c-20261024T080811Z`）与 `results/stage_c/arc_idle/`（空闲复测 `stage-c-20261024T083854Z`）的逐题原始 JSON。原始结果未被覆盖；复算与明细写入 `results/stage_c/audit/`，复算脚本为 `scripts/audit_stage_c.py`（只读原始结果）。
+范围：只审计，不扩展 TSL、不改搜索策略。依据：当前源码、`docs/LATIS_STAGE_C.md`、`LATIS_STAGE_C_REPORT.md`、`results/stage_c/arc/`（主运行 `stage-c-20261024T080811Z`）与 `results/stage_c/arc_idle/`（空闲复测 `stage-c-20261024T083854Z`）的逐题原始 JSON。原始结果未被覆盖；复算与明细写入 `results/stage_c/audit/`，复算脚本为 `scripts/audit_stage_c.py`（只读原始结果）。
 
 ## 0. 结论先行
 
@@ -46,7 +46,7 @@
 - 代码：`Front.shapeAudit` 新增计数器 `c_shape_decomposed_truncated`（同时 `Just` 且 `truncated`），注释写明分区恒等式；`StageCEvaluate.stageCMetricNames`、`scripts/arc_stage_c.py` 的 `C_METRICS` 与 CSV 列同步。报告脚本改为**从逐 mask 记录派生**四个互斥类别（对新旧 JSON 都成立），`summary.md` 的 Shape 表增加"对象实例""其中在截断候选集内找到""截断且无表达式""分区检查"列并打印 ✓/✗。
 - 测试（`test/StageCMain.hs`）：(a) 单元：`decompose` 在 `dbMaxCandidates=5` 下对 L 形返回 `Just` 且 `truncated=True`，且表达式的 mask 与输入相等；(b) 前端：每个机制实例、每个有 mask 的配置断言 `masks = decomposed + unrepresentable + (truncated − decomposed_truncated)`，并与 `Graph.shapes` 记录逐项相等。套件从 426 增至 **493** 条断言，全部通过（`results/stage_c/validation/StageC-tests-audit.txt`）。
 - 定向重放（不覆盖原结果）：用同源码 + 新计数器构建 `build/latis-stage-c-audit.exe`（SHA256 前缀 `aaf0ef62`），重放上述 16 题（`results/stage_c/audit/replay/`）：新计数器与由主运行记录派生的重叠数 **16/16 相等**，状态与 `search_work` 与主运行逐题相同（`results/stage_c/audit/replay_check.json`）。
-- 文档：`docs/LATIS_STAGE_C_REPORT.md` §5.5 改为按分区报告并注明统计单位、AST 与 ties 的分母。原始 `results/stage_c/arc/tasks/**` 未改动；`metrics.json/summary.md/per_task.csv` 是派生文件，已用修正后的脚本重新生成。
+- 文档：`LATIS_STAGE_C_REPORT.md` §5.5 改为按分区报告并注明统计单位、AST 与 ties 的分母。原始 `results/stage_c/arc/tasks/**` 未改动；`metrics.json/summary.md/per_task.csv` 是派生文件，已用修正后的脚本重新生成。
 
 ## 2. 任务 2：主要实验指标复算（`results/stage_c/audit/audit_recheck.json`、`cardinality_flow.csv`）
 

@@ -392,7 +392,7 @@ FullD 新增 ID：{full['new_vs_C']}；丢失旧 17 解：{full['lost_old_soluti
 
 评测之后还完成一个迁移接口边界修复：旧 C 的合法重叠发射可多于 900，MigratedBody 不应继承新 typed-program 的 900 发射预算。960 个发射对象的独立渲染比较及 Merge 后 Width 从 1 重建为 3、再供 A 位置表达式使用的测试通过。此修复不改 legacy emitObjects 求解路径或任何新 Pipeline 的预算；冻结评测二进制、最终兼容性实现二进制与源码快照分别保留并记录哈希，不将最后一版哈希冒充早期测评版本。
 '''
-    (ROOT / 'docs/LATIS_STAGE_D_REPORT.md').write_text(report, encoding='utf-8')
+    (ROOT / 'reports/stage_d/LATIS_STAGE_D_REPORT.md').write_text(report, encoding='utf-8')
     print(json.dumps({'arc': {c:r['train_exact'] for c,r in metrics['configs'].items()},
                       'mechanism_records': len(mech['summary'])*3*8, 'validation_suites': len(suites)}, ensure_ascii=False))
 

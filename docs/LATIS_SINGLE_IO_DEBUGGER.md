@@ -1,6 +1,6 @@
 # LATIS 单 IO 搜索诊断器：使用说明与语义
 
-本工具观测现有求解器，不改变它：A/B/C/D 的搜索机制、DSL、prior、类型规则、Alignment、Witness 与预算都没有改动。所有可视化内容来自真实搜索事件、真实执行和真实中间状态。开工审计见 [LATIS_SINGLE_IO_DEBUGGER_AUDIT.md](LATIS_SINGLE_IO_DEBUGGER_AUDIT.md)，实测结果见 [LATIS_SINGLE_IO_DEBUGGER_REPORT.md](LATIS_SINGLE_IO_DEBUGGER_REPORT.md)。
+本工具观测现有求解器，不改变它：A/B/C/D 的搜索机制、DSL、prior、类型规则、Alignment、Witness 与预算都没有改动。所有可视化内容来自真实搜索事件、真实执行和真实中间状态。开工审计见 [LATIS_SINGLE_IO_DEBUGGER_AUDIT.md](LATIS_SINGLE_IO_DEBUGGER_AUDIT.md)，实测结果见 [LATIS_SINGLE_IO_DEBUGGER_REPORT.md](../reports/single_io_debugger/LATIS_SINGLE_IO_DEBUGGER_REPORT.md)。
 
 ## 1. 命令
 

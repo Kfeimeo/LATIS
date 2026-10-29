@@ -1,6 +1,6 @@
 # LATIS 阶段 B：Case-Relative Abstract Referents + Witnessed VSA + 分层 TSL 搜索
 
-本轮对应 `../prompts/LATIS_STAGE_B_ABSTRACT_REFERENTS_PROMPT.md`，在阶段 A 代码上实现增量。所有 B 能力挂在前端 `Config` 的新字段 `stageB :: StageB` 上，默认 `stageBOff`（全部关闭）；`defaultConfig`/`v61Config`/阶段 A 的七个配置（`ARC.StageAEvaluate`）行为不变（回归见测试 `test/StageBMain.hs` 与 `results/stage_b/mechanism/regression_stage_a.csv`、`results/stage_b/arc/metrics.json.per_config.BaselineA.same_as_stage_a_fulla`）。结果与结论见 `LATIS_STAGE_B_REPORT.md`。
+本轮对应 `../prompts/LATIS_STAGE_B_ABSTRACT_REFERENTS_PROMPT.md`，在阶段 A 代码上实现增量。所有 B 能力挂在前端 `Config` 的新字段 `stageB :: StageB` 上，默认 `stageBOff`（全部关闭）；`defaultConfig`/`v61Config`/阶段 A 的七个配置（`ARC.StageAEvaluate`）行为不变（回归见测试 `test/StageBMain.hs` 与 `results/stage_b/mechanism/regression_stage_a.csv`、`results/stage_b/arc/metrics.json.per_config.BaselineA.same_as_stage_a_fulla`）。结果与结论见 `../reports/stage_b/LATIS_STAGE_B_REPORT.md`。
 
 ## 1. 开工前审计（接口定位，文档与源码一致性）
 

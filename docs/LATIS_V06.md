@@ -1,6 +1,6 @@
 # LATIS v0.6：Counterfactual-Preserving Online Abstraction
 
-本轮对应`../prompts/LATIS_v06_experiment_prompt.md`。实现为 v0.5 collection front-end 的增量升级，新增入口 `solve-collection-v6` / `collection-v6-experiment`。v0.5 的 `Synthesis.Collection`、`ARC.CollectionEvaluate`、v0.4 solver 与 R2 fallback 源码不改动（报告脚本对比 SHA-256 与 git diff）。实验结果与边界见 `../reports/LATIS_V06_REPORT.md`。
+本轮对应`../prompts/LATIS_v06_experiment_prompt.md`。实现为 v0.5 collection front-end 的增量升级，新增入口 `solve-collection-v6` / `collection-v6-experiment`。v0.5 的 `Synthesis.Collection`、`ARC.CollectionEvaluate`、v0.4 solver 与 R2 fallback 源码不改动（报告脚本对比 SHA-256 与 git diff）。实验结果与边界见 `../reports/v06/LATIS_V06_REPORT.md`。
 
 ## 模块
 

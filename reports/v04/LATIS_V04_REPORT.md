@@ -56,7 +56,7 @@ fallback_count=1；R2 expanded work=151856；训练、留出 exact 均为 true�
 | F-intensional-ref | 9951 | 0.2102 s | 0.2316 s | 0.2465 s | 0.85x | 4.7% | 4680/0 |
 | G-invalid-abstraction | 9890 | 0.0000 s | 0.0001 s | 0.0001 s | — | — | 0/0 |
 
-closure 耗时为 `v04-bench` 预热 2 次、重复 9 次的中位数，不含编译与序列化；“求值占 closure”是把该次提交的全部 term 在调度器外串行重算的耗时占比。E、G 没有可求值的候选（closure 不到 0.2 ms），不计加速。候选求值只占 closure 的百分之几，其余是必须串行的权威提交路径，因此并行求值在这些任务上没有加速，C 与 F 反而变慢；推测丢弃为 0，额外实际求值为 0。详细环境、RTS 参数、内存与 GHC 9.10.3 对照见 [并行报告](LATIS_V04_PARALLEL_REPORT.md)，语义见 [设计说明](../docs/LATIS_V04.md)。
+closure 耗时为 `v04-bench` 预热 2 次、重复 9 次的中位数，不含编译与序列化；“求值占 closure”是把该次提交的全部 term 在调度器外串行重算的耗时占比。E、G 没有可求值的候选（closure 不到 0.2 ms），不计加速。候选求值只占 closure 的百分之几，其余是必须串行的权威提交路径，因此并行求值在这些任务上没有加速，C 与 F 反而变慢；推测丢弃为 0，额外实际求值为 0。详细环境、RTS 参数、内存与 GHC 9.10.3 对照见 [并行报告](LATIS_V04_PARALLEL_REPORT.md)，语义见 [设计说明](../../docs/LATIS_V04.md)。
 
 ## 结论与限制
 
@@ -66,4 +66,4 @@ C 中匿名关系来自成功派生拓扑，最终程序实际调用这些关系
 
 前端仍是固定角色、有限 typed wrappers 与矩形构造语法的原型，未覆盖可变数量对象的关系闭包、遮挡及一般稀疏形状构造。全局最优仅限已生成的候选图，不能推导 ARC 整体泛化提升。失败 fallback 保持 R2 的原预算和搜索行为；前端训练 exact 不等于未知案例上的正确性保证。
 
-实现与复现命令见 [设计说明](../docs/LATIS_V04.md)。原始矩阵见 [metrics.csv](../results/v04/stress/metrics.csv)，R2 基线见 [baseline metrics](../results/v04/r2-baseline/metrics.csv)。
+实现与复现命令见 [设计说明](../../docs/LATIS_V04.md)。原始矩阵见 [metrics.csv](../../results/v04/stress/metrics.csv)，R2 基线见 [baseline metrics](../../results/v04/r2-baseline/metrics.csv)。

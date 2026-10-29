@@ -15,7 +15,7 @@
 
 两版 diagnostic 都有 2 个超时。超时可在固定预算的成功率中计失败，但其缺失的内部搜索/portfolio 证据应视为未知，不能解释成已经证明没有正确候选。58 题的混合总分适合回归对照，不是 ARC 整体泛化率。
 
-证据：[R2 报告](../reports/LATIS_V03R2_REPORT.md)、[R2 CSV](../results/v03r2/metrics.csv)、[Place 报告](../results/place-only/REPORT.md)、[Place CSV](../results/place-only/metrics.csv)。
+证据：[R2 报告](../reports/v03/LATIS_V03R2_REPORT.md)、[R2 CSV](../results/v03r2/metrics.csv)、[Place 报告](../results/place-only/REPORT.md)、[Place CSV](../results/place-only/metrics.csv)。
 
 有四个直接影响路线选择的事实：
 

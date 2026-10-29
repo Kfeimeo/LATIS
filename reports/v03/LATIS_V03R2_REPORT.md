@@ -187,7 +187,7 @@ P1: `(lambda v0:SceneT. let __cse0=sortBy((lambda key:PlacedT. x(Anchor(key,BR))
 
 P2: `(lambda v0:SceneT. let __cse0=sortBy((lambda key:PlacedT. x(Anchor(key,BR))),objects(v0)) in mkScene(canvasSize(v0),ColorV 0,scan((lambda __r1b0:PairT PlacedT PlacedT. Translate(snd(__r1b0),coordDelta(Anchor(fst(__r1b0),BR),Anchor(snd(__r1b0),TL)))),Translate(head(__cse0),vec(IntV 0,multiply(IntV (-1),y(Anchor(head(__cse0),TL))))),tail(__cse0))))`
 
-Distinguishing input: 10×10，其全部非零 cells（x,y,color）為 `[(1, 6, 8), (2, 6, 8), (3, 6, 8), (1, 7, 8), (2, 7, 8), (3, 7, 8), (1, 8, 8), (2, 8, 8), (3, 8, 8), (4, 8, 7), (5, 8, 7), (7, 8, 2), (8, 8, 2), (9, 8, 2), (1, 9, 8), (2, 9, 8), (3, 9, 8), (4, 9, 7), (5, 9, 7), (7, 9, 2), (8, 9, 2), (9, 9, 2)]`；其餘 cells=0。兩個完整 hypothetical predictions 見 [solution.json](E:/dev/AI/ARC-AGI-1/results/v03r2/core/03560426/Full/solution.json)。此 input 未提供真實 output，不參與選擇。
+Distinguishing input: 10×10，其全部非零 cells（x,y,color）為 `[(1, 6, 8), (2, 6, 8), (3, 6, 8), (1, 7, 8), (2, 7, 8), (3, 7, 8), (1, 8, 8), (2, 8, 8), (3, 8, 8), (4, 8, 7), (5, 8, 7), (7, 8, 2), (8, 8, 2), (9, 8, 2), (1, 9, 8), (2, 9, 8), (3, 9, 8), (4, 9, 7), (5, 9, 7), (7, 9, 2), (8, 9, 2), (9, 9, 2)]`；其餘 cells=0。兩個完整 hypothetical predictions 見 [solution.json](../../results/v03r2/core/03560426/Full/solution.json)。此 input 未提供真實 output，不參與選擇。
 
 ### grid-without-prev
 
@@ -195,7 +195,7 @@ P1: `(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. 
 
 P2: `(lambda v0:SceneT. mkScene(canvasSize(v0),ColorV 0,map((lambda v1:PlacedT. Translate(head(objects(v0)),coordDelta(coord(add(width(canvasSize(v0)),IntV (-1)),add(height(canvasSize(v0)),IntV (-1))),Anchor(v1,BR)))),objects(v0))))`
 
-Distinguishing input: 14×16，其全部非零 cells（x,y,color）為 `[(2, 3, 1), (2, 4, 1), (2, 5, 1), (3, 5, 1), (13, 15, 1)]`；其餘 cells=0。兩個完整 hypothetical predictions 見 [solution.json](E:/dev/AI/ARC-AGI-1/results/v03r2/regression/grid-without-prev/Full/solution.json)。此 input 未提供真實 output，不參與選擇。
+Distinguishing input: 14×16，其全部非零 cells（x,y,color）為 `[(2, 3, 1), (2, 4, 1), (2, 5, 1), (3, 5, 1), (13, 15, 1)]`；其餘 cells=0。兩個完整 hypothetical predictions 見 [solution.json](../../results/v03r2/regression/grid-without-prev/Full/solution.json)。此 input 未提供真實 output，不參與選擇。
 
 ### scan-reverse
 
@@ -203,7 +203,7 @@ P1: `(lambda v0:SceneT. let __cse0=sortBy((lambda key:PlacedT. subtract(IntV 0,x
 
 P2: `(lambda v0:SceneT. let __cse0=head(sortBy((lambda key:PlacedT. cardinality(ObjectCells(objectOf(key)))),objects(v0))) in mkScene(canvasSize(v0),ColorV 0,scan((lambda __r1b0:PairT PlacedT PlacedT. Translate(snd(__r1b0),coordDelta(Anchor(fst(__r1b0),BR),Anchor(snd(__r1b0),TL)))),Translate(__cse0,coordDelta(CoordV (Coord {cx = 0, cy = 0}),Anchor(__cse0,TL))),tail(sortBy((lambda key:PlacedT. subtract(IntV 0,x(Anchor(key,BR)))),objects(v0))))))`
 
-Distinguishing input: 18×18，其全部非零 cells（x,y,color）為 `[(7, 9, 2), (8, 9, 2), (7, 10, 2), (8, 10, 2), (2, 11, 4), (3, 11, 4), (4, 11, 4), (7, 11, 2), (8, 11, 2), (12, 11, 6), (13, 11, 6), (2, 12, 4), (3, 12, 4), (4, 12, 4), (7, 12, 2), (8, 12, 2), (12, 12, 6), (13, 12, 6), (12, 13, 6), (13, 13, 6)]`；其餘 cells=0。兩個完整 hypothetical predictions 見 [solution.json](E:/dev/AI/ARC-AGI-1/results/v03r2/regression/scan-reverse/Full/solution.json)。此 input 未提供真實 output，不參與選擇。
+Distinguishing input: 18×18，其全部非零 cells（x,y,color）為 `[(7, 9, 2), (8, 9, 2), (7, 10, 2), (8, 10, 2), (2, 11, 4), (3, 11, 4), (4, 11, 4), (7, 11, 2), (8, 11, 2), (12, 11, 6), (13, 11, 6), (2, 12, 4), (3, 12, 4), (4, 12, 4), (7, 12, 2), (8, 12, 2), (12, 12, 6), (13, 12, 6), (12, 13, 6), (13, 13, 6)]`；其餘 cells=0。兩個完整 hypothetical predictions 見 [solution.json](../../results/v03r2/regression/scan-reverse/Full/solution.json)。此 input 未提供真實 output，不參與選擇。
 
 完整 Full witnesses 亦集中保存於 `results/v03r2/counterfactual_witnesses.json`。
 

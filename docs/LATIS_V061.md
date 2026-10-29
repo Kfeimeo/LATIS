@@ -1,6 +1,6 @@
 # LATIS v0.6.1：Safe Online Abstraction & Robustness Audit
 
-本轮对应 `../prompts/LATIS_V061_EXPERIMENT_PROMPT.md`，在 v0.6 代码上实现。v0.6 入口（`solve-collection-v6`、`collection-v6-experiment`，默认 `ExclusiveReuse` 策略）、v0.5、v0.4 与 R2 fallback 行为不变；`results/v06` 不重算。v0.6.1 的新入口：`solve-collection-v61`、`collection-v61-experiment`、`collection-v61-battery`。结果与结论见 `../reports/LATIS_V061_REPORT.md`。
+本轮对应 `../prompts/LATIS_V061_EXPERIMENT_PROMPT.md`，在 v0.6 代码上实现。v0.6 入口（`solve-collection-v6`、`collection-v6-experiment`，默认 `ExclusiveReuse` 策略）、v0.5、v0.4 与 R2 fallback 行为不变；`results/v06` 不重算。v0.6.1 的新入口：`solve-collection-v61`、`collection-v61-experiment`、`collection-v61-battery`。结果与结论见 `../reports/v061/LATIS_V061_REPORT.md`。
 
 ## 模块变化
 

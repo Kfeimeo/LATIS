@@ -1,6 +1,6 @@
 # LATIS Stage E4 实测报告
 
-设计见 [LATIS_STAGE_E4.md](LATIS_STAGE_E4.md)，审计见 [LATIS_STAGE_E4_AUDIT.md](LATIS_STAGE_E4_AUDIT.md)。每个数字都可由 `results/stage_e4/e4-20261029-final/` 重算：`python -I scripts/run_stage_e4.py report --out <run>`、`python -I scripts/verify_stage_e4.py --out <run>`、`python -I scripts/report_stage_e4.py --out <run>`。**E4 不产生 `I→O` 程序，不增加 `train_exact`**；本报告所有"Verified"都指"共享骨架能逐格重构全部训练输出，参数为输出观察值"，`prediction_ready=false`。
+设计见 [LATIS_STAGE_E4.md](../../docs/LATIS_STAGE_E4.md)，审计见 [LATIS_STAGE_E4_AUDIT.md](../../docs/LATIS_STAGE_E4_AUDIT.md)。每个数字都可由 `results/stage_e4/e4-20261029-final/` 重算：`python -I scripts/run_stage_e4.py report --out <run>`、`python -I scripts/verify_stage_e4.py --out <run>`、`python -I scripts/report_stage_e4.py --out <run>`。**E4 不产生 `I→O` 程序，不增加 `train_exact`**；本报告所有"Verified"都指"共享骨架能逐格重构全部训练输出，参数为输出观察值"，`prediction_ready=false`。
 
 ## 0. 运行信息
 

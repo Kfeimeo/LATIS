@@ -312,7 +312,7 @@ Budget4x和Combined均在ed36ccf7、f25fbde4达到300秒上限；它们不是原
 
 运行 `./scripts/run_stage_d_plus.ps1 -Out {out.as_posix()}`，或分阶段运行Python prepare/baseline/regression/pilot/formal/window与本报告脚本。已有原始record不会覆盖；中断后沿同binary恢复。汇总文件允许重生成，历史Stage D/C目录不写入。源码快照、git状态/diff、binary、manifest与测试日志在本run目录。正式尚未运行的配置明确not_run，实验未证实的泛化或效率优势不作声称。
 '''
-    (ROOT/'docs/LATIS_STAGE_D_PLUS_REPORT.md').write_text(text,encoding='utf-8')
+    (ROOT/'reports/stage_d_plus/LATIS_STAGE_D_PLUS_REPORT.md').write_text(text,encoding='utf-8')
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--out',required=True);p.add_argument('--gate',action='store_true');p.add_argument('--docs-only',action='store_true');args=p.parse_args()

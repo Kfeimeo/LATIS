@@ -29,4 +29,4 @@ if (-not $SkipArc) {
   Invoke-Logged 'python' @('-I','scripts/arc_stage_c.py','all','--out','results/stage_d/baseline_c_replay','--source','data/arc1-training','--workers','2','--feature-timeout-ms','60000','--binary','build/latis-stage-d-substrate.exe','--configs','ObjectShapeFull') 'results/stage_d/validation/arc-baseline.log'
 }
 Invoke-Logged 'python' @('-I','scripts/audit_stage_d_substrate.py') 'results/stage_d/validation/audit.txt'
-Write-Output 'Partial Stage D substrate verified. FullD joint search/ablation remains unimplemented; see docs/LATIS_STAGE_D_REPORT.md.'
+Write-Output 'Partial Stage D substrate verified. FullD joint search/ablation remains unimplemented; see reports/stage_d/LATIS_STAGE_D_REPORT.md.'

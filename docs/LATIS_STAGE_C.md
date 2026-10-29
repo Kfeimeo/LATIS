@@ -1,6 +1,6 @@
 # LATIS 阶段 C：对象数量可变的合成、Shape 代数与目标驱动的抽象搜索（设计与实现）
 
-本文记录阶段 C 的形式定义、与既有模块的集成方式和复现步骤。实验数字见 `docs/LATIS_STAGE_C_REPORT.md`。接口名以仓库源码为准（`Synthesis.Collection.Shape`、`Synthesis.Collection.Relation`、`Synthesis.Collection.Front`、`Synthesis.Collection.Size`、`ARC.StageCEvaluate`、`ARC.ArcTrainOnly`）。
+本文记录阶段 C 的形式定义、与既有模块的集成方式和复现步骤。实验数字见 `../reports/stage_c/LATIS_STAGE_C_REPORT.md`。接口名以仓库源码为准（`Synthesis.Collection.Shape`、`Synthesis.Collection.Relation`、`Synthesis.Collection.Front`、`Synthesis.Collection.Size`、`ARC.StageCEvaluate`、`ARC.ArcTrainOnly`）。
 
 ## 1. C0：开工审计结论
 

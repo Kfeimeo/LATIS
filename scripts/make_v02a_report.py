@@ -209,7 +209,7 @@ core 0 个 branch；其他任务在 correspondence/order、Map/Scan/Filter famil
 
 本结果支持在保留模板中从 effect+witness+typed expression+FV constraints 推导结构；不证明整个 ARC 的结构都可唯一推导。Fold/Iterate 保持旧 observational trigger，未研究更一般 accumulator 或 loop induction。correspondence branch budget、ontology 不支持 union/split/全遮挡、有限 expression grammar 等限制继续存在。current/grid/prev 是旧语言全部可观察 source，没有新增任意 global/environment source。源保留、原始 JSON 和 trace 足以复核以上范围。
 """
-    (ROOT / "reports" / "LATIS_V02A_REPORT.md").write_text(report, encoding="utf-8")
+    (ROOT / "reports" / "v02a" / "LATIS_V02A_REPORT.md").write_text(report, encoding="utf-8")
     print(f"Report generated: {a['expanded']} expanded, {a['first_solution_expanded']} first; 11+6 exact; {len(preservation)} original modules unchanged.")
 
 if __name__ == "__main__":

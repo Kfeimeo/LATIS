@@ -1,4 +1,4 @@
-"""Render docs/LATIS_CONTENT_FIRST_REPORT.md tables from one content-first run.
+"""Render reports/content_first/LATIS_CONTENT_FIRST_REPORT.md tables from one content-first run.
 
 Reads only the raw records of results/content_first/<run_id> (mechanism matrix,
 leakage, regression, per_task.csv, metrics.json, funnel.json, traces) and

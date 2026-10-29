@@ -100,12 +100,12 @@ def main():
         text.append(f"| {task} | {b1['search_work']} | {b1['closure_median']:.4f} s | {b2['closure_median']:.4f} s | {b4['closure_median']:.4f} s | {speed} | {frac} | {b4['actual']}/{b4['discarded']} |")
     text += ["",
              "closure 耗时为 `v04-bench` 预热 2 次、重复 9 次的中位数，不含编译与序列化；“求值占 closure”是把该次提交的全部 term 在调度器外串行重算的耗时占比。"
-             "E、G 没有可求值的候选（closure 不到 0.2 ms），不计加速。候选求值只占 closure 的百分之几，其余是必须串行的权威提交路径，因此并行求值在这些任务上没有加速，C 与 F 反而变慢；推测丢弃为 0，额外实际求值为 0。详细环境、RTS 参数、内存与 GHC 9.10.3 对照见 [并行报告](LATIS_V04_PARALLEL_REPORT.md)，语义见 [设计说明](../docs/LATIS_V04.md)。", "",
+             "E、G 没有可求值的候选（closure 不到 0.2 ms），不计加速。候选求值只占 closure 的百分之几，其余是必须串行的权威提交路径，因此并行求值在这些任务上没有加速，C 与 F 反而变慢；推测丢弃为 0，额外实际求值为 0。详细环境、RTS 参数、内存与 GHC 9.10.3 对照见 [并行报告](LATIS_V04_PARALLEL_REPORT.md)，语义见 [设计说明](../../docs/LATIS_V04.md)。", "",
              "## 结论与限制", "", "极小 Object/Position 起点能覆盖本次有限任务族；冻结与可见性在 A、D 上显著减少逻辑工作。E 展示了 source 无对象时通过全输出 witness 构造；F 展示了跨尺寸 GridBR 指称。", "",
              "C 中匿名关系来自成功派生拓扑，最终程序实际调用这些关系；较大关系沿已登记依赖构成多层级。关系发现目前发生在完整解释之后，search-reduction 是结构估计：NoRelationInvention 和 FlatRelations 没有展示在线搜索收益，不据此宣称收益。", "",
              "前端仍是固定角色、有限 typed wrappers 与矩形构造语法的原型，未覆盖可变数量对象的关系闭包、遮挡及一般稀疏形状构造。全局最优仅限已生成的候选图，不能推导 ARC 整体泛化提升。失败 fallback 保持 R2 的原预算和搜索行为；前端训练 exact 不等于未知案例上的正确性保证。", "",
-             "实现与复现命令见 [设计说明](../docs/LATIS_V04.md)。原始矩阵见 [metrics.csv](results/v04/stress/metrics.csv)，R2 基线见 [baseline metrics](results/v04/r2-baseline/metrics.csv)。"]
-    (ROOT / "reports" / "LATIS_V04_REPORT.md").write_text("\n".join(text) + "\n", encoding="utf-8")
+             "实现与复现命令见 [设计说明](../../docs/LATIS_V04.md)。原始矩阵见 [metrics.csv](results/v04/stress/metrics.csv)，R2 基线见 [baseline metrics](results/v04/r2-baseline/metrics.csv)。"]
+    (ROOT / "reports" / "v04" / "LATIS_V04_REPORT.md").write_text("\n".join(text) + "\n", encoding="utf-8")
     sources = ["src/Synthesis/Triggered.hs", "src/Synthesis/Triggered/Parallel.hs", "src/ARC/TriggeredEvaluate.hs", "src/ARC/TriggeredStress.hs",
                "src/Synthesis/FeaturePipeline.hs", "test/TriggeredMain.hs", "test/TriggeredParallelMain.hs", "app/Main.hs", "latis.cabal",
                "src/Synthesis/InducedR2/Learn.hs", "scripts/report_v04.py", "scripts/report_v04_parallel.py"]
