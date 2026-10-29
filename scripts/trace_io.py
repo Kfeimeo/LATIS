@@ -43,6 +43,7 @@ STAGES = [
     ('JointForward', ['JointForward'], 'Stage D 联合 forward 回退'),
     ('ContentFirst', ['ContentFirst'], 'Content-first OutputSpec：Input → Selection → Bounds → Dimensions → Render'),
     ('RegionSearch', ['RegionSearch'], 'Stage E2/E3：Scene 视图 → Object 诱导分区树 → Region 整体程序（广度调度 / 安全剪枝）'),
+    ('OutputSkeleton', ['OutputSkeleton'], 'Stage E4：全部训练输出的 Scene 候选 → 结构角色对齐 → 类型化反统一 → 共享构造骨架（sidecar，不产生程序）'),
     ('Execution', ['Execution'], 'Pipeline 执行'),
     ('Render', ['Render'], '渲染与整格比对'),
     ('Verify', ['Run@terminal'], '终止与训练校验（驱动终止记录）'),
@@ -646,7 +647,7 @@ def render(record_path, out_html, focus_candidate=None, focus_branch=None, max_e
             'grids': b['grids'], 'witnesses': b['witnesses'], 'replays': b['replays'],
             'record': {k: record.get(k) for k in ('task_id', 'mode', 'pair_index', 'config', 'status', 'exact_scope', 'detail', 'program_kind', 'program_transform_ast',
                                                  'program_transform_id', 'search_work', 'posthoc_validation', 'size_rule', 'parameter_goals', 'relations', 'trace_lines',
-                                                 'failure_stage', 'pairs_used_in_search', 'diagnostics_forced_on', 'trace_level', 'stage_d', 'content_first', 'content_first_plan', 'region_search')},
+                                                 'failure_stage', 'pairs_used_in_search', 'diagnostics_forced_on', 'trace_level', 'stage_d', 'content_first', 'content_first_plan', 'region_search', 'output_skeleton')},
             'events': objs, 'event_columns': EVENT_COLS, 'event_rows': rows, 'events_total': len(b['events']), 'events_embedded': len(events),
             'focus': {'candidate': focus_candidate, 'branch': focus_branch}}
     data['record']['program'] = (record.get('program') or '')[:6000] or None

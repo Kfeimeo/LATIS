@@ -201,9 +201,9 @@ runTraceIO opt=do
             ,("stage_b",SB.stageBMetricsJSON gr),("stage_c",SC.stageCMetricsJSON gr),("relations",SC.relationsJSON gr),("shapes",SC.shapesJSON gr)
             ,("stage_d",SD.stageDMetricsJSON gr),("parameter_goals",SD.goalsJSON gr)
             ,("content_first",CFE.contentFirstJSON searchPairs gr program)
-            ,("region_search",CFE.regionJSONOf searchPairs gr program)
+            ,("region_search",CFE.regionJSONOf searchPairs gr program),("output_skeleton",CFE.outputSkeletonJSONOf gr)
             ,("trace_lines",jarr (map jstr (F.trace gr)))]
-          _->[("failure_stage","null"),("size_rule","null"),("stage_d","null"),("parameter_goals","[]"),("content_first","null"),("region_search","null"),("trace_lines","[]")])
+          _->[("failure_stage","null"),("size_rule","null"),("stage_d","null"),("parameter_goals","[]"),("content_first","null"),("region_search","null"),("output_skeleton","null"),("trace_lines","[]")])
   writeFile (out </> "solver_record.json") (record++"\n")
   -- Grids and encodings; Predicted only where the selected program executed.
   gridsOut<-forM (zip [0::Int ..] pairs) $ \(j,(x,y))->do

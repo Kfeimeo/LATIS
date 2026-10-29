@@ -248,7 +248,7 @@ if (typeof document !== 'undefined') (function () {
   function candById(cid) { return cands().filter(function (c) { return c.candidate_id === cid; })[0]; }
   function summary() { return D.trace.summary; }
 
-  var TABS = [['overview', '概览'], ['grid', '网格/对象'], ['pipeline', '搜索流程'], ['candidates', '候选浏览'], ['params', '参数目标'], ['derivation', '推导/Witness'], ['region', 'Scene/Region'], ['events', '原始事件']];
+  var TABS = [['overview', '概览'], ['grid', '网格/对象'], ['pipeline', '搜索流程'], ['candidates', '候选浏览'], ['params', '参数目标'], ['derivation', '推导/Witness'], ['region', 'Scene/Region'], ['skeleton', '输出骨架'], ['events', '原始事件']];
   function render() {
     var nav = document.getElementById('tabs'); nav.innerHTML = '';
     TABS.forEach(function (t) { add(nav, h('button', { class: state.tab === t[0] ? 'on' : '', text: t[1], onclick: function () { state.tab = t[0]; render(); } })); });
@@ -256,7 +256,7 @@ if (typeof document !== 'undefined') (function () {
     V.errors.forEach(function (e) { add(main, h('div', { class: 'banner bad', text: '数据错误：' + e })); });
     V.warnings.forEach(function (e) { add(main, h('div', { class: 'banner warn', text: e })); });
     if (V.errors.length) return;
-    var fn = { overview: viewOverview, grid: viewGrid, pipeline: viewPipeline, candidates: viewCandidates, params: viewParams, derivation: viewDerivation, region: viewRegion, events: viewEvents }[state.tab];
+    var fn = { overview: viewOverview, grid: viewGrid, pipeline: viewPipeline, candidates: viewCandidates, params: viewParams, derivation: viewDerivation, region: viewRegion, skeleton: viewSkeleton, events: viewEvents }[state.tab];
     add(main, fn());
   }
 
@@ -601,6 +601,32 @@ if (typeof document !== 'undefined') (function () {
     })));
     return out;
   }
+  // ---- Stage E4: output-skeleton sidecar (joint induction over all training OUTPUTS; never a program)
+  function viewSkeleton() {
+    var e4 = D.record && D.record.output_skeleton, out = [];
+    if (!e4 || typeof e4 !== 'object') return [card('输出骨架（Stage E4）', h('div', { class: 'muted', text: 'E4 sidecar 未运行（配置关闭，或记录中没有 output_skeleton）。' }))];
+    out.push(card('状态', kv([['status', chip(e4.status, e4.status === 'StructureVerifiedAllOutputs' ? 'ok' : (e4.status === 'NotAttempted' ? '' : 'warn'))], ['reason', e4.reason], ['训练输出数', e4.cases], ['mode', e4.mode],
+      ['prediction_ready', String(e4.prediction_ready) + '（E4 只做输出侧结构归纳，不产生程序，不计 train_exact）'], ['input_binding_status', e4.input_binding_status], ['预算截断', JSON.stringify(e4.budget_truncated)],
+      ['独立编码成本（各输出最便宜解释）', (e4.independent_costs || []).map(function (c) { return 'case ' + c.case_index + ': ' + c.cost; }).join('；')], ['退化参考成本', JSON.stringify(e4.degenerate_reference_costs)]])));
+    var best = e4.best;
+    if (best) {
+      var cost = best.cost || {};
+      out.push(card('共享骨架 Q（全部训练输出联合反统一）', h('pre', { text: best.text }), kv([['skeleton id', best.skeleton_id], ['c_ast / holes / bindings / views / matching', [cost.c_ast, cost.c_holes, cost.c_bindings, cost.c_views, cost.c_matching].join(' / ')], ['total vs independent（同视图）', cost.total + ' vs ' + cost.independent_total + '（压缩比 ' + Number(cost.compression_ratio).toFixed(3) + '）'],
+        ['其它视图更便宜的独立解释', best.independent_cheapest_any_view == null ? '无' : best.independent_cheapest_any_view], ['holes / slots / literals / relations', [cost.holes, cost.slots, cost.literals, cost.relations].join(' / ')], ['非平凡', best.nontrivial && best.nontrivial.ok ? 'yes' : ('no：' + (best.nontrivial && best.nontrivial.why))], ['角色分配歧义数', best.ambiguity], ['最优性', cost.optimality]])));
+      out.push(card('类型化 Hole（OutputObserved；InputBindingStatus = NotAttempted）', h('div', { class: 'scroll', id: 'e4-holes' }, table(['hole', 'type', 'role', '逐 case 观察值', '约束', 'occurrences', 'origin', 'input binding'], (best.holes || []).map(function (x) { return ['?' + x.hole, x.type, x.role, (x.values || []).map(function (v) { return 'c' + v.case_index + '=' + v.value; }).join(' '), (x.constraints || []).join('；'), x.occurrences, x.origin, x.input_binding_status]; })))));
+      out.push(card('角色对齐（结构匹配，不按下标）', h('div', { class: 'scroll', id: 'e4-roles' }, table(['role', 'kind', 'signature', '各 case 的对象 id', 'union 交换'], (best.roles || []).map(function (r) { return [r.role, r.kind, r.signature, (r.members || []).map(function (m) { return 'c' + m.case_index + ':' + JSON.stringify(m.object_ids); }).join(' '), (r.union_swaps || []).map(function (sw) { return 'case#' + sw.case_position; }).join(' ') || '—']; })))));
+      out.push(card('构造 Witness：Render(Q[θ_i]) 逐格等于 O_i', h('div', { class: 'scroll', id: 'e4-witness' }, table(['case', 'view', 'render == output', '像素来源'], (best.construction_witness || []).map(function (w) { var v = (best.views || []).filter(function (x) { return x.case_index === w.case_index; })[0]; return [w.case_index, v ? v.view : '', chip(w.render_equals_output ? 'exact' : 'mismatch', w.render_equals_output ? 'ok' : 'bad'), (w.pixel_provenance || []).map(function (q) { return q.source + ':' + q.pixels; }).join(' ')]; })))));
+    }
+    if (e4.alternatives && e4.alternatives.length) out.push(card('备选骨架（同宇宙内其它候选）', table(['text', 'total', 'holes', 'nontrivial'], e4.alternatives.map(function (a) { return [a.text, a.cost.total, a.cost.holes, a.nontrivial && a.nontrivial.ok ? 'yes' : 'no']; }))));
+    (e4.output_scenes || []).forEach(function (cs, i) {
+      out.push(card('输出 ' + i + ' 的 Scene 候选（每个合法视图一个；对象带备选 Shape AST）', h('div', { class: 'scroll' }, table(['view', 'dims', 'background', 'objects', 'independent cost', 'reconstructed', '对象（colour@x,y：备选 AST 数 / 状态）'], cs.map(function (c) { return [c.view, (c.dims || []).join('x'), c.background == null ? 'NoResidual' : c.background, (c.objects || []).length, c.independent_cost, String(c.reconstructed), (c.objects || []).map(function (o) { return o.colour + '@' + o.x + ',' + o.y + ':' + (o.shape_alternatives || []).length + '/' + o.alternatives_status; }).join('  ')]; })))));
+    });
+    if (e4.failures && e4.failures.length) out.push(card('失败的视图分配（最早冲突）', table(['view assignment', 'reason'], e4.failures.map(function (f) { return [f.view_assignment, f.reason]; }))));
+    if (e4.rejected_views && e4.rejected_views.length) out.push(card('被拒绝的输出视图', table(['case', 'view', 'reason'], e4.rejected_views.map(function (r) { return [r.case_index, r.view, r.reason]; }))));
+    if (e4.pairwise) out.push(card('Pairwise-only 消融', table(['pair', 'status'], e4.pairwise.map(function (q) { return [JSON.stringify(q.pair), q.status]; }))));
+    out.push(card('计数', h('pre', { text: JSON.stringify(e4.counters, null, 1) })));
+    return out;
+  }
   function viewDerivation() {
     var w = (D.witnesses || {}).execution_witnesses, out = [];
     out.push(card('选中程序', kv([['程序结构 ID', summary().program_transform_id], ['类型', summary().program_kind]]), D.record.program_transform_ast ? astTree(D.record.program_transform_ast) : h('pre', { text: (D.record.program || '无程序').slice(0, 3000) })));
@@ -731,6 +757,8 @@ if (typeof document !== 'undefined') (function () {
     } catch (e) { report.errors.push('grid_check: ' + e.message); } });
     // Stage E3.1 region cards: count rendered rows (never grep strings that also live in this script)
     run('region_e31', function () { state.tab = 'region'; });
+    run('skeleton_e4', function () { state.tab = 'skeleton'; });
+    report.e4_cards = { hole_rows: Math.max(0, document.querySelectorAll('#e4-holes tr').length - 1), role_rows: Math.max(0, document.querySelectorAll('#e4-roles tr').length - 1), witness_rows: Math.max(0, document.querySelectorAll('#e4-witness tr').length - 1) };
     report.region_cards = { precheck_witness_rows: Math.max(0, document.querySelectorAll('#precheck-witnesses tr').length - 1), precheck_skipped_rows: Math.max(0, document.querySelectorAll('#precheck-skipped tr').length - 1), goal_progress_rows: document.querySelectorAll('#goal-progress .goal-progress-row').length };
     report.embedded_unchanged = document.getElementById('trace-data').textContent.length === before;
     report.candidates = cs.length; report.events = (D.events || []).length;

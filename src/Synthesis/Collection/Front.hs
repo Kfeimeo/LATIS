@@ -21,7 +21,7 @@ module Synthesis.Collection.Front
   , StageC(..), stageCOff, RelationRecord(..), ShapeRecord(..), ObjectTransform, transformText
   , StageD(..), stageDOff, stageDFull
   , ContentFirst(..), contentFirstOff, contentFirstOn, ContentFirstPlan(..), CFRun(..)
-  , RegionConfig(..), regionConfigOff, regionConfigOn, RegionProgram(..), RegionSearch(..)
+  , RegionConfig(..), regionConfigOff, regionConfigOn, RegionProgram(..), RegionSearch(..), InduceConfig(..), InduceResult(..), induceOff
   ) where
 
 import Latent.Grid
@@ -44,6 +44,7 @@ import Synthesis.Collection.Geometry.Features (GeometryWitness(..))
 import Synthesis.Collection.Region.Program (RegionProgram(..), runRegionProgram, RegionExec(..), programText, programCost)
 import Synthesis.Collection.Region.Search
 import Synthesis.Collection.Region.Partition (defaultPartitionBudget)
+import Synthesis.Collection.Output.Induce (InduceConfig(..), InduceResult(..), induceOff, induceOutputSkeleton, e4Metrics, e4MetricNames, statusText)
 import Debug.Trace (traceEvent)
 import qualified Synthesis.Collection.Diagnostics as DG
 import qualified Data.Map.Strict as M
@@ -85,7 +86,9 @@ data Graph = Graph
   -- Content-first runs (solution run and/or recorded alternatives); empty when the path never opened.
   , contentFirstRuns :: [CFRun]
   -- Stage E2/E3 region search (at most one run per task); Nothing when the path never opened.
-  , regionRun :: Maybe RegionSearch } deriving (Eq,Show)
+  , regionRun :: Maybe RegionSearch
+  -- Stage E4 output-skeleton sidecar (joint induction over the training OUTPUTS only); never changes the program.
+  , outputSkeletonRun :: Maybe InduceResult } deriving (Eq,Show)
 -- Stage C audit records: every training-exact object transformation (the
 -- selected one carries the relation witnesses) and the canonical Shape
 -- decomposition of every distinct object mask of the training scenes.
@@ -104,9 +107,9 @@ data Front = Front { program :: Maybe Program, graph :: Graph, failure :: String
 -- default; with it off the Size-first behaviour is exactly Stage D.
 data Config = Config { alignmentBudget :: Int, scalarBudget :: Int, synthesisDepth :: Int, synthesisCostBound :: Int, promotionThreshold :: Int
   , reusePolicy :: ReusePolicy, enumerationSeed :: Maybe Int, legacyConfig :: V4.Config, stageA :: StageA, stageB :: StageB, stageC :: StageC, stageD :: StageD
-  , contentFirst :: ContentFirst, regionSearch :: RegionConfig } deriving (Eq,Show)
+  , contentFirst :: ContentFirst, regionSearch :: RegionConfig, outputSkeleton :: InduceConfig } deriving (Eq,Show)
 defaultConfig :: Config
-defaultConfig=Config 400 2000 2 5 4 ExclusiveReuse Nothing V4.defaultConfig stageAOff stageBOff stageCOff stageDOff contentFirstOff regionConfigOff
+defaultConfig=Config 400 2000 2 5 4 ExclusiveReuse Nothing V4.defaultConfig stageAOff stageBOff stageCOff stageDOff contentFirstOff regionConfigOff induceOff
 -- Candidate source of a slot: the v0.6.1 scalar grammar, the Stage B referent
 -- hierarchy (frozen per-axis snapshot, class lookup under a schedule) and the
 -- typed N-ary hole search; the latter two are unlocked only after the grammar
@@ -130,7 +133,7 @@ safePolicy SafeOnline _=True
 safePolicy ExclusiveReuseLegacy _=False
 safePolicy _ conf=reusePolicy conf==SafeReuse
 metricNames :: [String]
-metricNames=cfMetricNames++regionMetricNames++words "b_goal_queries b_goal_leaves_dropped b_goal_cache_hits b_goal_level1_hits b_goal_level2_builds c_relation_triggered c_relation_trigger_cardinality c_relation_trigger_fallback c_relation_candidates c_relation_tried c_relation_executions c_relation_fits c_relation_truncated c_relation_selected_cost c_relation_shape_used c_object_count_exact c_object_transform_exact c_shape_masks c_shape_decomposed c_shape_decomposed_truncated c_shape_unrepresentable c_shape_truncated c_shape_ast_total c_shape_ties c_shape_work c_diagonal_chains_accepted c_diagonal_chains_rejected c_view_pixels_merged c_size_object_features b_snapshots_built b_snapshot_work b_graph_nodes b_graph_classes b_graph_templates b_graph_closed_terms b_graph_truncations b_constant_only_dropped b_edges_confirmed b_edges_pending b_edges_not_supported b_type_edges b_closure_edges b_sccs b_layers b_substitutions_tried b_outside_universe b_edge_truncations b_vsa_nodes b_vsa_unions b_vsa_expanded b_vsa_expansion_mismatch b_sharing_avg_x100 b_sharing_max_x100 b_dag_evaluations b_reference_evaluations b_witness_full b_hierarchy_slots b_hierarchy_fits b_class_checks b_row_lookups b_flat_row_evaluations b_candidates_covered b_fitting_classes b_layer_exposed b_layer_searched b_layer_truncated b_slot_truncations b_global_truncations b_hierarchy_fallbacks b_hierarchy_solved_slots typed_hole_global_truncations size_rule_templates size_rule_evaluations size_rule_candidates size_rule_truncations size_rule_exact canvas_changes_entering_search typed_hole_slots_triggered typed_hole_templates typed_hole_evaluations typed_hole_fits typed_hole_constant_fits typed_hole_feature_fits typed_hole_truncations grid_realizations_attempted grid_realization_ok realization_render_errors realization_mismatches UntriggeredExpansionCount ConcreteCrossItemEdgeCount_high_level expanded_frozen_features alignment_attempts alignment_rejections equality_attempts rejected_size_comparisons unexplained_equalities alignment_lift_attempts alignment_lift_successes accepted_abstractions construction_triggers fallback_count semantic_classes representatives max_representatives_per_class counterfactual_contexts_generated counterfactual_contexts_rejected counterfactual_evaluations counterfactual_splits canonical_merges premature_collapses dropped_by_collapse intensional_candidates literal_candidates alignment_key_candidates synthesized_keys_accepted ordering_ties_rejected alignment_witnesses online_abstractions_proposed online_abstractions_accepted online_abstraction_reuses refinement_expansions_saved operator_applications refinement_expansions active_frontier_size visibility_size visibility_keys search_work alignment_failure_triggers posthoc_abstractions_accepted reuse_attempts reuse_hits call_attempts call_legality_checks call_legality_rejections deferred_candidates resumed_candidates resume_events resume_retries recovered_solutions reselected_after_completion exclusive_reuse_missed_candidates exclusive_reuse_missed_solutions diagnostic_operator_applications first_solution_work total_work_to_exhaustion completion_work alignment_candidates_remaining rank_reuse_witnesses_verified"
+metricNames=cfMetricNames++regionMetricNames++e4MetricNames++words "b_goal_queries b_goal_leaves_dropped b_goal_cache_hits b_goal_level1_hits b_goal_level2_builds c_relation_triggered c_relation_trigger_cardinality c_relation_trigger_fallback c_relation_candidates c_relation_tried c_relation_executions c_relation_fits c_relation_truncated c_relation_selected_cost c_relation_shape_used c_object_count_exact c_object_transform_exact c_shape_masks c_shape_decomposed c_shape_decomposed_truncated c_shape_unrepresentable c_shape_truncated c_shape_ast_total c_shape_ties c_shape_work c_diagonal_chains_accepted c_diagonal_chains_rejected c_view_pixels_merged c_size_object_features b_snapshots_built b_snapshot_work b_graph_nodes b_graph_classes b_graph_templates b_graph_closed_terms b_graph_truncations b_constant_only_dropped b_edges_confirmed b_edges_pending b_edges_not_supported b_type_edges b_closure_edges b_sccs b_layers b_substitutions_tried b_outside_universe b_edge_truncations b_vsa_nodes b_vsa_unions b_vsa_expanded b_vsa_expansion_mismatch b_sharing_avg_x100 b_sharing_max_x100 b_dag_evaluations b_reference_evaluations b_witness_full b_hierarchy_slots b_hierarchy_fits b_class_checks b_row_lookups b_flat_row_evaluations b_candidates_covered b_fitting_classes b_layer_exposed b_layer_searched b_layer_truncated b_slot_truncations b_global_truncations b_hierarchy_fallbacks b_hierarchy_solved_slots typed_hole_global_truncations size_rule_templates size_rule_evaluations size_rule_candidates size_rule_truncations size_rule_exact canvas_changes_entering_search typed_hole_slots_triggered typed_hole_templates typed_hole_evaluations typed_hole_fits typed_hole_constant_fits typed_hole_feature_fits typed_hole_truncations grid_realizations_attempted grid_realization_ok realization_render_errors realization_mismatches UntriggeredExpansionCount ConcreteCrossItemEdgeCount_high_level expanded_frozen_features alignment_attempts alignment_rejections equality_attempts rejected_size_comparisons unexplained_equalities alignment_lift_attempts alignment_lift_successes accepted_abstractions construction_triggers fallback_count semantic_classes representatives max_representatives_per_class counterfactual_contexts_generated counterfactual_contexts_rejected counterfactual_evaluations counterfactual_splits canonical_merges premature_collapses dropped_by_collapse intensional_candidates literal_candidates alignment_key_candidates synthesized_keys_accepted ordering_ties_rejected alignment_witnesses online_abstractions_proposed online_abstractions_accepted online_abstraction_reuses refinement_expansions_saved operator_applications refinement_expansions active_frontier_size visibility_size visibility_keys search_work alignment_failure_triggers posthoc_abstractions_accepted reuse_attempts reuse_hits call_attempts call_legality_checks call_legality_rejections deferred_candidates resumed_candidates resume_events resume_retries recovered_solutions reselected_after_completion exclusive_reuse_missed_candidates exclusive_reuse_missed_solutions diagnostic_operator_applications first_solution_work total_work_to_exhaustion completion_work alignment_candidates_remaining rank_reuse_witnesses_verified"
 
 -- Stage B leaf meta-information of the object-slot language. Previous leaves
 -- and set aggregates are partial (rank 0 / empty set); Ext Current is fixed
@@ -329,7 +332,7 @@ currentWork :: Search Int
 currentWork=gets (\s->metric "operator_applications" (stGraph s)+length (refinements (stGraph s)))
 
 seedGraph :: [(O.Scene,O.Scene)] -> Graph
-seedGraph pairs=Graph fs [] [] (M.fromList [(k,0) | k<-metricNames]) [] [] [] [] [] [] [] [] [] [] [] [] [] [] Nothing
+seedGraph pairs=Graph fs [] [] (M.fromList [(k,0) | k<-metricNames]) [] [] [] [] [] [] [] [] [] [] [] [] [] [] Nothing Nothing
   where fs=[Feature (SetT ExistsPlacedT) (map (show . count . objectSet . O.objects . side) pairs) (show origin)
               ["Objects(Scene)","existential size-index packaging"] Nothing 0 Unmatched
            | (origin,side)<-[(InputSet,fst),(OutputSet,snd)]]
@@ -455,7 +458,27 @@ frontSearch mode conf examples
         Left err->pure (Left err)
         Right ()->sizeFirstPaths
       cfResult<-contentFirstGate sized legacy
-      regionGate cfResult
+      final<-regionGate cfResult
+      outputSkeletonSidecar final
+      pure final
+
+    -- Stage E4 sidecar: joint induction of one construction skeleton over
+    -- ALL training outputs. Read-only with respect to the solver: it runs
+    -- after the result is fixed, stores its record and e4_* counters, and
+    -- never produces, replaces or scores a Program (prediction_ready=false).
+    e4=outputSkeleton conf
+    outputSkeletonSidecar :: Either String Program -> Search ()
+    outputSkeletonSidecar final
+      | not (icEnabled e4) = pure ()
+      | isRight final && not (icAuditSolved e4) = pure ()
+      | otherwise = do
+          emit [("scope",DG.jstr "OutputSkeleton"),("branch_id",DG.jstr "output_skeleton"),("parent_id",DG.jstr "task"),("event",DG.jstr "entered"),("trigger",DG.jstr (if isRight final then "audit_after_solution" else "unsolved"))]
+          let res=induceOutputSkeleton e4 (map snd examples)
+          mapM_ (uncurry inc) (e4Metrics res)
+          onGraph (\g->g {outputSkeletonRun=Just res})
+          traceMsg ("output skeleton: "++statusText (irStatus res)++"; "++irReason res)
+          emit [("scope",DG.jstr "OutputSkeleton"),("branch_id",DG.jstr "output_skeleton"),("parent_id",DG.jstr "task"),("event",DG.jstr "completed"),("status",DG.jstr (statusText (irStatus res))),("prediction_ready",DG.jbool False)
+               ,("exhaustiveness",DG.jstr (if null (irTruncated res) then "ProvenExhausted" else "ProvenNotExhausted")),("exhaustiveness_scope",DG.jstr "bounded output-template grammar over the legal scene views of the training outputs")]
 
     -- Stage E2/E3 region search: opened only when both the Size-first and the
     -- content-first paths failed (or, under ExploreAlternatives, recorded

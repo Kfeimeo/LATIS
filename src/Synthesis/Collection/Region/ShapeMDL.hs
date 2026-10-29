@@ -33,7 +33,7 @@ module Synthesis.Collection.Region.ShapeMDL
   ( ShapeExpr(..), evalShape, shapeCost, shapeText, shapeJSON, shapeDepth, shapeRects
   , ShapeWitness(..), shapeWitness, verifyShapeWitness, shapeWitnessJSON
   , MDLBudget(..), defaultMDLBudget, MDLResult(..), mdlStatusText, bestShape, attachRectCover, mdlJSON, mdlDSLVersion
-  , rowRunPartition, bruteForceBestCost, rectCoverBudget
+  , rowRunPartition, bruteForceBestCost, rectCoverBudget, shapeAlternatives
   ) where
 
 import Latent.Grid (Coord(..))
@@ -210,6 +210,30 @@ level _ s n limit=
             (e:rest)->let acc'=if evalShape e==Right s then e:acc else acc
                       in cnt `seq` walk (cnt+1) acc' rest
   in if limit<=0 then ([],0,not (null exprs)) else walk 0 [] exprs
+
+-- Stage E4: bounded cross-level alternatives of one mask, cheapest first
+-- (cost, text), deduplicated, at most `maxAlts`, plus the row-run partition
+-- as the last entry when it is not already present. Unlike bestShape it does
+-- NOT stop at the first fitting level, so a Shell is returned both as
+-- RectOuter \ RectInner (12) and as a disjoint union of four rectangles
+-- (23). Status: "Complete" (every level enumerated), "Truncated" (expression
+-- budget cut some level), "AreaExceeded" (only the row-run partition).
+shapeAlternatives :: MDLBudget -> Int -> PixelSet -> ([ShapeExpr],String)
+shapeAlternatives b maxAlts s
+  | S.null s = ([],"EmptyMask")
+  | otherwise =
+      let part=rowRunPartition s
+          base=foldUnion part
+          area=case boundsOfPixels s of EmptyBounds->0; PixelBounds r->(rx1 r-rx0 r+1)*(ry1 r-ry0 r+1)
+      in if area>smMaxArea b then ([base],"AreaExceeded")
+         else
+           let go n tried acc cutAny
+                 | n>smMaxRects b = (acc,cutAny)
+                 | otherwise = let (fits,cnt,cut)=level b s n (smMaxExprs b-tried) in go (n+1) (tried+cnt) (acc++fits) (cutAny || cut)
+               (fits,cut)=go 1 0 [] False
+               ordered=sortOn (\e->(shapeCost e,shapeText e)) (nub fits)
+               withBase=take maxAlts ordered++[base | base `notElem` take maxAlts ordered]
+           in (withBase,if cut then "Truncated" else "Complete")
 
 -- Independent brute force for tests (same universe definition, no pruning,
 -- evaluates every expression): returns the minimum cost of a fitting

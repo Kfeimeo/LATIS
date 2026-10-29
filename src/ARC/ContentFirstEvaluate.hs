@@ -5,9 +5,10 @@
 module ARC.ContentFirstEvaluate
   ( frozenD, contentFirstOnly, contentFirstExplore, namedConfigsCF, configByNameCF, configNamesCF
   , contentFirstJSON, finalClassification, programSceneCF, programSpecsCF, planFromProgram, crossCaseOf
-  , configNamesE01, namedConfigsE01, namedConfigsE23, configNamesE23, namedConfigsE31, configNamesE31, regionJSONOf
+  , configNamesE01, namedConfigsE01, namedConfigsE23, configNamesE23, namedConfigsE31, configNamesE31, namedConfigsE4, configNamesE4, regionJSONOf, outputSkeletonJSONOf
   ) where
 import Synthesis.Collection.Region.Search (regionSearchJSON)
+import Synthesis.Collection.Output.Induce (induceJSON)
 import Synthesis.Collection.Region.Program (programJSON, runRegionProgram, regionExecJSON, RegionExec(..))
 import Synthesis.Collection.Region.Partition (defaultPartitionBudget)
 import Synthesis.Collection.Geometry.Features (CaseBinding(..), CrossCaseWitness, crossCaseWitness, crossCaseJSON, GeometryWitness(..), RegionProvenance(..))
@@ -68,8 +69,16 @@ configNamesE23=map fst namedConfigsE23
 -- eight region configurations of StageDEvaluate.
 namedConfigsE31 :: [(String,Config)]
 namedConfigsE31=[(n,c) | n<-configNamesE31, Just c<-[configByNameD n]]
+namedConfigsE4 :: [(String,Config)]
+namedConfigsE4=[(n,c) | n<-configNamesE4, Just c<-[configByNameD n]]
+configNamesE4 :: [String]
+configNamesE4=["E4_Off","E4_OutputSkeletonOnly","E4_NoCrossOutput","E4_PairwiseOnly","E4_NoMDLScore","E4_SingleExplanation","E4_NoStructuralSharing"]
 configNamesE31 :: [String]
 configNamesE31=["FrozenE01","E31_PatchedBaseline","E31_PrecheckOnly","E31_LazyMDLOnly","E31_Full","E31_FullNoMDL","E31_FullNoSafePrune","E31_FullSelectorPriority","E31_FullCostOrder"]
+
+-- Stage E4 output-skeleton record of one run (null when the sidecar never ran).
+outputSkeletonJSONOf :: Graph -> String
+outputSkeletonJSONOf g=jmaybe induceJSON (outputSkeletonRun g)
 
 -- Region-search evidence of one run: the search record and, for a region
 -- program, its per-pair execution (read/write regions, output dims, exact).

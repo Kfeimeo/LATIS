@@ -1,6 +1,7 @@
 module ARC.StageDEvaluate
   ( namedConfigsD, configByNameD, configNamesD, fullD, stageDMetricsJSON, goalsJSON, witnessesJSON ) where
 import Synthesis.Collection.Front
+import Synthesis.Collection.Output.Induce (InduceConfig(..), InduceMode(..), induceOn)
 import Synthesis.Collection.Unified
 import ARC.StageAEvaluate (fullA)
 import ARC.StageBEvaluate (fullB)
@@ -67,10 +68,22 @@ namedConfigsD=
     ,("E31_FullNoSafePrune",e01 {regionSearch=e31 {rcSafePrune=False}})
     ,("E31_FullSelectorPriority",e01 {regionSearch=e31 {rcSelectorPriority=True}})
     ,("E31_FullCostOrder",e01 {regionSearch=e31 {rcRegionFirst=False}})]
+  -- Stage E4 (ARC.ContentFirstEvaluate.namedConfigsE4): E4_Off (= E31_Full, alias
+  -- E4_FrozenE31) and the output-skeleton sidecar variants; the sidecar never
+  -- changes the solver's result, so every E4 configuration has the E31_Full
+  -- solver semantics and budgets.
+  ++[("E4_Off",e4base),("E4_FrozenE31",e4base)
+    ,("E4_OutputSkeletonOnly",e4base {outputSkeleton=induceOn})
+    ,("E4_NoCrossOutput",e4base {outputSkeleton=induceOn {icMode=IndependentOnly}})
+    ,("E4_PairwiseOnly",e4base {outputSkeleton=induceOn {icMode=PairwiseOnly}})
+    ,("E4_NoMDLScore",e4base {outputSkeleton=induceOn {icMDLScore=False}})
+    ,("E4_SingleExplanation",e4base {outputSkeleton=induceOn {icMode=FirstSceneOnly}})
+    ,("E4_NoStructuralSharing",e4base {outputSkeleton=induceOn {icSharing=False}})]
   where
     d0=scaling 1 2 2 True
     e01=d0 {contentFirst=contentFirstOn {cfViews=True,cfGeometry=True,cfPlanBudget=2400,cfExecutionBudget=16000}}
     e31=regionConfigOn {rcPrecheck=True,rcLazyMDL=True}
+    e4base=e01 {regionSearch=e31}
     scaling m cd pd diag=fullD
       { alignmentBudget=alignmentBudget fullD*m,scalarBudget=scalarBudget fullD*m
       , stageA=(stageA fullD) {saHoleBudget=saHoleBudget (stageA fullD)*m,saTotalHoleBudget=saTotalHoleBudget (stageA fullD)*m}
